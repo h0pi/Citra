@@ -1,7 +1,13 @@
 using Citra.Infrastructure.HealthChecks;
 using Citra.Infrastructure.Options;
+using Citra.Infrastructure.Persistence;
+using Citra.Infrastructure.Persistence.Interceptors;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Npgsql;
+using Pgvector.Npgsql;
 
 namespace Citra.Infrastructure;
 
@@ -26,8 +32,20 @@ public static class DependencyInjection
             throw new InvalidOperationException("Connection string 'Database' is not configured.");
         }
 
-        // One shared, pooled PostgreSQL data source (EF Core will reuse it in Phase 3).
-        services.AddNpgsqlDataSource(connectionString);
+        // One shared, pooled PostgreSQL connection source, used by EF Core and by raw SQL/health checks.
+        // pgvector must be enabled on both levels: here (Npgsql type mapping) and in EF Core below.
+        services.AddNpgsqlDataSource(connectionString, dataSource => dataSource.UseVector());
+
+        // The app's clock. TryAdd: tests (or a host) can register a fake TimeProvider first.
+        services.TryAddSingleton(TimeProvider.System);
+        services.AddSingleton<AuditTimestampsInterceptor>();
+
+        services.AddDbContext<CitraDbContext>((serviceProvider, options) => options
+            .UseNpgsql(
+                serviceProvider.GetRequiredService<NpgsqlDataSource>(),
+                npgsql => npgsql.UseVector())
+            .UseSnakeCaseNamingConvention()
+            .AddInterceptors(serviceProvider.GetRequiredService<AuditTimestampsInterceptor>()));
 
         services.AddHealthChecks()
             .AddCheck<DatabaseHealthCheck>("database", tags: ["ready"]);

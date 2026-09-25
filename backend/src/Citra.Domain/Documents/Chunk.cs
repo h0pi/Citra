@@ -10,6 +10,12 @@ public sealed class Chunk : Entity
 {
     public const int HeadingMaxLength = 300;
 
+    /// <summary>
+    /// Size of every embedding vector. Fixed by the database column (vector(1024)); changing the
+    /// embedding model to a different size requires a migration and re-processing all documents.
+    /// </summary>
+    public const int EmbeddingDimensions = 1024;
+
     public Guid DocumentId { get; private set; }
 
     /// <summary>Denormalized from the document so vector search can filter by bot without a join.</summary>
@@ -82,9 +88,11 @@ public sealed class Chunk : Entity
     public void SetEmbedding(float[] embedding)
     {
         ArgumentNullException.ThrowIfNull(embedding);
-        if (embedding.Length == 0)
+        if (embedding.Length != EmbeddingDimensions)
         {
-            throw new ArgumentException("Embedding cannot be empty.", nameof(embedding));
+            throw new ArgumentException(
+                $"Embedding must have {EmbeddingDimensions} dimensions, got {embedding.Length}.",
+                nameof(embedding));
         }
 
         Embedding = embedding;

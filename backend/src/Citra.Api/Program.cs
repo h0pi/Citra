@@ -4,6 +4,7 @@ using Citra.Api.OpenApi;
 using Citra.Application;
 using Citra.Infrastructure;
 using Citra.Infrastructure.Options;
+using Citra.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Scalar.AspNetCore;
 using Serilog;
@@ -55,6 +56,13 @@ try
 
     var app = builder.Build();
 
+    // Development only: bring the local database schema up to date on startup.
+    // (Only the API does this — the Worker never migrates, so the two can't race.)
+    if (app.Environment.IsDevelopment())
+    {
+        await app.Services.ApplyDatabaseMigrationsAsync();
+    }
+
     // One compact log line per HTTP request (method, path, status, duration).
     // Registered first (outermost) so it records the final status code set by the exception handler.
     app.UseSerilogRequestLogging();
@@ -93,7 +101,7 @@ try
         ResponseWriter = HealthCheckResponseWriter.WriteAsync,
     });
 
-    app.Run();
+    await app.RunAsync();
 }
 catch (Exception ex) when (ex is not HostAbortedException)
 {
