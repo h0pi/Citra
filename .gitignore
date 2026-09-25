@@ -1,0 +1,62 @@
+# ---------- Secrets & local config ----------
+.env
+.env.*
+!.env.example
+appsettings.*.local.json
+*.pfx
+*.key
+
+# ---------- .NET ----------
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.rsuser
+TestResults/
+[Tt]est[Rr]esult*/
+coverage*.json
+coverage*.xml
+*.coverage
+*.nupkg
+*.snupkg
+.nuget/
+project.lock.json
+publish/
+artifacts/
+
+# ---------- Node / Angular / Vite ----------
+node_modules/
+dist/
+out-tsc/
+.angular/
+.sass-cache/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+coverage/
+
+# ---------- IDEs ----------
+.vs/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+.idea/
+*.swp
+*.sublime-workspace
+
+# ---------- Runtime data ----------
+# Uploaded documents stored locally during development
+storage/
+uploads/
+
+# ---------- OS ----------
+Thumbs.db
+Desktop.ini
+.DS_Store

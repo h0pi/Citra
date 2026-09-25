@@ -1,0 +1,24 @@
+# Local development infrastructure.
+# Usage:  docker compose -f docker-compose.dev.yml up -d
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    container_name: citra-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: citra
+      POSTGRES_USER: citra
+      POSTGRES_PASSWORD: citra_dev_password
+    ports:
+      - "5433:5432"
+    volumes:
+      - citra-db-data:/var/lib/postgresql/data
+      - ./deploy/db-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U citra -d citra"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  citra-db-data:
