@@ -1,0 +1,17 @@
+# Store text files with LF line endings in the repo, regardless of OS.
+* text=auto eol=lf
+
+# Visual Studio expects CRLF in solution files.
+*.sln text eol=crlf
+
+# Binary files: never touch line endings or diff them as text.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.docx binary
+*.xlsx binary
+*.woff binary
+*.woff2 binary

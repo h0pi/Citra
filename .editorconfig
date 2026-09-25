@@ -14,7 +14,6 @@ trim_trailing_whitespace = false
 # ---------- C# ----------
 [*.{cs,csx}]
 indent_size = 4
-end_of_line = crlf
 
 # Namespaces & usings
 csharp_style_namespace_declarations = file_scoped:warning
@@ -37,6 +36,22 @@ csharp_style_prefer_primary_constructors = true:suggestion
 csharp_style_prefer_collection_expression = true:suggestion
 csharp_style_pattern_matching_over_is_with_cast_check = true:suggestion
 dotnet_style_prefer_conditional_expression_over_assignment = true:silent
+
+# Naming: constants and static readonly fields PascalCase
+# (more specific than the private-field rule below, so it wins for these)
+dotnet_naming_rule.constants_pascal.severity = warning
+dotnet_naming_rule.constants_pascal.symbols = constant_fields
+dotnet_naming_rule.constants_pascal.style = pascal_case
+dotnet_naming_symbols.constant_fields.applicable_kinds = field
+dotnet_naming_symbols.constant_fields.required_modifiers = const
+
+dotnet_naming_rule.static_readonly_pascal.severity = warning
+dotnet_naming_rule.static_readonly_pascal.symbols = static_readonly_fields
+dotnet_naming_rule.static_readonly_pascal.style = pascal_case
+dotnet_naming_symbols.static_readonly_fields.applicable_kinds = field
+dotnet_naming_symbols.static_readonly_fields.required_modifiers = static, readonly
+
+dotnet_naming_style.pascal_case.capitalization = pascal_case
 
 # Naming: private fields _camelCase
 dotnet_naming_rule.private_fields_underscore.severity = warning

@@ -1,0 +1,44 @@
+<Project>
+
+  <!--
+    Central Package Management: every NuGet version is defined here, once.
+    Projects reference packages WITHOUT a Version attribute.
+  -->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <!-- Microsoft / ASP.NET Core -->
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.12" />
+    <PackageVersion Include="Scalar.AspNetCore" Version="2.17.10" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.12" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.12" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.12" />
+    <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="10.0.12" />
+    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.12" />
+    <PackageVersion Include="Microsoft.Extensions.Options.DataAnnotations" Version="10.0.12" />
+  </ItemGroup>
+
+  <!-- Database -->
+  <ItemGroup>
+    <PackageVersion Include="Npgsql.DependencyInjection" Version="10.0.3" />
+  </ItemGroup>
+
+  <!-- Logging -->
+  <ItemGroup>
+    <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
+    <PackageVersion Include="Serilog.Extensions.Hosting" Version="10.0.0" />
+    <PackageVersion Include="Serilog.Settings.Configuration" Version="10.0.1" />
+    <PackageVersion Include="Serilog.Sinks.Console" Version="6.1.1" />
+  </ItemGroup>
+
+  <!-- Application layer: CQRS + validation -->
+  <ItemGroup>
+    <!-- Pinned to 12.x: last Apache-2.0 release. 13+ requires a commercial license key. -->
+    <PackageVersion Include="MediatR" Version="12.5.0" />
+    <PackageVersion Include="FluentValidation" Version="12.1.1" />
+    <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
+  </ItemGroup>
+
+</Project>

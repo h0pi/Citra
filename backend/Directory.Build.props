@@ -1,0 +1,19 @@
+<Project>
+
+  <!-- Shared settings for every project under /backend. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <!-- Null-safety warnings fail the build instead of being ignored. -->
+    <WarningsAsErrors>$(WarningsAsErrors);nullable</WarningsAsErrors>
+
+    <!-- Apply .editorconfig code-style rules during build, not only in the IDE. -->
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+
+</Project>

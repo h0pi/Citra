@@ -1,0 +1,6 @@
+@Citra.Api_HostAddress = http://localhost:5100
+
+GET {{Citra.Api_HostAddress}}/openapi/v1.json
+Accept: application/json
+
+###
