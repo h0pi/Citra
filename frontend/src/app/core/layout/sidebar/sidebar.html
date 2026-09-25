@@ -1,0 +1,30 @@
+<aside class="sidebar" aria-label="Main navigation">
+  <a class="brand" routerLink="/dashboard" (click)="navigate.emit()">
+    <span class="brand-mark" aria-hidden="true"><i class="pi pi-sparkles"></i></span>
+    <span class="brand-name">Citra</span>
+  </a>
+
+  <nav class="nav">
+    @for (section of sections; track $index) {
+      <div class="nav-section">
+        @if (section.heading) {
+          <div class="nav-heading">{{ section.heading }}</div>
+        }
+        @for (item of section.items; track item.route) {
+          <a
+            class="nav-link"
+            [routerLink]="item.route"
+            routerLinkActive="active"
+            ariaCurrentWhenActive="page"
+            (click)="navigate.emit()"
+          >
+            <i [class]="item.icon" aria-hidden="true"></i>
+            <span>{{ item.label }}</span>
+          </a>
+        }
+      </div>
+    }
+  </nav>
+
+  <div class="sidebar-footer text-muted">AI knowledge assistant</div>
+</aside>

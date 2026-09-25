@@ -1,0 +1,42 @@
+:host {
+  display: block;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: var(--citra-space-3);
+  height: var(--citra-topbar-height);
+  padding: 0 var(--citra-space-5);
+  background: color-mix(in srgb, var(--citra-bg) 85%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--citra-border);
+}
+
+.topbar-spacer {
+  flex: 1;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--citra-space-2);
+}
+
+// The menu button only makes sense when the sidebar is a drawer.
+.menu-button {
+  display: none;
+}
+
+@media (max-width: 991.98px) {
+  .menu-button {
+    display: inline-flex;
+  }
+
+  .topbar {
+    padding: 0 var(--citra-space-3);
+  }
+}

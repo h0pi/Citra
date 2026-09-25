@@ -83,6 +83,7 @@ dotnet_naming_style.async_suffix.capitalization = pascal_case
 [*.{ts,js,mjs,html,scss,css,json}]
 indent_size = 2
 quote_type = single
+ij_typescript_use_double_quotes = false
 
 # ---------- Project / config files ----------
 [*.{csproj,props,targets,xml,config}]

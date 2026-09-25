@@ -1,0 +1,106 @@
+:host {
+  display: block;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: var(--citra-space-4) var(--citra-space-3);
+  background: var(--citra-surface);
+  border-right: 1px solid var(--citra-border);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--citra-space-3);
+  height: calc(var(--citra-topbar-height) - var(--citra-space-4));
+  padding: 0 var(--citra-space-2);
+  margin-bottom: var(--citra-space-4);
+  color: var(--citra-text);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--citra-radius-md);
+  background: var(--p-primary-500);
+  color: var(--p-primary-contrast-color, #fff);
+  font-size: 1rem;
+}
+
+.brand-name {
+  font-size: var(--citra-text-lg);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--citra-space-4);
+  overflow-y: auto;
+}
+
+.nav-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nav-heading {
+  padding: 0 var(--citra-space-3) var(--citra-space-1);
+  font-size: var(--citra-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--citra-text-muted);
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: var(--citra-space-3);
+  padding: var(--citra-space-2) var(--citra-space-3);
+  border-radius: var(--citra-radius-md);
+  color: var(--citra-text-muted);
+  font-size: var(--citra-text-sm);
+  font-weight: 500;
+  text-decoration: none;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+
+  i {
+    width: 1.1rem;
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  &:hover {
+    background: var(--citra-surface-hover);
+    color: var(--citra-text);
+    text-decoration: none;
+  }
+
+  &.active {
+    background: var(--citra-primary-soft);
+    color: var(--citra-primary);
+    font-weight: 600;
+  }
+}
+
+.sidebar-footer {
+  padding: var(--citra-space-3) var(--citra-space-2) 0;
+  border-top: 1px solid var(--citra-border);
+  font-size: var(--citra-text-xs);
+}

@@ -1,0 +1,26 @@
+<header class="topbar">
+  <p-button
+    class="menu-button"
+    icon="pi pi-bars"
+    [text]="true"
+    severity="secondary"
+    ariaLabel="Open navigation"
+    (onClick)="menuToggle.emit()"
+  />
+
+  <div class="topbar-spacer"></div>
+
+  <div class="topbar-actions">
+    <p-button
+      [icon]="isDark() ? 'pi pi-sun' : 'pi pi-moon'"
+      [text]="true"
+      [rounded]="true"
+      severity="secondary"
+      [ariaLabel]="isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
+      [pTooltip]="isDark() ? 'Light mode' : 'Dark mode'"
+      tooltipPosition="bottom"
+      (onClick)="toggleTheme()"
+    />
+    <!-- User menu (name, logout) is added in Phase 4. -->
+  </div>
+</header>
