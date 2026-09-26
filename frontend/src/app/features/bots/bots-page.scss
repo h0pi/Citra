@@ -1,0 +1,119 @@
+.bot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--citra-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bot-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--citra-space-3);
+  padding: var(--citra-space-5);
+  background: var(--citra-surface);
+  border: 1px solid var(--citra-border);
+  border-radius: var(--citra-radius-lg);
+  box-shadow: var(--citra-shadow-sm);
+}
+
+.bot-card-head {
+  display: flex;
+  align-items: center;
+  gap: var(--citra-space-3);
+}
+
+.bot-avatar {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  color: #fff;
+  font-weight: 600;
+}
+
+.bot-title {
+  flex: 1;
+  min-width: 0;
+
+  h3 {
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.bot-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--citra-space-2);
+  margin-top: var(--citra-space-1);
+  font-size: var(--citra-text-xs);
+  white-space: nowrap;
+
+  p-tag {
+    font-size: var(--citra-text-xs);
+  }
+}
+
+.bot-description {
+  display: -webkit-box;
+  flex: 1;
+  margin: 0;
+  overflow: hidden;
+  font-size: var(--citra-text-sm);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.bot-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--citra-space-2) var(--citra-space-4);
+  font-size: var(--citra-text-sm);
+
+  i {
+    color: var(--citra-text-muted);
+    font-size: var(--citra-text-xs);
+  }
+}
+
+// The whole card is clickable: the name link stretches over it (one link per card, good for screen readers).
+.bot-link {
+  color: inherit;
+  text-decoration: none;
+
+  &::after {
+    position: absolute;
+    inset: 0;
+    border-radius: var(--citra-radius-lg);
+    content: '';
+  }
+
+  &:focus-visible {
+    outline: none;
+
+    &::after {
+      outline: 2px solid var(--citra-primary);
+      outline-offset: 2px;
+    }
+  }
+}
+
+.bot-card:has(.bot-link) {
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+
+  &:hover {
+    border-color: var(--citra-primary);
+    box-shadow: var(--citra-shadow-md);
+  }
+}

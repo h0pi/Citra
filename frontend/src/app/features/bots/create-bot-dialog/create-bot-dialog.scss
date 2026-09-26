@@ -1,0 +1,14 @@
+.dialog-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--citra-space-4);
+}
+
+.intro {
+  margin: 0;
+  font-size: var(--citra-text-sm);
+}
+
+textarea {
+  resize: vertical;
+}

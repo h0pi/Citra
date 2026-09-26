@@ -1,0 +1,262 @@
+<a class="back-link" routerLink="/bots"
+  ><i class="pi pi-arrow-left" aria-hidden="true"></i> All bots</a
+>
+
+@switch (state()) {
+  @case ('loading') {
+    <div aria-busy="true" aria-label="Loading bot settings">
+      <p-skeleton width="16rem" height="2rem" styleClass="skeleton-title" />
+      <div class="settings-card"><p-skeleton height="8rem" /></div>
+      <div class="settings-card"><p-skeleton height="12rem" /></div>
+    </div>
+  }
+
+  @case ('not-found') {
+    <app-empty-state
+      icon="pi-search"
+      title="Bot not found"
+      message="It may have been deleted, or the link is wrong."
+    >
+      <p-button label="Back to bots" icon="pi pi-arrow-left" routerLink="/bots" />
+    </app-empty-state>
+  }
+
+  @case ('error') {
+    <app-empty-state
+      icon="pi-exclamation-triangle"
+      title="Couldn't load this bot"
+      message="Check your connection and try again."
+    >
+      <p-button label="Try again" icon="pi pi-refresh" (onClick)="load(id())" />
+    </app-empty-state>
+  }
+
+  @case ('ready') {
+    <app-page-header [title]="bot()?.name ?? 'Bot settings'" subtitle="Bot settings" />
+
+    @if (!canEdit()) {
+      <p-message
+        severity="info"
+        icon="pi pi-lock"
+        text="You can view these settings, but only an owner or admin can change them."
+        styleClass="read-only-note"
+      />
+    }
+
+    <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+      @if (errorMessage(); as message) {
+        <p-message severity="error" [text]="message" styleClass="form-message" />
+      }
+
+      <section class="settings-card" aria-labelledby="general-heading">
+        <h2 id="general-heading">General</h2>
+
+        <div class="field">
+          <label for="name">Name</label>
+          <input
+            pInputText
+            id="name"
+            formControlName="name"
+            [attr.maxlength]="limits.name"
+            [attr.aria-invalid]="showError('name')"
+            fluid
+          />
+          @if (showError('name')) {
+            <small class="field-error">{{ errorFor('name') }}</small>
+          } @else {
+            <small class="text-muted hint">
+              Widget address stays <code>{{ bot()?.slug }}</code> even if you rename the bot.
+            </small>
+          }
+        </div>
+
+        <div class="field">
+          <label for="description">Description <span class="text-muted">(optional)</span></label>
+          <textarea
+            pTextarea
+            id="description"
+            formControlName="description"
+            rows="2"
+            [attr.maxlength]="limits.description"
+            [attr.aria-invalid]="showError('description')"
+            fluid
+          ></textarea>
+          @if (showError('description')) {
+            <small class="field-error">{{ errorFor('description') }}</small>
+          } @else {
+            <small class="text-muted hint">Only your team sees this.</small>
+          }
+        </div>
+      </section>
+
+      <section class="settings-card" aria-labelledby="answers-heading">
+        <h2 id="answers-heading">Answers</h2>
+
+        <div class="field">
+          <label for="welcomeMessage">Welcome message</label>
+          <input
+            pInputText
+            id="welcomeMessage"
+            formControlName="welcomeMessage"
+            [attr.maxlength]="limits.welcomeMessage"
+            [attr.aria-invalid]="showError('welcomeMessage')"
+            fluid
+          />
+          @if (showError('welcomeMessage')) {
+            <small class="field-error">{{ errorFor('welcomeMessage') }}</small>
+          } @else {
+            <small class="text-muted hint">The first message people see when a chat opens.</small>
+          }
+        </div>
+
+        <div class="field">
+          <label for="systemPrompt">Instructions <span class="text-muted">(optional)</span></label>
+          <textarea
+            pTextarea
+            id="systemPrompt"
+            formControlName="systemPrompt"
+            rows="6"
+            placeholder="e.g. Answer briefly and in a friendly tone. Always reply in the language of the question."
+            [attr.maxlength]="limits.systemPrompt"
+            [attr.aria-invalid]="showError('systemPrompt')"
+            fluid
+          ></textarea>
+          <div class="field-footer">
+            @if (showError('systemPrompt')) {
+              <small class="field-error">{{ errorFor('systemPrompt') }}</small>
+            } @else {
+              <small class="text-muted hint">
+                Tone and focus. Citra always answers only from your documents and cites its sources.
+              </small>
+            }
+            <small class="text-muted hint counter">
+              {{ systemPromptLength() }} / {{ limits.systemPrompt }}
+            </small>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="model">Model</label>
+            <p-select
+              inputId="model"
+              formControlName="model"
+              [options]="modelOptions()"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+              fluid
+            />
+            <small class="text-muted hint">Default uses the app's standard model.</small>
+          </div>
+
+          <div class="field">
+            <label id="temperature-label" for="temperature">
+              Creativity <span class="temperature-value">{{ temperature().toFixed(1) }}</span>
+            </label>
+            <p-slider
+              formControlName="temperature"
+              [min]="0"
+              [max]="1"
+              [step]="0.1"
+              ariaLabelledBy="temperature-label"
+              styleClass="temperature-slider"
+            />
+            <div class="slider-scale text-muted">
+              <span>Precise</span>
+              <span>Creative</span>
+            </div>
+            <small class="text-muted hint">Keep it low (0.1–0.3) for answers from documents.</small>
+          </div>
+        </div>
+      </section>
+
+      <section class="settings-card" aria-labelledby="widget-heading">
+        <h2 id="widget-heading">Widget</h2>
+
+        <div class="field">
+          <label for="widgetColor">Color</label>
+          <div class="color-row">
+            <!-- Not a second formControlName: Angular would not copy typed hex values into it. -->
+            <input
+              type="color"
+              class="color-swatch"
+              aria-label="Pick a color"
+              [value]="previewColor().toLowerCase()"
+              [disabled]="!canEdit()"
+              (input)="pickColor($any($event.target).value)"
+            />
+            <input
+              pInputText
+              id="widgetColor"
+              formControlName="widgetColor"
+              class="color-hex"
+              maxlength="7"
+              [attr.aria-invalid]="showError('widgetColor')"
+            />
+            <div class="widget-preview" aria-hidden="true">
+              <span class="preview-bubble" [style.background]="previewColor()">
+                <i class="pi pi-comments"></i>
+              </span>
+              <span class="preview-header" [style.background]="previewColor()">
+                {{ form.controls.name.value || 'Bot' }}
+              </span>
+            </div>
+          </div>
+          @if (showError('widgetColor')) {
+            <small class="field-error">{{ errorFor('widgetColor') }}</small>
+          } @else {
+            <small class="text-muted hint"
+              >Used for the chat bubble and header on your website.</small
+            >
+          }
+        </div>
+      </section>
+
+      @if (canEdit()) {
+        <div class="form-actions">
+          @if (dirty()) {
+            <span class="text-muted unsaved">Unsaved changes</span>
+          }
+          <p-button
+            label="Discard"
+            severity="secondary"
+            [text]="true"
+            [disabled]="!dirty() || saving()"
+            (onClick)="discard()"
+          />
+          <p-button
+            type="submit"
+            label="Save changes"
+            icon="pi pi-check"
+            [disabled]="!dirty()"
+            [loading]="saving()"
+          />
+        </div>
+      }
+    </form>
+
+    @if (canEdit() && bot(); as current) {
+      <section class="settings-card danger-zone" aria-labelledby="danger-heading">
+        <h2 id="danger-heading">Danger zone</h2>
+        <div class="danger-row">
+          <div>
+            <strong>Delete this bot</strong>
+            <p class="text-muted">
+              Removes the bot with all its documents, chats and evaluations. This cannot be undone.
+            </p>
+          </div>
+          <p-button
+            label="Delete bot"
+            icon="pi pi-trash"
+            severity="danger"
+            [outlined]="true"
+            (onClick)="showDelete.set(true)"
+          />
+        </div>
+      </section>
+
+      <app-delete-bot-dialog [bot]="current" [(visible)]="showDelete" (deleted)="onDeleted()" />
+    }
+  }
+}

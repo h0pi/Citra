@@ -1,0 +1,68 @@
+<p-dialog
+  header="New bot"
+  [(visible)]="visible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closeOnEscape]="!submitting()"
+  [closable]="!submitting()"
+  [style]="{ width: '32rem' }"
+  [breakpoints]="{ '575px': '95vw' }"
+>
+  <form class="dialog-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <p class="text-muted intro">
+      A bot answers questions from its own documents. You can change its instructions, model and
+      website widget later in its settings.
+    </p>
+
+    @if (errorMessage(); as message) {
+      <p-message severity="error" [text]="message" />
+    }
+
+    <div class="field">
+      <label for="bot-name">Name</label>
+      <input
+        pInputText
+        id="bot-name"
+        formControlName="name"
+        placeholder="e.g. Customer Support"
+        autocomplete="off"
+        [attr.aria-invalid]="showError('name')"
+        [attr.maxlength]="limits.name"
+        fluid
+      />
+      @if (showError('name')) {
+        <small class="field-error">{{ errorFor('name') }}</small>
+      }
+    </div>
+
+    <div class="field">
+      <label for="bot-description">Description <span class="text-muted">(optional)</span></label>
+      <textarea
+        pTextarea
+        id="bot-description"
+        formControlName="description"
+        rows="3"
+        placeholder="What is this bot for? Only your team sees this."
+        [attr.aria-invalid]="showError('description')"
+        [attr.maxlength]="limits.description"
+        fluid
+      ></textarea>
+      @if (showError('description')) {
+        <small class="field-error">{{ errorFor('description') }}</small>
+      }
+    </div>
+  </form>
+
+  <ng-template #footer>
+    <p-button
+      label="Cancel"
+      severity="secondary"
+      [text]="true"
+      [disabled]="submitting()"
+      (onClick)="cancel()"
+    />
+    <!-- The footer sits outside the <form>, so the button calls submit() itself; Enter in the form still works. -->
+    <p-button label="Create bot" icon="pi pi-plus" [loading]="submitting()" (onClick)="submit()" />
+  </ng-template>
+</p-dialog>

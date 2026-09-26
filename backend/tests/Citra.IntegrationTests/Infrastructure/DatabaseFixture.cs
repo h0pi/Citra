@@ -1,4 +1,6 @@
+using Citra.Application;
 using Citra.Application.Common.Security;
+using Citra.Domain.Users;
 using Citra.Infrastructure;
 using Citra.Infrastructure.Persistence;
 using Microsoft.Extensions.Configuration;
@@ -20,6 +22,9 @@ public sealed class DatabaseFixture : IAsyncLifetime
 
     private ServiceProvider? _services;
 
+    /// <summary>A private folder for uploaded files, deleted when the tests finish.</summary>
+    public string StorageRoot { get; } = Path.Combine(Path.GetTempPath(), $"citra-tests-{Guid.NewGuid():N}");
+
     public async ValueTask InitializeAsync()
     {
         await _container.StartAsync();
@@ -34,13 +39,14 @@ public sealed class DatabaseFixture : IAsyncLifetime
                 ["Voyage:EmbeddingModel"] = "test-embedding",
                 ["Voyage:EmbeddingDimensions"] = "1024",
                 ["Voyage:BatchSize"] = "8",
-                ["Storage:LocalRootPath"] = Path.GetTempPath(),
+                ["Storage:LocalRootPath"] = StorageRoot,
                 ["Storage:MaxUploadSizeMb"] = "20",
             })
             .Build();
 
         var services = new ServiceCollection();
         services.AddLogging();
+        services.AddApplication();
         services.AddInfrastructure(configuration);
 
         // Tests decide who the current user is, per scope.
@@ -52,11 +58,16 @@ public sealed class DatabaseFixture : IAsyncLifetime
         await _services.ApplyDatabaseMigrationsAsync();
     }
 
-    /// <summary>A unit of work acting as a user of <paramref name="tenantId"/> (null = nobody logged in).</summary>
-    public DbScope OpenScope(Guid? tenantId)
+    /// <summary>
+    /// A unit of work acting as a user of <paramref name="tenantId"/> with <paramref name="role"/>
+    /// (tenantId null = nobody logged in).
+    /// </summary>
+    public DbScope OpenScope(Guid? tenantId, UserRole role = UserRole.Admin)
     {
         var scope = _services!.CreateAsyncScope();
-        scope.ServiceProvider.GetRequiredService<TestCurrentUser>().TenantId = tenantId;
+        var user = scope.ServiceProvider.GetRequiredService<TestCurrentUser>();
+        user.TenantId = tenantId;
+        user.Role = tenantId is null ? null : role;
         return new DbScope(scope);
     }
 
@@ -68,6 +79,11 @@ public sealed class DatabaseFixture : IAsyncLifetime
         }
 
         await _container.DisposeAsync();
+
+        if (Directory.Exists(StorageRoot))
+        {
+            Directory.Delete(StorageRoot, recursive: true);
+        }
     }
 }
 
@@ -77,6 +93,14 @@ public sealed class DbScope(AsyncServiceScope scope) : IAsyncDisposable
     public CitraDbContext Db { get; } = scope.ServiceProvider.GetRequiredService<CitraDbContext>();
 
     public IServiceProvider Services => scope.ServiceProvider;
+
+    /// <summary>Runs a command or query through MediatR, with the same validation and logging as the API.</summary>
+    public Task<TResponse> Send<TResponse>(MediatR.IRequest<TResponse> request) =>
+        scope.ServiceProvider.GetRequiredService<MediatR.ISender>().Send(request, TestContext.Current.CancellationToken);
+
+    /// <summary>Same, for commands that return nothing.</summary>
+    public Task Send(MediatR.IRequest request) =>
+        scope.ServiceProvider.GetRequiredService<MediatR.ISender>().Send(request, TestContext.Current.CancellationToken);
 
     public ValueTask DisposeAsync() => scope.DisposeAsync();
 }

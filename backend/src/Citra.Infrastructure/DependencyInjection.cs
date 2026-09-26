@@ -1,9 +1,11 @@
 using Citra.Application.Common.Persistence;
+using Citra.Application.Common.Storage;
 using Citra.Infrastructure.HealthChecks;
 using Citra.Infrastructure.Identity;
 using Citra.Infrastructure.Options;
 using Citra.Infrastructure.Persistence;
 using Citra.Infrastructure.Persistence.Interceptors;
+using Citra.Infrastructure.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -57,6 +59,9 @@ public static class DependencyInjection
         // (e.g. RegisterCommandHandler) depend on them and .NET validates all registrations at startup.
         // The Worker never uses them, so it needs no JWT settings; the API registers and validates JwtOptions.
         services.AddCitraIdentity();
+
+        // Uploaded files. Stateless, so one instance serves everyone.
+        services.AddSingleton<IFileStorage, LocalFileStorage>();
 
         services.AddHealthChecks()
             .AddCheck<DatabaseHealthCheck>("database", tags: ["ready"]);

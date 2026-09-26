@@ -1,0 +1,40 @@
+:host {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.bot-select {
+  width: 15rem;
+  max-width: 100%;
+}
+
+.bot-option {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--citra-space-2);
+  min-width: 0;
+}
+
+.dot {
+  flex-shrink: 0;
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 50%;
+}
+
+.bot-option-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.placeholder {
+  font-size: var(--citra-text-sm);
+}
+
+@media (max-width: 575.98px) {
+  .bot-select {
+    width: 10rem;
+  }
+}

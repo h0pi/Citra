@@ -157,3 +157,25 @@ pre {
   box-shadow: var(--citra-shadow-sm);
   padding: var(--citra-space-5);
 }
+
+// ---------- Forms (shared by every form: auth pages, dialogs, settings) ----------
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--citra-space-1);
+
+  label {
+    font-size: var(--citra-text-sm);
+    font-weight: 500;
+  }
+}
+
+.hint {
+  font-size: var(--citra-text-xs);
+}
+
+.field-error {
+  color: var(--p-red-500);
+  font-size: var(--citra-text-xs);
+}

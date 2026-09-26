@@ -103,6 +103,12 @@ public sealed class Bot : Entity, ITenantOwned
         Temperature = temperature;
     }
 
+    public void ChangeWidgetColor(string widgetColor)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(widgetColor);
+        WidgetColor = widgetColor.Trim().ToUpperInvariant();
+    }
+
     public void ConfigureWidget(
         bool isPublic,
         string widgetColor,
@@ -117,7 +123,7 @@ public sealed class Bot : Entity, ITenantOwned
         }
 
         IsPublic = isPublic;
-        WidgetColor = widgetColor.Trim();
+        ChangeWidgetColor(widgetColor);
         AllowedDomains = CleanList(allowedDomains, MaxAllowedDomains, toLower: true);
         StarterQuestions = CleanList(starterQuestions, MaxStarterQuestions, toLower: false);
         DailyMessageLimit = dailyMessageLimit;

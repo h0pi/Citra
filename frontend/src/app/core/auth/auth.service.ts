@@ -47,6 +47,15 @@ export class AuthService {
   readonly currentUser = this._currentUser.asReadonly();
   readonly isAuthenticated = computed(() => this._currentUser() !== null);
 
+  /**
+   * Owner and Admin may create, change and delete bots and documents; Viewer and Demo only look.
+   * Used to hide edit buttons. The API enforces the same rule (403), so this is convenience, not security.
+   */
+  readonly canEdit = computed(() => {
+    const role = this._currentUser()?.role;
+    return role === 'Owner' || role === 'Admin';
+  });
+
   /** Current access token for the auth interceptor (null when logged out). */
   getAccessToken(): string | null {
     return this.accessToken;

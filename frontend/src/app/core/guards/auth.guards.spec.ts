@@ -65,6 +65,12 @@ describe('auth guards', () => {
     expect(await navigate('/register')).toBe('/dashboard');
   });
 
+  it('sends logged-in users on a login link to the page it was for, but only inside the app', async () => {
+    loggedIn.set(true);
+    expect(await navigate('/login?returnUrl=%2Fdocuments')).toBe('/documents');
+    expect(await navigate('/login?returnUrl=https%3A%2F%2Fevil.com')).toBe('/dashboard');
+  });
+
   it('lets logged-out users open login and register', async () => {
     expect(await navigate('/login')).toBe('/login');
     expect(await navigate('/register')).toBe('/register');

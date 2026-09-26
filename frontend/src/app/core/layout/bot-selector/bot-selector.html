@@ -1,0 +1,54 @@
+@switch (current.status()) {
+  @case ('ready') {
+    @if (current.bots().length > 0) {
+      <p-select
+        class="bot-select"
+        [options]="current.bots()"
+        optionLabel="name"
+        optionValue="id"
+        [ngModel]="current.selectedId()"
+        (ngModelChange)="onChange($event)"
+        [filter]="current.bots().length > 7"
+        filterBy="name"
+        appendTo="body"
+        ariaLabel="Current bot"
+      >
+        <ng-template #selectedItem let-bot>
+          @if (bot) {
+            <span class="bot-option">
+              <span class="dot" [style.background]="bot.widgetColor" aria-hidden="true"></span>
+              <span class="bot-option-name">{{ bot.name }}</span>
+            </span>
+          }
+        </ng-template>
+        <ng-template #item let-bot>
+          <span class="bot-option">
+            <span class="dot" [style.background]="bot.widgetColor" aria-hidden="true"></span>
+            <span class="bot-option-name">{{ bot.name }}</span>
+          </span>
+        </ng-template>
+      </p-select>
+    } @else {
+      <p-button
+        label="Create a bot"
+        icon="pi pi-plus"
+        size="small"
+        [outlined]="true"
+        routerLink="/bots"
+      />
+    }
+  }
+  @case ('loading') {
+    <span class="placeholder text-muted" aria-live="polite">Loading bots…</span>
+  }
+  @case ('error') {
+    <p-button
+      label="Couldn't load bots, retry"
+      icon="pi pi-refresh"
+      size="small"
+      severity="secondary"
+      [text]="true"
+      (onClick)="current.refresh()"
+    />
+  }
+}

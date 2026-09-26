@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authChildGuard, authGuard, guestGuard } from '@core/guards/auth.guards';
+import { unsavedChangesGuard } from '@core/guards/unsaved-changes.guard';
 import { Shell } from '@core/layout/shell/shell';
 
 // Every page is lazy-loaded: its code is downloaded only when the user first opens it,
@@ -37,6 +38,13 @@ export const routes: Routes = [
         path: 'bots',
         title: 'Bots',
         loadComponent: () => import('@features/bots/bots-page').then((m) => m.BotsPage),
+      },
+      {
+        path: 'bots/:id',
+        title: 'Bot settings',
+        canDeactivate: [unsavedChangesGuard],
+        loadComponent: () =>
+          import('@features/bots/bot-settings/bot-settings-page').then((m) => m.BotSettingsPage),
       },
       {
         path: 'documents',

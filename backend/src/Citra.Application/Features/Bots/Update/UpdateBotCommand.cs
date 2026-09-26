@@ -1,0 +1,17 @@
+using MediatR;
+
+namespace Citra.Application.Features.Bots.Update;
+
+/// <summary>
+/// Saves the bot settings form. All fields are sent every time (the form always has them all).
+/// The slug is not changed on rename: it is part of widget URLs already embedded on customers' websites.
+/// </summary>
+public sealed record UpdateBotCommand(
+    Guid Id,
+    string Name,
+    string? Description,
+    string? SystemPrompt,
+    string WelcomeMessage,
+    string? Model,
+    double Temperature,
+    string WidgetColor) : IRequest<BotDto>;

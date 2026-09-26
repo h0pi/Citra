@@ -8,6 +8,11 @@
     (onClick)="menuToggle.emit()"
   />
 
+  <!-- Separate chunk, fetched right away: keeps the dropdown code out of the first download. -->
+  @defer (on immediate) {
+    <app-bot-selector />
+  }
+
   <div class="topbar-spacer"></div>
 
   <div class="topbar-actions">

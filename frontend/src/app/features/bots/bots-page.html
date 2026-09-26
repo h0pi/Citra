@@ -1,0 +1,89 @@
+<app-page-header
+  title="Bots"
+  subtitle="Each bot has its own documents, instructions and website widget."
+>
+  @if (canEdit() && !loading() && !loadFailed() && bots().length > 0) {
+    <p-button label="New bot" icon="pi pi-plus" (onClick)="showCreate.set(true)" />
+  }
+</app-page-header>
+
+<app-create-bot-dialog [(visible)]="showCreate" (created)="onCreated($event)" />
+
+@if (loading()) {
+  <div class="bot-grid" aria-busy="true" aria-label="Loading bots">
+    @for (s of skeletons; track s) {
+      <div class="bot-card">
+        <div class="bot-card-head">
+          <p-skeleton shape="circle" size="2.5rem" />
+          <p-skeleton width="60%" height="1.25rem" />
+        </div>
+        <p-skeleton width="90%" />
+        <p-skeleton width="70%" />
+      </div>
+    }
+  </div>
+} @else if (loadFailed()) {
+  <app-empty-state
+    icon="pi-exclamation-triangle"
+    title="Couldn't load your bots"
+    message="Check your connection and try again."
+  >
+    <p-button label="Try again" icon="pi pi-refresh" (onClick)="load()" />
+  </app-empty-state>
+} @else if (bots().length === 0) {
+  @if (canEdit()) {
+    <app-empty-state
+      icon="pi-microchip-ai"
+      title="No bots yet"
+      message="Create your first bot to start adding documents."
+    >
+      <p-button label="Create your first bot" icon="pi pi-plus" (onClick)="showCreate.set(true)" />
+    </app-empty-state>
+  } @else {
+    <app-empty-state
+      icon="pi-microchip-ai"
+      title="No bots yet"
+      message="An owner or admin of your workspace can create one."
+    />
+  }
+} @else {
+  <ul class="bot-grid" aria-label="Bots">
+    @for (bot of bots(); track bot.id) {
+      <li class="bot-card">
+        <div class="bot-card-head">
+          <span class="bot-avatar" [style.background]="bot.widgetColor" aria-hidden="true">
+            {{ bot.name.charAt(0).toUpperCase() }}
+          </span>
+          <div class="bot-title">
+            <h3 [title]="bot.name">
+              <a class="bot-link" [routerLink]="['/bots', bot.id]">{{ bot.name }}</a>
+            </h3>
+            <div class="bot-meta">
+              <p-tag
+                [value]="bot.isPublic ? 'Public' : 'Private'"
+                [severity]="bot.isPublic ? 'success' : 'secondary'"
+                [icon]="bot.isPublic ? 'pi pi-globe' : 'pi pi-lock'"
+              />
+              <span class="text-muted">Created {{ bot.createdAt | date: 'mediumDate' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <p class="bot-description" [class.text-muted]="!bot.description">
+          {{ bot.description || 'No description' }}
+        </p>
+
+        <div class="bot-footer">
+          <span>
+            <i class="pi pi-file" aria-hidden="true"></i>
+            {{ plural(bot.documentCount, 'document') }}
+          </span>
+          <span>
+            <i class="pi pi-comments" aria-hidden="true"></i>
+            {{ plural(bot.messageCount, 'message') }}
+          </span>
+        </div>
+      </li>
+    }
+  </ul>
+}

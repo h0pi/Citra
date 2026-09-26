@@ -25,4 +25,19 @@ public static class CurrentUserExtensions
 
     public static Guid RequireTenantId(this ICurrentUser user) =>
         user.TenantId ?? throw new UnauthorizedException("You need to be logged in.");
+
+    /// <summary>
+    /// For actions that change the tenant's bots, documents or settings: only Owner and Admin may.
+    /// Viewer and the read-only Demo account get 403. Returns the tenant the change belongs to.
+    /// </summary>
+    public static Guid RequireEditorTenantId(this ICurrentUser user)
+    {
+        var tenantId = user.RequireTenantId();
+        if (user.Role is not (UserRole.Owner or UserRole.Admin))
+        {
+            throw new ForbiddenException("Your role can view but not change this.");
+        }
+
+        return tenantId;
+    }
 }
