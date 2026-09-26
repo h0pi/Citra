@@ -29,6 +29,9 @@ internal sealed class DocumentConfiguration : IEntityTypeConfiguration<Document>
         // The same file can't be uploaded twice to one bot. URL documents have no hash (NULLs never collide).
         builder.HasIndex(d => new { d.BotId, d.ContentHash }).IsUnique();
 
+        // The same web page can't be added twice to one bot. Uploaded files have no URL (NULLs never collide).
+        builder.HasIndex(d => new { d.BotId, d.SourceUrl }).IsUnique();
+
         builder.HasIndex(d => d.TenantId);
     }
 }

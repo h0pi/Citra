@@ -492,6 +492,10 @@ namespace Citra.Infrastructure.Persistence.Migrations
                     b.HasIndex("BotId", "CreatedAt")
                         .HasDatabaseName("ix_documents_bot_id_created_at");
 
+                    b.HasIndex("BotId", "SourceUrl")
+                        .IsUnique()
+                        .HasDatabaseName("ix_documents_bot_id_source_url");
+
                     b.ToTable("documents", (string)null);
                 });
 

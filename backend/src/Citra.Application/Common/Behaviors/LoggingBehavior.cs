@@ -54,7 +54,7 @@ public sealed class LoggingBehavior<TRequest, TResponse>(ILogger<LoggingBehavior
                 requestName, stopwatch.ElapsedMilliseconds, ex.Errors.Keys);
             throw;
         }
-        catch (Exception ex) when (ex is UnauthorizedException or NotFoundException or ForbiddenException)
+        catch (Exception ex) when (ex is UnauthorizedException or NotFoundException or ForbiddenException or ConflictException)
         {
             // Expected outcomes (wrong password, missing record, not allowed) — normal user situations,
             // not server faults. Logged briefly, so real errors aren't buried in noise.

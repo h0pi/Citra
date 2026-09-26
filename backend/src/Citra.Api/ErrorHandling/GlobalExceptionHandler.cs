@@ -51,6 +51,22 @@ public sealed class GlobalExceptionHandler(
                 Detail = forbidden.Message,
             },
 
+            // Raised by Kestrel itself, e.g. an upload over the request size limit (413) or a broken multipart body.
+            BadHttpRequestException badRequest => new ProblemDetails
+            {
+                Status = badRequest.StatusCode,
+                Title = badRequest.StatusCode == StatusCodes.Status413PayloadTooLarge
+                    ? "The request is too large."
+                    : "The request could not be read.",
+            },
+
+            ConflictException conflict => new ProblemDetails
+            {
+                Status = StatusCodes.Status409Conflict,
+                Title = "Conflict.",
+                Detail = conflict.Message,
+            },
+
             _ => new ProblemDetails
             {
                 Status = StatusCodes.Status500InternalServerError,

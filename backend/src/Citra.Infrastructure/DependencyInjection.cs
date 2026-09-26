@@ -62,6 +62,7 @@ public static class DependencyInjection
 
         // Uploaded files. Stateless, so one instance serves everyone.
         services.AddSingleton<IFileStorage, LocalFileStorage>();
+        services.AddSingleton<IUploadLimits, ConfiguredUploadLimits>();
 
         services.AddHealthChecks()
             .AddCheck<DatabaseHealthCheck>("database", tags: ["ready"]);

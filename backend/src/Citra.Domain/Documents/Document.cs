@@ -59,7 +59,8 @@ public sealed class Document : Entity, ITenantOwned
         long sizeBytes,
         DocumentSourceType sourceType,
         string storagePath,
-        string contentHash)
+        string contentHash,
+        Guid? id = null)
     {
         EnsureIds(tenantId, botId);
         ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
@@ -67,6 +68,11 @@ public sealed class Document : Entity, ITenantOwned
         ArgumentException.ThrowIfNullOrWhiteSpace(storagePath);
         ArgumentException.ThrowIfNullOrWhiteSpace(contentHash);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(sizeBytes);
+        if (id == Guid.Empty)
+        {
+            throw new ArgumentException("Document id cannot be empty.", nameof(id));
+        }
+
         if (sourceType == DocumentSourceType.Url)
         {
             throw new ArgumentException("Use FromUrl for web pages.", nameof(sourceType));
@@ -74,6 +80,8 @@ public sealed class Document : Entity, ITenantOwned
 
         return new Document
         {
+            // The upload handler picks the id first: the storage path contains it and is written before the row.
+            Id = id ?? Guid.CreateVersion7(),
             TenantId = tenantId,
             BotId = botId,
             FileName = fileName.Trim(),
@@ -136,9 +144,17 @@ public sealed class Document : Entity, ITenantOwned
         ProcessedAt = now;
     }
 
+    /// <summary>Only finished documents (Ready or Failed) can be sent through the pipeline again.</summary>
+    public bool CanBeReprocessed => Status is DocumentStatus.Ready or DocumentStatus.Failed;
+
     /// <summary>Sends the document through the pipeline again (after a failure, or to re-embed with a new model).</summary>
     public void ResetForReprocessing()
     {
+        if (!CanBeReprocessed)
+        {
+            throw new InvalidOperationException($"Document {Id} is {Status}; only Ready or Failed documents can be reprocessed.");
+        }
+
         Status = DocumentStatus.Uploaded;
         ErrorMessage = null;
         PageCount = 0;

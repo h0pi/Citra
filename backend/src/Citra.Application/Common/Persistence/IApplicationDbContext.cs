@@ -4,6 +4,7 @@ using Citra.Domain.Documents;
 using Citra.Domain.Evaluation;
 using Citra.Domain.Tenants;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace Citra.Application.Common.Persistence;
 
@@ -36,6 +37,9 @@ public interface IApplicationDbContext
     DbSet<EvalRun> EvalRuns { get; }
 
     DbSet<EvalResult> EvalResults { get; }
+
+    /// <summary>For the rare handler that must combine a bulk ExecuteDelete/ExecuteUpdate with SaveChanges in one transaction.</summary>
+    DatabaseFacade Database { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
