@@ -52,9 +52,12 @@ coverage/
 *.sublime-workspace
 
 # ---------- Runtime data ----------
-# Uploaded documents stored locally during development
-storage/
-uploads/
+# Uploaded documents stored locally during development (Storage:LocalRootPath = backend/storage).
+# Anchored with a leading "/" so code folders named "Storage" (e.g. Common/Storage) are NOT ignored.
+/backend/storage/
+/storage/
+/backend/uploads/
+/uploads/
 
 # ---------- OS ----------
 Thumbs.db
