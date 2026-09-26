@@ -1,4 +1,5 @@
 using Citra.Application.Common.Behaviors;
+using Citra.Application.Features.Auth;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -24,6 +25,8 @@ public static class DependencyInjection
         });
 
         services.AddValidatorsFromAssembly(assembly, includeInternalTypes: true);
+
+        services.AddScoped<AuthSessionIssuer>();
 
         return services;
     }

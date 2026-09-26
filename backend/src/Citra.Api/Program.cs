@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+using Citra.Api.Auth;
 using Citra.Api.ErrorHandling;
 using Citra.Api.HealthChecks;
 using Citra.Api.OpenApi;
@@ -27,6 +29,7 @@ try
     builder.Services.AddApplication();
     builder.Services.AddInfrastructure(builder.Configuration);
     builder.Services.AddValidatedOptions<JwtOptions>(builder.Configuration, JwtOptions.SectionName);
+    builder.Services.AddCitraAuthentication();
 
     // Errors are returned as RFC 7807 ProblemDetails JSON, always with a traceId
     // so a user-reported error can be matched to the server log.
@@ -47,7 +50,9 @@ try
         .WithExposedHeaders("Content-Disposition") // lets the browser read download file names
         .SetPreflightMaxAge(TimeSpan.FromMinutes(10))));
 
-    builder.Services.AddControllers();
+    // Enums travel as text ("Owner", "Ready"), not numbers: readable, and safe if an enum's order changes.
+    builder.Services.AddControllers()
+        .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
     builder.Services.AddOpenApi(options =>
     {
         options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
@@ -85,6 +90,7 @@ try
 
     app.UseCors(FrontendCorsPolicy);
 
+    app.UseAuthentication();
     app.UseAuthorization();
 
     app.MapControllers();

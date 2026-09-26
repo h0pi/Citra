@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Citra.Application.Common.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
@@ -21,8 +22,9 @@ public sealed class GlobalExceptionHandler(
     {
         var problem = exception switch
         {
+            // Keys in camelCase ("companyName") to match the JSON field names the client sent.
             ValidationException validation => new ValidationProblemDetails(
-                validation.Errors.ToDictionary(e => e.Key, e => e.Value))
+                validation.Errors.ToDictionary(e => JsonNamingPolicy.CamelCase.ConvertName(e.Key), e => e.Value))
             {
                 Status = StatusCodes.Status400BadRequest,
                 Title = "One or more validation errors occurred.",
@@ -33,6 +35,13 @@ public sealed class GlobalExceptionHandler(
                 Status = StatusCodes.Status404NotFound,
                 Title = "Resource not found.",
                 Detail = notFound.Message,
+            },
+
+            UnauthorizedException unauthorized => new ProblemDetails
+            {
+                Status = StatusCodes.Status401Unauthorized,
+                Title = "Unauthorized.",
+                Detail = unauthorized.Message,
             },
 
             ForbiddenException forbidden => new ProblemDetails

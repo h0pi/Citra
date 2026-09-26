@@ -17,4 +17,16 @@ public sealed class ValidationException : Exception
             .GroupBy(f => f.PropertyName, f => f.ErrorMessage)
             .ToDictionary(g => g.Key, g => g.Distinct().ToArray());
     }
+
+    /// <summary>For errors found outside FluentValidation (e.g. Identity's password rules, duplicate email).</summary>
+    public ValidationException(IReadOnlyDictionary<string, string[]> errors)
+        : base("One or more validation errors occurred.")
+    {
+        Errors = errors;
+    }
+
+    public ValidationException(string propertyName, string errorMessage)
+        : this(new Dictionary<string, string[]> { [propertyName] = [errorMessage] })
+    {
+    }
 }

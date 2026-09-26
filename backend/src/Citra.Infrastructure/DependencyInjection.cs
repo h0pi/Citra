@@ -1,4 +1,6 @@
+using Citra.Application.Common.Persistence;
 using Citra.Infrastructure.HealthChecks;
+using Citra.Infrastructure.Identity;
 using Citra.Infrastructure.Options;
 using Citra.Infrastructure.Persistence;
 using Citra.Infrastructure.Persistence.Interceptors;
@@ -46,6 +48,15 @@ public static class DependencyInjection
                 npgsql => npgsql.UseVector())
             .UseSnakeCaseNamingConvention()
             .AddInterceptors(serviceProvider.GetRequiredService<AuditTimestampsInterceptor>()));
+
+        // Handlers depend on the interface; it resolves to the same scoped DbContext instance,
+        // so handlers, Identity and other services share one unit of work per request.
+        services.AddScoped<IApplicationDbContext>(sp => sp.GetRequiredService<CitraDbContext>());
+
+        // Accounts & tokens. Registered for every host because the Application layer's handlers
+        // (e.g. RegisterCommandHandler) depend on them and .NET validates all registrations at startup.
+        // The Worker never uses them, so it needs no JWT settings; the API registers and validates JwtOptions.
+        services.AddCitraIdentity();
 
         services.AddHealthChecks()
             .AddCheck<DatabaseHealthCheck>("database", tags: ["ready"]);

@@ -54,6 +54,16 @@ public sealed class LoggingBehavior<TRequest, TResponse>(ILogger<LoggingBehavior
                 requestName, stopwatch.ElapsedMilliseconds, ex.Errors.Keys);
             throw;
         }
+        catch (Exception ex) when (ex is UnauthorizedException or NotFoundException or ForbiddenException)
+        {
+            // Expected outcomes (wrong password, missing record, not allowed) — normal user situations,
+            // not server faults. Logged briefly, so real errors aren't buried in noise.
+            stopwatch.Stop();
+            logger.LogWarning(
+                "Request {RequestName} was rejected after {ElapsedMs} ms: {Reason}",
+                requestName, stopwatch.ElapsedMilliseconds, ex.Message);
+            throw;
+        }
         catch (Exception ex)
         {
             stopwatch.Stop();

@@ -38,4 +38,11 @@ public sealed class Tenant : Entity
     }
 
     public void ChangePlan(TenantPlan plan) => Plan = plan;
+
+    /// <summary>Set separately so the application layer can make it unique first (e.g. "acme" → "acme-2").</summary>
+    public void ChangeSlug(string slug)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(slug);
+        Slug = Common.Slug.From(slug);
+    }
 }
