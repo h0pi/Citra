@@ -1,0 +1,56 @@
+<app-auth-layout title="Welcome back" subtitle="Log in to your Citra workspace.">
+  <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    @if (errorMessage(); as message) {
+      <p-message severity="error" [text]="message" styleClass="form-error" />
+    }
+
+    <div class="field">
+      <label for="email">Email</label>
+      <input
+        pInputText
+        id="email"
+        type="email"
+        formControlName="email"
+        autocomplete="email"
+        [attr.aria-invalid]="showError('email')"
+        aria-describedby="email-error"
+        fluid
+      />
+      @if (showError('email')) {
+        <small id="email-error" class="field-error">
+          {{
+            form.controls.email.hasError('required')
+              ? 'Email is required.'
+              : 'Enter a valid email address.'
+          }}
+        </small>
+      }
+    </div>
+
+    <div class="field">
+      <label for="password">Password</label>
+      <p-password
+        inputId="password"
+        formControlName="password"
+        [feedback]="false"
+        [toggleMask]="true"
+        autocomplete="current-password"
+        fluid
+      />
+      @if (showError('password')) {
+        <small class="field-error">Password is required.</small>
+      }
+    </div>
+
+    <p-button
+      type="submit"
+      label="Log in"
+      icon="pi pi-sign-in"
+      [loading]="submitting()"
+      styleClass="submit"
+      fluid
+    />
+
+    <p class="switch text-muted">New to Citra? <a routerLink="/register">Create an account</a></p>
+  </form>
+</app-auth-layout>

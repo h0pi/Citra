@@ -1,0 +1,33 @@
+// Shared by the login and register forms.
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--citra-space-4);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--citra-space-1);
+
+  label {
+    font-size: var(--citra-text-sm);
+    font-weight: 500;
+  }
+}
+
+.hint {
+  font-size: var(--citra-text-xs);
+}
+
+.field-error {
+  color: var(--p-red-500);
+  font-size: var(--citra-text-xs);
+}
+
+.switch {
+  margin: 0;
+  text-align: center;
+  font-size: var(--citra-text-sm);
+}

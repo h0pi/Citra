@@ -1,0 +1,27 @@
+<div class="auth-page">
+  <p-button
+    class="theme-toggle"
+    [icon]="isDark() ? 'pi pi-sun' : 'pi pi-moon'"
+    [text]="true"
+    [rounded]="true"
+    severity="secondary"
+    [ariaLabel]="isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
+    (onClick)="toggleTheme()"
+  />
+
+  <main class="auth-card">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"><i class="pi pi-sparkles"></i></span>
+      <span class="brand-name">Citra</span>
+    </div>
+
+    <h1>{{ title() }}</h1>
+    @if (subtitle()) {
+      <p class="text-muted subtitle">{{ subtitle() }}</p>
+    }
+
+    <ng-content />
+  </main>
+
+  <p class="footer text-muted">AI knowledge assistant — answers with exact citations.</p>
+</div>

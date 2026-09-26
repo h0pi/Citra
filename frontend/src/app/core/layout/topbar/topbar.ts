@@ -3,10 +3,12 @@ import { ThemeService } from '@core/theme/theme.service';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 
-/** Top bar: mobile menu button, theme toggle and (from Phase 4) the user menu. */
+import { UserMenu } from '../user-menu/user-menu';
+
+/** Top bar: mobile menu button, theme toggle and the user menu. */
 @Component({
   selector: 'app-topbar',
-  imports: [ButtonModule, TooltipModule],
+  imports: [ButtonModule, TooltipModule, UserMenu],
   templateUrl: './topbar.html',
   styleUrl: './topbar.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,0 +1,27 @@
+@if (user(); as user) {
+  <button
+    type="button"
+    class="user-button"
+    aria-haspopup="menu"
+    [attr.aria-label]="'Account menu for ' + user.displayName"
+    (click)="menu.toggle($event)"
+  >
+    <p-avatar [label]="initials()" shape="circle" styleClass="avatar" />
+    <span class="user-name">{{ user.displayName }}</span>
+    <i class="pi pi-chevron-down chevron" aria-hidden="true"></i>
+  </button>
+
+  <p-menu #menu [model]="items" [popup]="true" appendTo="body" styleClass="user-menu-popup">
+    <ng-template #start>
+      <div class="menu-header">
+        <div class="menu-name">{{ user.displayName }}</div>
+        <div class="menu-email text-muted">{{ user.email }}</div>
+        <div class="menu-tenant">
+          <i class="pi pi-building" aria-hidden="true"></i>
+          <span>{{ user.tenantName }}</span>
+          <p-tag [value]="user.role" severity="secondary" />
+        </div>
+      </div>
+    </ng-template>
+  </p-menu>
+}

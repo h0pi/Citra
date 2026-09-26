@@ -1,0 +1,77 @@
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+.auth-page {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--citra-space-6) var(--citra-space-4);
+  background:
+    radial-gradient(circle at 20% 10%, var(--citra-primary-soft), transparent 45%),
+    radial-gradient(circle at 85% 90%, var(--citra-primary-soft), transparent 40%), var(--citra-bg);
+}
+
+.theme-toggle {
+  position: absolute;
+  top: var(--citra-space-4);
+  right: var(--citra-space-4);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  padding: var(--citra-space-6);
+  background: var(--citra-surface);
+  border: 1px solid var(--citra-border);
+  border-radius: var(--citra-radius-lg);
+  box-shadow: var(--citra-shadow-md);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--citra-space-2);
+  margin-bottom: var(--citra-space-5);
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--citra-radius-md);
+  background: var(--p-primary-500);
+  color: var(--p-primary-contrast-color, #fff);
+}
+
+.brand-name {
+  font-size: var(--citra-text-lg);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+h1 {
+  font-size: var(--citra-text-xl);
+  margin-bottom: var(--citra-space-1);
+}
+
+.subtitle {
+  margin-bottom: var(--citra-space-5);
+}
+
+.footer {
+  margin: var(--citra-space-5) 0 0;
+  font-size: var(--citra-text-xs);
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .auth-card {
+    padding: var(--citra-space-5) var(--citra-space-4);
+  }
+}

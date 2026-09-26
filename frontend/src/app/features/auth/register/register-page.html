@@ -1,0 +1,86 @@
+<app-auth-layout
+  title="Create your workspace"
+  subtitle="Upload documents and get answers with exact citations."
+>
+  <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    @if (errorMessage(); as message) {
+      <p-message severity="error" [text]="message" styleClass="form-error" />
+    }
+
+    <div class="field">
+      <label for="companyName">Company name</label>
+      <input
+        pInputText
+        id="companyName"
+        formControlName="companyName"
+        autocomplete="organization"
+        [attr.aria-invalid]="showError('companyName')"
+        fluid
+      />
+      @if (showError('companyName')) {
+        <small class="field-error">{{ errorFor('companyName') }}</small>
+      }
+    </div>
+
+    <div class="field">
+      <label for="displayName">Your name</label>
+      <input
+        pInputText
+        id="displayName"
+        formControlName="displayName"
+        autocomplete="name"
+        [attr.aria-invalid]="showError('displayName')"
+        fluid
+      />
+      @if (showError('displayName')) {
+        <small class="field-error">{{ errorFor('displayName') }}</small>
+      }
+    </div>
+
+    <div class="field">
+      <label for="email">Work email</label>
+      <input
+        pInputText
+        id="email"
+        type="email"
+        formControlName="email"
+        autocomplete="email"
+        [attr.aria-invalid]="showError('email')"
+        fluid
+      />
+      @if (showError('email')) {
+        <small class="field-error">{{ errorFor('email') }}</small>
+      }
+    </div>
+
+    <div class="field">
+      <label for="password">Password</label>
+      <p-password
+        inputId="password"
+        formControlName="password"
+        [feedback]="false"
+        [toggleMask]="true"
+        autocomplete="new-password"
+        fluid
+      />
+      @if (showError('password')) {
+        <small class="field-error">{{ errorFor('password') }}</small>
+      } @else {
+        <small class="text-muted hint"
+          >At least {{ passwordMinLength }} characters, including a number.</small
+        >
+      }
+    </div>
+
+    <p-button
+      type="submit"
+      label="Create account"
+      icon="pi pi-arrow-right"
+      iconPos="right"
+      [loading]="submitting()"
+      fluid
+    />
+
+    <p class="switch text-muted">Already have an account? <a routerLink="/login">Log in</a></p>
+  </form>
+</app-auth-layout>

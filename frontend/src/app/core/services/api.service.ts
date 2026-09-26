@@ -1,10 +1,18 @@
-import { HttpClient, HttpEvent, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpContext, HttpEvent, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { environment } from '@env/environment';
 import { Observable } from 'rxjs';
 
 /** Query string values; null/undefined/empty-string entries are skipped. */
 export type QueryParams = Record<string, string | number | boolean | null | undefined>;
+
+/**
+ * Per-request options. `context` carries flags for the interceptors,
+ * e.g. `new HttpContext().set(SKIP_ERROR_TOAST, true)` when the caller shows the error itself.
+ */
+export interface RequestOptions {
+  context?: HttpContext;
+}
 
 /**
  * The single place that talks HTTP to the Citra API.
@@ -16,24 +24,27 @@ export class ApiService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = environment.apiUrl.replace(/\/+$/, '');
 
-  get<T>(path: string, params?: QueryParams): Observable<T> {
-    return this.http.get<T>(this.url(path), { params: toHttpParams(params) });
+  get<T>(path: string, params?: QueryParams, options?: RequestOptions): Observable<T> {
+    return this.http.get<T>(this.url(path), {
+      params: toHttpParams(params),
+      context: options?.context,
+    });
   }
 
-  post<T>(path: string, body?: unknown): Observable<T> {
-    return this.http.post<T>(this.url(path), body ?? null);
+  post<T>(path: string, body?: unknown, options?: RequestOptions): Observable<T> {
+    return this.http.post<T>(this.url(path), body ?? null, { context: options?.context });
   }
 
-  put<T>(path: string, body?: unknown): Observable<T> {
-    return this.http.put<T>(this.url(path), body ?? null);
+  put<T>(path: string, body?: unknown, options?: RequestOptions): Observable<T> {
+    return this.http.put<T>(this.url(path), body ?? null, { context: options?.context });
   }
 
-  patch<T>(path: string, body?: unknown): Observable<T> {
-    return this.http.patch<T>(this.url(path), body ?? null);
+  patch<T>(path: string, body?: unknown, options?: RequestOptions): Observable<T> {
+    return this.http.patch<T>(this.url(path), body ?? null, { context: options?.context });
   }
 
-  delete<T = void>(path: string): Observable<T> {
-    return this.http.delete<T>(this.url(path));
+  delete<T = void>(path: string, options?: RequestOptions): Observable<T> {
+    return this.http.delete<T>(this.url(path), { context: options?.context });
   }
 
   /**
