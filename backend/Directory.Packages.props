@@ -75,4 +75,16 @@
     <PackageVersion Include="AngleSharp" Version="1.8.2" />
   </ItemGroup>
 
+  <!-- Token counting for chunk sizes (Infrastructure). MIT; its only .NET 8+ dependency, Google.Protobuf, is BSD-3. -->
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.ML.Tokenizers" Version="2.0.0" />
+    <PackageVersion Include="Microsoft.ML.Tokenizers.Data.Cl100kBase" Version="2.0.0" />
+    <!--
+      The data package only targets netstandard2.0 and pulls Microsoft.Bcl.Memory 9.0.4, which has a known high-severity
+      DoS vulnerability (GHSA-73j8-2gch-69rq, fixed in 9.0.14 / 10.0.4). Pinned to the patched line we use elsewhere.
+      Remove this pin once the tokenizer packages depend on a fixed version themselves.
+    -->
+    <PackageVersion Include="Microsoft.Bcl.Memory" Version="10.0.12" />
+  </ItemGroup>
+
 </Project>

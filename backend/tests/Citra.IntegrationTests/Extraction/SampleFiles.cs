@@ -20,7 +20,10 @@ internal static class SampleFiles
         "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==");
 
     /// <summary>A PDF with one page per entry; each page's lines are written top to bottom.</summary>
-    public static byte[] Pdf(params string[][] pages)
+    public static byte[] Pdf(params string[][] pages) => Pdf(lineSpacing: 20, pages);
+
+    /// <summary>Same, with a custom distance between lines (12 fits about 62 lines on an A4 page).</summary>
+    public static byte[] Pdf(double lineSpacing, params string[][] pages)
     {
         var builder = new PdfDocumentBuilder();
         var font = builder.AddStandard14Font(Standard14Font.Helvetica);
@@ -30,8 +33,8 @@ internal static class SampleFiles
             var y = 800.0;
             foreach (var line in lines)
             {
-                page.AddText(line, 11, new PdfPoint(50, y), font);
-                y -= 20;
+                page.AddText(line, 9, new PdfPoint(40, y), font);
+                y -= lineSpacing;
             }
         }
 

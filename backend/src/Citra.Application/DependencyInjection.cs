@@ -1,4 +1,5 @@
 using Citra.Application.Common.Behaviors;
+using Citra.Application.Common.Chunking;
 using Citra.Application.Features.Auth;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,6 +28,9 @@ public static class DependencyInjection
         services.AddValidatorsFromAssembly(assembly, includeInternalTypes: true);
 
         services.AddScoped<AuthSessionIssuer>();
+
+        // Stateless (each call keeps its own state); needs the ITokenCounter registered by Infrastructure.
+        services.AddSingleton<TextChunker>();
 
         return services;
     }

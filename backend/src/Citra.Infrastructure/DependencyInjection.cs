@@ -1,6 +1,8 @@
+using Citra.Application.Common.Chunking;
 using Citra.Application.Common.Extraction;
 using Citra.Application.Common.Persistence;
 using Citra.Application.Common.Storage;
+using Citra.Infrastructure.Chunking;
 using Citra.Infrastructure.Extraction;
 using Citra.Infrastructure.HealthChecks;
 using Citra.Infrastructure.Identity;
@@ -73,6 +75,9 @@ public static class DependencyInjection
         services.AddSingleton<ITextExtractor, PlainTextExtractor>();
         services.AddSingleton<ITextExtractor, UrlTextExtractor>();
         services.AddSingleton<ITextExtractorFactory, TextExtractorFactory>();
+
+        // Chunk sizing. One shared tokenizer: loading its vocabulary is slow, using it is thread-safe.
+        services.AddSingleton<ITokenCounter, TiktokenTokenCounter>();
 
         services.AddHealthChecks()
             .AddCheck<DatabaseHealthCheck>("database", tags: ["ready"]);
