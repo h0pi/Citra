@@ -12,10 +12,18 @@
     <PackageReference Include="Npgsql.DependencyInjection" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
     <PackageReference Include="Pgvector.EntityFrameworkCore" />
+    <PackageReference Include="PdfPig" />
+    <PackageReference Include="DocumentFormat.OpenXml" />
+    <PackageReference Include="AngleSharp" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Citra.Application\Citra.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Integration tests construct internal pieces directly (e.g. the web fetcher with a fake DNS resolver). -->
+    <InternalsVisibleTo Include="Citra.IntegrationTests" />
   </ItemGroup>
 
 </Project>

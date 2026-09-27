@@ -1,5 +1,7 @@
+using Citra.Application.Common.Extraction;
 using Citra.Application.Common.Persistence;
 using Citra.Application.Common.Storage;
+using Citra.Infrastructure.Extraction;
 using Citra.Infrastructure.HealthChecks;
 using Citra.Infrastructure.Identity;
 using Citra.Infrastructure.Options;
@@ -63,6 +65,14 @@ public static class DependencyInjection
         // Uploaded files. Stateless, so one instance serves everyone.
         services.AddSingleton<IFileStorage, LocalFileStorage>();
         services.AddSingleton<IUploadLimits, ConfiguredUploadLimits>();
+
+        // Text extraction (used by the Worker). Stateless; the fetcher owns one pooled HttpClient.
+        services.AddSingleton<WebPageFetcher>();
+        services.AddSingleton<ITextExtractor, PdfTextExtractor>();
+        services.AddSingleton<ITextExtractor, DocxTextExtractor>();
+        services.AddSingleton<ITextExtractor, PlainTextExtractor>();
+        services.AddSingleton<ITextExtractor, UrlTextExtractor>();
+        services.AddSingleton<ITextExtractorFactory, TextExtractorFactory>();
 
         services.AddHealthChecks()
             .AddCheck<DatabaseHealthCheck>("database", tags: ["ready"]);
