@@ -36,4 +36,18 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <!--
+    Testcontainers' Docker.DotNet.Enhanced.* packages each ship a Microsoft.Net.Http.Client.dll. The NPipe, Unix and
+    X509 ones are identical; the LegacyHttp one differs and cannot be loaded here. Which copy lands in bin depends on
+    copy order, so a clean build (e.g. a fresh clone) could get the wrong one and fail to reach Docker
+    (BadImageFormatException "Index not found"). Never copy the LegacyHttp one.
+  -->
+  <Target Name="SkipConflictingDockerHttpClient" AfterTargets="ResolvePackageAssets">
+    <ItemGroup>
+      <_ConflictingDockerHttpClient Include="@(RuntimeCopyLocalItems)"
+        Condition="'%(RuntimeCopyLocalItems.NuGetPackageId)' == 'Docker.DotNet.Enhanced.LegacyHttp' And '%(RuntimeCopyLocalItems.Filename)' == 'Microsoft.Net.Http.Client'" />
+      <RuntimeCopyLocalItems Remove="@(_ConflictingDockerHttpClient)" />
+    </ItemGroup>
+  </Target>
+
 </Project>
