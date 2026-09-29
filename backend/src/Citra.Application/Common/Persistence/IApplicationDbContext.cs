@@ -3,6 +3,7 @@ using Citra.Domain.Conversations;
 using Citra.Domain.Documents;
 using Citra.Domain.Evaluation;
 using Citra.Domain.Tenants;
+using Citra.Domain.Usage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
@@ -37,6 +38,8 @@ public interface IApplicationDbContext
     DbSet<EvalRun> EvalRuns { get; }
 
     DbSet<EvalResult> EvalResults { get; }
+
+    DbSet<EmbeddingUsage> EmbeddingUsages { get; }
 
     /// <summary>For the rare handler that must combine a bulk ExecuteDelete/ExecuteUpdate with SaveChanges in one transaction.</summary>
     DatabaseFacade Database { get; }

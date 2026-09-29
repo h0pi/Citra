@@ -848,6 +848,68 @@ namespace Citra.Infrastructure.Persistence.Migrations
                     b.ToTable("tenants", (string)null);
                 });
 
+            modelBuilder.Entity("Citra.Domain.Usage.EmbeddingUsage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid?>("BotId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("bot_id");
+
+                    b.Property<decimal>("CostUsd")
+                        .HasPrecision(18, 10)
+                        .HasColumnType("numeric(18,10)")
+                        .HasColumnName("cost_usd");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("DocumentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("document_id");
+
+                    b.Property<string>("Model")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("model");
+
+                    b.Property<string>("Purpose")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("purpose");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<int>("Tokens")
+                        .HasColumnType("integer")
+                        .HasColumnName("tokens");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_embedding_usages");
+
+                    b.HasIndex("DocumentId")
+                        .HasDatabaseName("ix_embedding_usages_document_id");
+
+                    b.HasIndex("BotId", "CreatedAt")
+                        .HasDatabaseName("ix_embedding_usages_bot_id_created_at");
+
+                    b.HasIndex("TenantId", "CreatedAt")
+                        .HasDatabaseName("ix_embedding_usages_tenant_id_created_at");
+
+                    b.ToTable("embedding_usages", (string)null);
+                });
+
             modelBuilder.Entity("Citra.Infrastructure.Identity.ApplicationUser", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1310,6 +1372,28 @@ namespace Citra.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_eval_sets_bots_bot_id");
+                });
+
+            modelBuilder.Entity("Citra.Domain.Usage.EmbeddingUsage", b =>
+                {
+                    b.HasOne("Citra.Domain.Bots.Bot", null)
+                        .WithMany()
+                        .HasForeignKey("BotId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_embedding_usages_bots_bot_id");
+
+                    b.HasOne("Citra.Domain.Documents.Document", null)
+                        .WithMany()
+                        .HasForeignKey("DocumentId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_embedding_usages_documents_document_id");
+
+                    b.HasOne("Citra.Domain.Tenants.Tenant", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_embedding_usages_tenants_tenant_id");
                 });
 
             modelBuilder.Entity("Citra.Infrastructure.Identity.ApplicationUser", b =>

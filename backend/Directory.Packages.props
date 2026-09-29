@@ -18,6 +18,9 @@
     <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="10.0.12" />
     <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.12" />
     <PackageVersion Include="Microsoft.Extensions.Options.DataAnnotations" Version="10.0.12" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.12" />
+    <!-- Retries with backoff for outside APIs (Voyage, later Claude). MIT; uses Polly (BSD-3-Clause). -->
+    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.10.0" />
   </ItemGroup>
 
   <!-- Identity -->
@@ -58,6 +61,8 @@
     <PackageVersion Include="Testcontainers.PostgreSql" Version="4.15.0" />
     <!-- Shouldly (BSD-3) instead of FluentAssertions, which moved to a paid commercial license in v8. -->
     <PackageVersion Include="Shouldly" Version="4.3.0" />
+    <!-- Lets tests read the real appsettings.json (e.g. the opt-in real Voyage test). -->
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="10.0.12" />
   </ItemGroup>
 
   <!-- Application layer: CQRS + validation -->

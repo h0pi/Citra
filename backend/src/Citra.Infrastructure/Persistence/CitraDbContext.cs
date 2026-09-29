@@ -7,6 +7,7 @@ using Citra.Domain.Conversations;
 using Citra.Domain.Documents;
 using Citra.Domain.Evaluation;
 using Citra.Domain.Tenants;
+using Citra.Domain.Usage;
 using Citra.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -49,6 +50,8 @@ public sealed class CitraDbContext(DbContextOptions<CitraDbContext> options, ICu
     public DbSet<EvalRun> EvalRuns => Set<EvalRun>();
 
     public DbSet<EvalResult> EvalResults => Set<EvalResult>();
+
+    public DbSet<EmbeddingUsage> EmbeddingUsages => Set<EmbeddingUsage>();
 
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 

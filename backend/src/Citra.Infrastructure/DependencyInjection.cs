@@ -1,8 +1,10 @@
 using Citra.Application.Common.Chunking;
+using Citra.Application.Common.Embeddings;
 using Citra.Application.Common.Extraction;
 using Citra.Application.Common.Persistence;
 using Citra.Application.Common.Storage;
 using Citra.Infrastructure.Chunking;
+using Citra.Infrastructure.Embeddings;
 using Citra.Infrastructure.Extraction;
 using Citra.Infrastructure.HealthChecks;
 using Citra.Infrastructure.Identity;
@@ -14,6 +16,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using Npgsql;
 using Pgvector.Npgsql;
 
@@ -78,6 +81,16 @@ public static class DependencyInjection
 
         // Chunk sizing. One shared tokenizer: loading its vocabulary is slow, using it is thread-safe.
         services.AddSingleton<ITokenCounter, TiktokenTokenCounter>();
+
+        // Embeddings (Voyage AI) through a typed HttpClient: pooled connections, base address from settings,
+        // and automatic retries (see VoyageResilience). Timeouts are set there, per attempt and in total.
+        services.AddHttpClient<IEmbeddingService, VoyageEmbeddingService>((provider, client) =>
+            {
+                var voyage = provider.GetRequiredService<IOptions<VoyageOptions>>().Value;
+                client.BaseAddress = new Uri(voyage.BaseUrl.EndsWith('/') ? voyage.BaseUrl : voyage.BaseUrl + "/");
+                client.Timeout = Timeout.InfiniteTimeSpan; // the resilience pipeline owns timeouts (retries need time)
+            })
+            .AddVoyageResilience();
 
         services.AddHealthChecks()
             .AddCheck<DatabaseHealthCheck>("database", tags: ["ready"]);
