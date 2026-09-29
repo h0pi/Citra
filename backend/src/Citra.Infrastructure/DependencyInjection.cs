@@ -3,6 +3,7 @@ using Citra.Application.Common.Embeddings;
 using Citra.Application.Common.Extraction;
 using Citra.Application.Common.Persistence;
 using Citra.Application.Common.Storage;
+using Citra.Application.Features.Documents.Processing;
 using Citra.Infrastructure.Chunking;
 using Citra.Infrastructure.Embeddings;
 using Citra.Infrastructure.Extraction;
@@ -11,6 +12,7 @@ using Citra.Infrastructure.Identity;
 using Citra.Infrastructure.Options;
 using Citra.Infrastructure.Persistence;
 using Citra.Infrastructure.Persistence.Interceptors;
+using Citra.Infrastructure.Processing;
 using Citra.Infrastructure.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -36,6 +38,7 @@ public static class DependencyInjection
         services.AddValidatedOptions<AnthropicOptions>(configuration, AnthropicOptions.SectionName);
         services.AddValidatedOptions<VoyageOptions>(configuration, VoyageOptions.SectionName);
         services.AddValidatedOptions<StorageOptions>(configuration, StorageOptions.SectionName);
+        services.AddValidatedOptions<ProcessingOptions>(configuration, ProcessingOptions.SectionName);
 
         var connectionString = configuration.GetConnectionString("Database");
         if (string.IsNullOrWhiteSpace(connectionString))
@@ -91,6 +94,9 @@ public static class DependencyInjection
                 client.Timeout = Timeout.InfiniteTimeSpan; // the resilience pipeline owns timeouts (retries need time)
             })
             .AddVoyageResilience();
+
+        // Background processing: jobs are claimed with row locks, one unit of work per job.
+        services.AddScoped<IProcessingJobQueue, ProcessingJobQueue>();
 
         services.AddHealthChecks()
             .AddCheck<DatabaseHealthCheck>("database", tags: ["ready"]);

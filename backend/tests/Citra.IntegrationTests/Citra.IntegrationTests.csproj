@@ -20,10 +20,15 @@
     <PackageReference Include="Testcontainers.PostgreSql" />
     <PackageReference Include="Shouldly" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
+    <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Citra.Infrastructure\Citra.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Citra.Worker\Citra.Worker.csproj" />
+    <ProjectReference Include="..\..\src\Citra.Api\Citra.Api.csproj" />
   </ItemGroup>
 
   <ItemGroup>

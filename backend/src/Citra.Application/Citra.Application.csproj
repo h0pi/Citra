@@ -13,4 +13,9 @@
     <ProjectReference Include="..\Citra.Domain\Citra.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Integration tests drive single pipeline steps directly (e.g. with a fake extractor). -->
+    <InternalsVisibleTo Include="Citra.IntegrationTests" />
+  </ItemGroup>
+
 </Project>

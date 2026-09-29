@@ -80,22 +80,36 @@ public sealed class ProcessingJob : Entity
     /// </summary>
     public bool Fail(string error, DateTimeOffset now)
     {
+        if (Attempts >= MaxAttempts)
+        {
+            GiveUp(error, now);
+            return true;
+        }
+
+        RecordError(error);
+        Status = ProcessingJobStatus.Pending;
+        NextAttemptAt = now + TimeSpan.FromSeconds(30 * Math.Pow(4, Attempts - 1));
+        return false;
+    }
+
+    /// <summary>
+    /// Gives up at once, whatever attempts are left: for errors that another attempt cannot fix
+    /// (a scanned PDF stays scanned), or when attempts ran out.
+    /// </summary>
+    public void GiveUp(string error, DateTimeOffset now)
+    {
+        RecordError(error);
+        Status = ProcessingJobStatus.Failed;
+        CompletedAt = now;
+    }
+
+    private void RecordError(string error)
+    {
         EnsureRunning();
         ArgumentException.ThrowIfNullOrWhiteSpace(error);
 
         LastError = error.Length > LastErrorMaxLength ? error[..LastErrorMaxLength] : error;
         LockedUntil = null;
-
-        if (Attempts >= MaxAttempts)
-        {
-            Status = ProcessingJobStatus.Failed;
-            CompletedAt = now;
-            return true;
-        }
-
-        Status = ProcessingJobStatus.Pending;
-        NextAttemptAt = now + TimeSpan.FromSeconds(30 * Math.Pow(4, Attempts - 1));
-        return false;
     }
 
     private void EnsureRunning()

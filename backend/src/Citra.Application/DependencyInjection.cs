@@ -1,6 +1,7 @@
 using Citra.Application.Common.Behaviors;
 using Citra.Application.Common.Chunking;
 using Citra.Application.Features.Auth;
+using Citra.Application.Features.Documents.Processing;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -31,6 +32,11 @@ public static class DependencyInjection
 
         // Stateless (each call keeps its own state); needs the ITokenCounter registered by Infrastructure.
         services.AddSingleton<TextChunker>();
+
+        // Background document processing (run by the Worker). Scoped: one database unit of work per job.
+        services.AddScoped<IProcessingJobRunner, ProcessingJobRunner>();
+        services.AddScoped<DocumentPipeline>();
+        services.AddSingleton<ProcessingFailures>(); // opens its own scope for every failure
 
         return services;
     }

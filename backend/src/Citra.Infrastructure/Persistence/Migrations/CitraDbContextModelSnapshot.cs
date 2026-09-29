@@ -506,6 +506,7 @@ namespace Citra.Infrastructure.Persistence.Migrations
                         .HasColumnName("id");
 
                     b.Property<int>("Attempts")
+                        .IsConcurrencyToken()
                         .HasColumnType("integer")
                         .HasColumnName("attempts");
 

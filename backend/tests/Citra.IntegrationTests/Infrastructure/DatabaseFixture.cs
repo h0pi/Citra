@@ -1,4 +1,5 @@
 using Citra.Application;
+using Citra.Application.Common.Embeddings;
 using Citra.Application.Common.Security;
 using Citra.Domain.Users;
 using Citra.Infrastructure;
@@ -24,6 +25,12 @@ public sealed class DatabaseFixture : IAsyncLifetime
 
     /// <summary>A private folder for uploaded files, deleted when the tests finish.</summary>
     public string StorageRoot { get; } = Path.Combine(Path.GetTempPath(), $"citra-tests-{Guid.NewGuid():N}");
+
+    /// <summary>The test database, e.g. for hosting the real API against it (see <see cref="ApiFactory"/>).</summary>
+    public string ConnectionString => _container.GetConnectionString();
+
+    /// <summary>The embedding service every scope gets (see <see cref="FakeEmbeddingService"/>).</summary>
+    public FakeEmbeddingService Embeddings { get; } = new();
 
     public async ValueTask InitializeAsync()
     {
@@ -52,6 +59,9 @@ public sealed class DatabaseFixture : IAsyncLifetime
         // Tests decide who the current user is, per scope.
         services.AddScoped<TestCurrentUser>();
         services.Replace(ServiceDescriptor.Scoped<ICurrentUser>(sp => sp.GetRequiredService<TestCurrentUser>()));
+
+        // Never Voyage: no network, no cost. (The Voyage client itself is tested with a scripted HTTP handler.)
+        services.Replace(ServiceDescriptor.Singleton<IEmbeddingService>(Embeddings));
 
         _services = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
 
@@ -110,4 +120,14 @@ public sealed class DbScope(AsyncServiceScope scope) : IAsyncDisposable
 public sealed class DatabaseCollection : ICollectionFixture<DatabaseFixture>
 {
     public const string Name = "Database";
+}
+
+/// <summary>
+/// A second, separate database container for tests that must own a whole table (e.g. the job queue takes
+/// "the oldest due job" of all), so jobs other test classes create can never interfere.
+/// </summary>
+[CollectionDefinition(Name)]
+public sealed class IsolatedDatabaseCollection : ICollectionFixture<DatabaseFixture>
+{
+    public const string Name = "Isolated database";
 }

@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using Citra.Api.Auth;
 using Citra.Api.ErrorHandling;
 using Citra.Api.HealthChecks;
+using Citra.Api.Hubs;
 using Citra.Api.OpenApi;
 using Citra.Application;
 using Citra.Infrastructure;
@@ -53,6 +54,13 @@ try
     // Enums travel as text ("Owner", "Ready"), not numbers: readable, and safe if an enum's order changes.
     builder.Services.AddControllers()
         .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+    // Live updates (SignalR), with the same JSON as the API: camelCase names and enums as text.
+    builder.Services.AddSignalR()
+        .AddJsonProtocol(options => options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+    // Forwards the Worker's document changes (PostgreSQL notifications) to the documents page.
+    builder.Services.AddHostedService<DocumentChangeListener>();
     builder.Services.AddOpenApi(options =>
     {
         options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
@@ -94,6 +102,10 @@ try
     app.UseAuthorization();
 
     app.MapControllers();
+
+    // Documents page live updates. A connection is closed when its token expires (the page then reconnects with a
+    // fresh one), so a signed-out or removed user does not keep receiving updates on an old connection.
+    app.MapHub<DocumentsHub>(DocumentsHub.Path, options => options.CloseOnAuthenticationExpiration = true);
 
     // /health       → runs all checks (database, …): is the app ready to serve traffic?
     // /health/live  → runs no checks: is the process alive? (used by Docker / uptime monitors)

@@ -115,7 +115,13 @@ public sealed class Document : Entity, ITenantOwned
 
     // ---------- Processing pipeline ----------
 
-    public void StartExtracting() => MoveTo(DocumentStatus.Extracting, from: [DocumentStatus.Uploaded]);
+    /// <summary>
+    /// First step of processing. Also allowed mid-processing: when a worker crashed or an attempt is retried,
+    /// the next attempt starts again from the beginning. A finished document (Ready/Failed) must be reset first.
+    /// </summary>
+    public void StartExtracting() => MoveTo(
+        DocumentStatus.Extracting,
+        from: [DocumentStatus.Uploaded, DocumentStatus.Extracting, DocumentStatus.Chunking, DocumentStatus.Embedding]);
 
     public void StartChunking() => MoveTo(DocumentStatus.Chunking, from: [DocumentStatus.Extracting]);
 

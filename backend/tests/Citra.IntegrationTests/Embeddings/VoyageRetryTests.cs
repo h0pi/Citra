@@ -104,14 +104,18 @@ public sealed class VoyageRetryTests
     [Fact]
     public async Task Waits_grow_between_retries()
     {
-        var network = new ScriptedNetwork(Fail(503), Fail(503), Fail(503), Ok());
+        var network = new ScriptedNetwork(Fail(503), Fail(503), Fail(503), Fail(503), Fail(503), Fail(503), Ok());
 
-        await Embedding(network, baseDelaySeconds: 0.1).EmbedDocumentsAsync(["t0"], Ct);
+        await Embedding(network, maxRetries: 6, baseDelaySeconds: 0.02).EmbedDocumentsAsync(["t0"], Ct);
 
-        // Exponential with jitter: roughly 0.1, 0.2, 0.4 s; the last wait must be clearly longer than the first.
+        // Exponential with jitter: each wait is random around 20, 40, 80, 160, 320, 640 ms, so single waits can
+        // overlap (the 3rd was once shorter than the 1st). Sums smooth the jitter out: measured, the last three
+        // waits took 3.3–7.2× as long as the first three; waits that don't grow would give about 1×.
         var gaps = network.CallTimes.Zip(network.CallTimes.Skip(1), (a, b) => b - a).ToList();
-        gaps.Count.ShouldBe(3);
-        gaps[2].ShouldBeGreaterThan(gaps[0]);
+        gaps.Count.ShouldBe(6);
+        var early = gaps.Take(3).Sum(g => g.TotalMilliseconds);
+        var late = gaps.Skip(3).Sum(g => g.TotalMilliseconds);
+        late.ShouldBeGreaterThan(early * 2, $"waits (ms): {string.Join(", ", gaps.Select(g => (int)g.TotalMilliseconds))}");
     }
 
     [Fact]

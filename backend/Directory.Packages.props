@@ -63,6 +63,11 @@
     <PackageVersion Include="Shouldly" Version="4.3.0" />
     <!-- Lets tests read the real appsettings.json (e.g. the opt-in real Voyage test). -->
     <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="10.0.12" />
+    <!-- FakeTimeProvider: tests move time forward instantly (e.g. "5 minutes later" for lock renewal). MIT. -->
+    <PackageVersion Include="Microsoft.Extensions.TimeProvider.Testing" Version="10.10.0" />
+    <!-- The real API hosted in memory (WebApplicationFactory), and the official SignalR client. Both MIT. -->
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.12" />
+    <PackageVersion Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.12" />
   </ItemGroup>
 
   <!-- Application layer: CQRS + validation -->

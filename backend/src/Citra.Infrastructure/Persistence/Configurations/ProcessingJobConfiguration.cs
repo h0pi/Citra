@@ -11,6 +11,11 @@ internal sealed class ProcessingJobConfiguration : IEntityTypeConfiguration<Proc
         builder.Property(j => j.Status).IsEnumText();
         builder.Property(j => j.LastError).HasMaxLength(ProcessingJob.LastErrorMaxLength);
 
+        // Every claim counts a new attempt, so the attempt number tells whose job it is. As a concurrency token,
+        // a worker's final save (Succeeded/Failed) only goes through while the job is still on ITS attempt:
+        // if another worker took the job over meanwhile, the save fails and its whole transaction rolls back.
+        builder.Property(j => j.Attempts).IsConcurrencyToken();
+
         builder.HasOne<Document>()
             .WithMany()
             .HasForeignKey(j => j.DocumentId)
