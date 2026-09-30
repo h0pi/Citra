@@ -1,0 +1,53 @@
+<p-dialog
+  header="Add a web page"
+  [(visible)]="visible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closeOnEscape]="!submitting()"
+  [closable]="!submitting()"
+  [style]="{ width: '32rem' }"
+  [breakpoints]="{ '575px': '95vw' }"
+>
+  <form class="dialog-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <p class="text-muted intro">
+      The page is downloaded and read in the background, like an uploaded file. Only public pages
+      work (no pages behind a login).
+    </p>
+
+    @if (errorMessage(); as message) {
+      <p-message severity="error" [text]="message" />
+    }
+
+    <div class="field">
+      <label for="document-url">Web address</label>
+      <input
+        pInputText
+        id="document-url"
+        type="url"
+        inputmode="url"
+        formControlName="url"
+        placeholder="https://example.com/help/returns"
+        autocomplete="url"
+        [attr.aria-invalid]="showError()"
+        [attr.maxlength]="maxLength"
+        fluid
+      />
+      @if (showError()) {
+        <small class="field-error">{{ errorText() }}</small>
+      }
+    </div>
+  </form>
+
+  <ng-template #footer>
+    <p-button
+      label="Cancel"
+      severity="secondary"
+      [text]="true"
+      [disabled]="submitting()"
+      (onClick)="cancel()"
+    />
+    <!-- The footer sits outside the <form>, so the button calls submit() itself; Enter in the form still works. -->
+    <p-button label="Add page" icon="pi pi-plus" [loading]="submitting()" (onClick)="submit()" />
+  </ng-template>
+</p-dialog>

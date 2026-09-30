@@ -4,6 +4,7 @@ using Citra.Application.Common.Paging;
 using Citra.Application.Common.Storage;
 using Citra.Application.Features.Documents;
 using Citra.Application.Features.Documents.AddUrl;
+using Citra.Application.Features.Documents.Chunks;
 using Citra.Application.Features.Documents.Delete;
 using Citra.Application.Features.Documents.GetById;
 using Citra.Application.Features.Documents.GetFile;
@@ -109,6 +110,18 @@ public sealed class DocumentsController(ISender sender, IUploadLimits uploadLimi
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public Task<DocumentDto> GetById(Guid id, CancellationToken cancellationToken) =>
         sender.Send(new GetDocumentByIdQuery(id), cancellationToken);
+
+    /// <summary>A document's chunks in reading order, a page at a time (what the bot searches).</summary>
+    [HttpGet("documents/{id:guid}/chunks")]
+    [ProducesResponseType<PagedResult<ChunkDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public Task<PagedResult<ChunkDto>> GetChunks(
+        Guid id,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = GetDocumentChunksQuery.DefaultPageSize,
+        CancellationToken cancellationToken = default) =>
+        sender.Send(new GetDocumentChunksQuery(id, page, pageSize), cancellationToken);
 
     /// <summary>
     /// The original file. Shown in the browser (e.g. the PDF viewer); add ?download=true to save it instead.

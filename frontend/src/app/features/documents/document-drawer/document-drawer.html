@@ -1,0 +1,142 @@
+<p-drawer
+  position="right"
+  [visible]="visible()"
+  (visibleChange)="onVisibleChange($event)"
+  [modal]="true"
+  [dismissible]="true"
+  [closeOnEscape]="true"
+  styleClass="document-drawer"
+>
+  @if (document(); as doc) {
+    @let type = typeIcon(doc.sourceType);
+    @let badge = statusBadge(doc.status);
+    <ng-template #header>
+      <div class="drawer-title">
+        <i [class]="'pi ' + type.icon" aria-hidden="true"></i>
+        <h2 [title]="doc.fileName">{{ doc.fileName }}</h2>
+      </div>
+    </ng-template>
+
+    <section aria-label="Details">
+      <dl class="details">
+        <dt>Status</dt>
+        <dd>
+          <p-tag
+            [value]="badge.label"
+            [severity]="badge.severity"
+            [icon]="badge.busy ? 'pi pi-spin pi-spinner' : ''"
+          />
+        </dd>
+        @if (doc.status === 'Failed' && doc.errorMessage) {
+          <dt>Problem</dt>
+          <dd class="error-text">{{ doc.errorMessage }}</dd>
+        }
+        <dt>Type</dt>
+        <dd>{{ type.label }}</dd>
+        @if (doc.sourceUrl) {
+          <dt>Address</dt>
+          <dd>
+            <a [href]="doc.sourceUrl" target="_blank" rel="noopener noreferrer" class="source-link">
+              {{ doc.sourceUrl }} <i class="pi pi-external-link" aria-hidden="true"></i>
+            </a>
+          </dd>
+        } @else {
+          <dt>Size</dt>
+          <dd>{{ fileSize(doc) }}</dd>
+        }
+        <dt>Pages</dt>
+        <dd>{{ pageCount(doc) }}</dd>
+        <dt>Chunks</dt>
+        <dd>{{ chunkCount(doc) }}</dd>
+        <dt>Uploaded</dt>
+        <dd>{{ doc.createdAt | date: 'MMM d, y, HH:mm' }}</dd>
+        @if (doc.processedAt) {
+          <dt>Processed</dt>
+          <dd>{{ doc.processedAt | date: 'MMM d, y, HH:mm' }}</dd>
+        }
+      </dl>
+    </section>
+
+    <section class="chunks" aria-labelledby="chunks-heading">
+      <h3 id="chunks-heading">
+        Chunks
+        @if (chunkState() === 'ready') {
+          <span class="text-muted">({{ totalChunks() }})</span>
+        }
+      </h3>
+      <p class="text-muted hint">The pieces of text the bot searches when it answers.</p>
+
+      @switch (chunkState()) {
+        @case ('idle') {
+          <p class="text-muted placeholder">
+            @if (doc.status === 'Failed') {
+              No chunks: processing failed.
+            } @else {
+              Chunks appear here once processing is finished.
+            }
+          </p>
+        }
+        @case ('loading') {
+          <div aria-busy="true" aria-label="Loading chunks">
+            @for (s of skeletons; track s) {
+              <div class="chunk">
+                <p-skeleton width="40%" />
+                <p-skeleton width="100%" height="3rem" />
+              </div>
+            }
+          </div>
+        }
+        @case ('error') {
+          <p class="error-text">The chunks could not be loaded.</p>
+          <p-button label="Try again" icon="pi pi-refresh" [outlined]="true" (onClick)="retry()" />
+        }
+        @case ('ready') {
+          @if (chunks().length === 0) {
+            <p class="text-muted placeholder">This document has no chunks.</p>
+          }
+          <ol class="chunk-list">
+            @for (chunk of chunks(); track chunk.id) {
+              <li class="chunk">
+                <div class="chunk-meta">
+                  <span class="chunk-number">#{{ chunk.index + 1 }}</span>
+                  @if (chunk.pageNumber) {
+                    <span>Page {{ chunk.pageNumber }}</span>
+                  }
+                  @if (chunk.heading) {
+                    <span class="chunk-heading" [title]="chunk.heading">{{ chunk.heading }}</span>
+                  }
+                  <span class="text-muted tokens">{{ chunk.tokenCount }} tokens</span>
+                </div>
+                <!-- Bound, not interpolated: shown with its exact line breaks and no template whitespace. -->
+                <p
+                  class="chunk-content"
+                  [class.clipped]="isLong(chunk) && !isExpanded(chunk)"
+                  [textContent]="chunk.content"
+                ></p>
+                @if (isLong(chunk)) {
+                  <p-button
+                    [label]="isExpanded(chunk) ? 'Show less' : 'Show all'"
+                    [text]="true"
+                    size="small"
+                    [attr.aria-expanded]="isExpanded(chunk)"
+                    (onClick)="toggle(chunk)"
+                  />
+                }
+              </li>
+            }
+          </ol>
+          @if (hasMore()) {
+            <p-button
+              class="load-more"
+              [label]="'Load more (' + (totalChunks() - chunks().length) + ' left)'"
+              icon="pi pi-angle-down"
+              [outlined]="true"
+              [loading]="loadingMore()"
+              (onClick)="loadMore()"
+            />
+          }
+        }
+      }
+    </section>
+  }
+</p-drawer>

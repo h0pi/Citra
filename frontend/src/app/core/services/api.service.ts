@@ -51,10 +51,11 @@ export class ApiService {
    * Multipart upload with progress events (HttpEventType.UploadProgress / Response),
    * used for document uploads so the UI can show a progress bar.
    */
-  upload<T>(path: string, formData: FormData): Observable<HttpEvent<T>> {
+  upload<T>(path: string, formData: FormData, options?: RequestOptions): Observable<HttpEvent<T>> {
     return this.http.post<T>(this.url(path), formData, {
       reportProgress: true,
       observe: 'events',
+      context: options?.context,
     });
   }
 

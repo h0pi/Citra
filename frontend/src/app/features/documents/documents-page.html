@@ -1,0 +1,294 @@
+@let bot = currentBot.bot();
+@let firstDocument = state() === 'ready' && totalCount() === 0 && !filtering();
+
+<app-page-header
+  title="Documents"
+  [subtitle]="
+    bot
+      ? 'Files and web pages ' + bot.name + ' answers from.'
+      : 'Files and web pages your bot answers from.'
+  "
+>
+  @if (canEdit() && bot && state() === 'ready' && !firstDocument) {
+    <p-button
+      label="Add web page"
+      icon="pi pi-globe"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="showAddUrl.set(true)"
+    />
+  }
+</app-page-header>
+
+@if (bot) {
+  <app-add-url-dialog [(visible)]="showAddUrl" [botId]="bot.id" (added)="show($event)" />
+}
+
+<app-document-drawer [document]="selectedDocument()" (closed)="selectedId.set(null)" />
+
+<p-confirmdialog [style]="{ width: '28rem' }" [breakpoints]="{ '575px': '95vw' }" />
+
+@if (bot && (live.state() === 'reconnecting' || live.state() === 'offline')) {
+  <p class="live-paused text-muted" role="status">
+    <i class="pi pi-sync pi-spin" aria-hidden="true"></i>
+    Live updates paused — reconnecting. Statuses refresh as soon as the connection is back.
+  </p>
+}
+
+<app-upload-list [items]="uploads.items()" (dismiss)="uploads.dismiss($event)" />
+
+@switch (currentBot.status()) {
+  @case ('error') {
+    <app-empty-state
+      icon="pi-exclamation-triangle"
+      title="Couldn't load your bots"
+      message="Check your connection and try again."
+    >
+      <p-button label="Try again" icon="pi pi-refresh" (onClick)="currentBot.refresh()" />
+    </app-empty-state>
+  }
+  @case ('ready') {
+    @if (!bot) {
+      <app-empty-state
+        icon="pi-microchip-ai"
+        title="Create a bot first"
+        message="Documents belong to a bot. Create one, then add the files it should answer from."
+      >
+        <p-button label="Go to bots" icon="pi pi-arrow-right" iconPos="right" routerLink="/bots" />
+      </app-empty-state>
+    } @else if (state() === 'error') {
+      <app-empty-state
+        icon="pi-exclamation-triangle"
+        title="Couldn't load the documents"
+        message="Check your connection and try again."
+      >
+        <p-button label="Try again" icon="pi pi-refresh" (onClick)="retry()" />
+      </app-empty-state>
+    } @else if (firstDocument) {
+      @if (canEdit()) {
+        <app-empty-state
+          icon="pi-cloud-upload"
+          title="Upload your first document"
+          [message]="
+            'Add PDFs, Word or text files, or a web page. ' +
+            bot.name +
+            ' answers questions from them, with a link to the exact passage.'
+          "
+        >
+          <div class="first-upload">
+            <app-upload-zone (files)="upload($event)" />
+            <p-button
+              label="Or add a web page"
+              icon="pi pi-globe"
+              [text]="true"
+              (onClick)="showAddUrl.set(true)"
+            />
+          </div>
+        </app-empty-state>
+      } @else {
+        <app-empty-state
+          icon="pi-file"
+          title="No documents yet"
+          [message]="
+            'An owner or admin of your workspace can add the files ' + bot.name + ' answers from.'
+          "
+        />
+      }
+    } @else if (state() === 'ready') {
+      @if (canEdit()) {
+        <app-upload-zone class="zone-above-table" [compact]="true" (files)="upload($event)" />
+      }
+
+      <div class="list-toolbar">
+        <p-iconfield class="search">
+          <p-inputicon styleClass="pi pi-search" />
+          <input
+            pInputText
+            type="search"
+            placeholder="Search by name"
+            aria-label="Search documents by name"
+            [attr.maxlength]="searchMaxLength"
+            [ngModel]="searchText()"
+            (ngModelChange)="searchText.set($event)"
+            fluid
+          />
+        </p-iconfield>
+        <p-select
+          class="status-filter"
+          [options]="statusOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="All statuses"
+          ariaLabel="Filter by status"
+          [showClear]="true"
+          [ngModel]="statusFilter()"
+          (ngModelChange)="onStatusChange($event)"
+        />
+        <span class="list-count text-muted" aria-live="polite">
+          {{ totalCount() }} {{ totalCount() === 1 ? 'document' : 'documents' }}
+        </span>
+      </div>
+
+      @if (documents().length === 0) {
+        <app-empty-state
+          icon="pi-filter-slash"
+          title="No documents match"
+          message="Try another name or status."
+        >
+          <p-button
+            label="Clear filters"
+            icon="pi pi-times"
+            [outlined]="true"
+            (onClick)="clearFilters()"
+          />
+        </app-empty-state>
+      } @else {
+        <div
+          class="table-card"
+          role="region"
+          [attr.aria-label]="'Documents of ' + bot.name"
+          [class.refreshing]="refreshing()"
+          [attr.aria-busy]="refreshing()"
+        >
+          <p-table
+            [value]="documents()"
+            dataKey="id"
+            [tableStyle]="{ 'min-width': '52rem' }"
+            styleClass="documents-table"
+          >
+            <ng-template #header>
+              <tr>
+                <th scope="col">Name</th>
+                <th scope="col" class="num">Size</th>
+                <th scope="col" class="num">Pages</th>
+                <th scope="col" class="num">Chunks</th>
+                <th scope="col">Status</th>
+                <th scope="col">Uploaded</th>
+                @if (canEdit()) {
+                  <th scope="col"><span class="sr-only">Actions</span></th>
+                }
+              </tr>
+            </ng-template>
+            <ng-template #body let-document>
+              @let type = typeIcon(document.sourceType);
+              @let badge = statusBadge(document.status);
+              <tr>
+                <td>
+                  <div class="doc-name">
+                    <i
+                      [class]="'pi ' + type.icon + ' doc-icon'"
+                      [attr.aria-label]="type.label"
+                      role="img"
+                    ></i>
+                    <div class="doc-name-text">
+                      <button
+                        type="button"
+                        class="doc-title"
+                        [title]="document.fileName"
+                        [attr.aria-label]="'Show details of ' + document.fileName"
+                        (click)="openDetails(document)"
+                      >
+                        {{ document.fileName }}
+                      </button>
+                      @if (document.sourceUrl) {
+                        <span class="doc-url text-muted" [title]="document.sourceUrl">{{
+                          document.sourceUrl
+                        }}</span>
+                      }
+                    </div>
+                  </div>
+                </td>
+                <td class="num">{{ fileSize(document) }}</td>
+                <td class="num">{{ pageCount(document) }}</td>
+                <td class="num">{{ chunkCount(document) }}</td>
+                <td>
+                  @if (document.status === 'Failed' && document.errorMessage) {
+                    <!-- Focusable, so keyboard users get the reason too; screen readers hear it via the label. -->
+                    <span
+                      class="failed-reason"
+                      tabindex="0"
+                      [pTooltip]="document.errorMessage"
+                      tooltipPosition="top"
+                      [attr.aria-label]="'Failed: ' + document.errorMessage"
+                    >
+                      <p-tag
+                        [value]="badge.label"
+                        [severity]="badge.severity"
+                        icon="pi pi-info-circle"
+                        [attr.data-status]="document.status"
+                      />
+                    </span>
+                  } @else {
+                    <p-tag
+                      [value]="badge.label"
+                      [severity]="badge.severity"
+                      [icon]="badge.busy ? 'pi pi-spin pi-spinner' : ''"
+                      [attr.data-status]="document.status"
+                    />
+                  }
+                </td>
+                <td class="text-muted nowrap">
+                  {{ document.createdAt | date: 'MMM d, y, HH:mm' }}
+                </td>
+                @if (canEdit()) {
+                  <td class="actions">
+                    @if (document.status === 'Failed') {
+                      <p-button
+                        label="Retry"
+                        icon="pi pi-refresh"
+                        size="small"
+                        [text]="true"
+                        [loading]="isBusy(document.id)"
+                        [ariaLabel]="'Retry ' + document.fileName"
+                        (onClick)="retryDocument(document)"
+                      />
+                    }
+                    <p-button
+                      icon="pi pi-trash"
+                      severity="danger"
+                      size="small"
+                      [text]="true"
+                      [rounded]="true"
+                      [disabled]="isBusy(document.id)"
+                      pTooltip="Delete"
+                      tooltipPosition="top"
+                      [ariaLabel]="'Delete ' + document.fileName"
+                      (onClick)="confirmDelete(document)"
+                    />
+                  </td>
+                }
+              </tr>
+            </ng-template>
+          </p-table>
+          @if (totalCount() > pageSizes[0]) {
+            <p-paginator
+              [first]="(page() - 1) * pageSize()"
+              [rows]="pageSize()"
+              [totalRecords]="totalCount()"
+              [rowsPerPageOptions]="pageSizes"
+              (onPageChange)="onPage($event)"
+            />
+          }
+        </div>
+      }
+    } @else {
+      <ng-container *ngTemplateOutlet="loadingTable" />
+    }
+  }
+  @default {
+    <ng-container *ngTemplateOutlet="loadingTable" />
+  }
+}
+
+<ng-template #loadingTable>
+  <div class="table-card loading-rows" aria-busy="true" aria-label="Loading documents">
+    @for (row of skeletonRows; track row) {
+      <div class="loading-row">
+        <p-skeleton shape="circle" size="1.75rem" />
+        <p-skeleton width="40%" />
+        <p-skeleton width="10%" />
+        <p-skeleton width="12%" />
+      </div>
+    }
+  </div>
+</ng-template>
