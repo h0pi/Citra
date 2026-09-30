@@ -1,6 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+import { SKIP_ERROR_TOAST } from '@core/interceptors/error.interceptor';
 import { environment } from '@env/environment';
 
 import { BotsApi } from './bots-api';
@@ -55,5 +56,15 @@ describe('BotsApi', () => {
   it('escapes ids in the URL', () => {
     api.get('a/b').subscribe();
     http.expectOne(`${base}/a%2Fb`);
+  });
+
+  it('searches a bot with GET, a trimmed question and the number of results, showing errors itself', () => {
+    api.search('b1', '  How many vacation days?  ', 5).subscribe();
+
+    const request = http.expectOne((r) => r.url === `${base}/b1/search`);
+    expect(request.request.method).toBe('GET');
+    expect(request.request.params.get('q')).toBe('How many vacation days?');
+    expect(request.request.params.get('topK')).toBe('5');
+    expect(request.request.context.get(SKIP_ERROR_TOAST)).toBe(true);
   });
 });

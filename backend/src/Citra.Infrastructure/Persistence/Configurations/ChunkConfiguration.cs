@@ -33,8 +33,7 @@ internal sealed class ChunkConfiguration : IEntityTypeConfiguration<Chunk>
 
         // HNSW index for fast nearest-neighbour search. Operator class must match the search operator:
         // vector_cosine_ops ↔ cosine distance (<=>). m / ef_construction are pgvector's recommended defaults.
-        // Note for search queries (Phase 12): results are filtered by bot, so use pgvector's iterative scan
-        // (SET hnsw.iterative_scan = relaxed_order) to avoid returning too few rows after filtering.
+        // Searches filter by bot, so they use pgvector's iterative scan (see ChunkSearch) to still get enough rows.
         builder.HasIndex(c => c.Embedding)
             .HasDatabaseName("ix_chunks_embedding_hnsw")
             .HasMethod("hnsw")

@@ -1,0 +1,167 @@
+<section class="settings-card" aria-labelledby="playground-heading">
+  <div>
+    <h2 id="playground-heading">Search playground</h2>
+    <p class="text-muted intro">
+      Ask a question the way your customers would and see which passages the bot would answer from,
+      and how each one scored. Every search uses a few embedding tokens.
+    </p>
+  </div>
+
+  <form class="search-form" (ngSubmit)="search()" novalidate>
+    <label for="playground-query" class="sr-only">Question</label>
+    <input
+      pInputText
+      id="playground-query"
+      name="query"
+      [(ngModel)]="query"
+      [attr.maxlength]="limits.query"
+      placeholder="e.g. How many vacation days do I get?"
+      autocomplete="off"
+      class="query-input"
+    />
+    <p-select
+      name="topK"
+      [(ngModel)]="topK"
+      [options]="topKOptions"
+      optionLabel="label"
+      optionValue="value"
+      ariaLabel="Number of results"
+      appendTo="body"
+      styleClass="top-k"
+    />
+    <p-button
+      type="submit"
+      label="Search"
+      icon="pi pi-search"
+      [disabled]="!canSearch()"
+      [loading]="state() === 'loading'"
+    />
+  </form>
+
+  @switch (state()) {
+    @case ('idle') {
+      <p class="text-muted placeholder">
+        Results show the document, page and section of each passage, its similarity in meaning,
+        whether the question's words were found, and the combined score used for ranking.
+      </p>
+    }
+    @case ('loading') {
+      <div aria-busy="true" aria-label="Searching">
+        @for (s of skeletons; track s) {
+          <div class="result">
+            <p-skeleton width="50%" />
+            <p-skeleton width="100%" height="3rem" />
+          </div>
+        }
+      </div>
+    }
+    @case ('error') {
+      <p-message severity="error" [text]="errorMessage() ?? ''" styleClass="search-error" />
+      <p-button label="Try again" icon="pi pi-refresh" [outlined]="true" (onClick)="retry()" />
+    }
+    @case ('ready') {
+      @if (result(); as found) {
+        <p class="summary text-muted" role="status">
+          @if (found.results.length === 1) {
+            1 passage
+          } @else {
+            {{ found.results.length }} passages
+          }
+          for “{{ found.query }}” · {{ found.queryTokens }} tokens ·
+          @if (found.minSimilarity > -1 || found.minKeywordSimilarity > -1) {
+            minimum similarity {{ fixed(found.minSimilarity, 2) }},
+            {{ fixed(found.minKeywordSimilarity, 2) }} with the question's words
+          } @else {
+            no minimum similarity
+          }
+        </p>
+
+        @if (found.results.length === 0) {
+          <p class="placeholder empty">
+            Nothing close enough was found. Try other words, or check on the Documents page that the
+            documents with the answer are Ready.
+          </p>
+        }
+
+        <ol class="results">
+          @for (r of found.results; track r.chunkId) {
+            <li class="result">
+              <div class="result-head">
+                <span class="rank">#{{ r.rank }}</span>
+                <span class="document" [title]="r.documentName">
+                  <i class="pi pi-file" aria-hidden="true"></i> {{ r.documentName }}
+                </span>
+                @if (r.pageNumber) {
+                  <span class="text-muted">Page {{ r.pageNumber }}</span>
+                }
+                @if (r.heading) {
+                  <span class="heading text-muted" [title]="r.heading">{{ r.heading }}</span>
+                }
+                @if (r.chunkCount > 1) {
+                  <p-tag severity="secondary" [value]="r.chunkCount + ' chunks joined'" />
+                }
+              </div>
+
+              <dl class="scores">
+                <div class="score similarity">
+                  <dt>Similarity</dt>
+                  <dd>
+                    <p-progressbar
+                      [value]="similarityPercent(r)"
+                      [showValue]="false"
+                      styleClass="similarity-bar"
+                      [attr.aria-label]="'Similarity ' + fixed(r.similarity, 3)"
+                    />
+                    <span class="value">{{ fixed(r.similarity, 3) }}</span>
+                  </dd>
+                </div>
+                <div class="score">
+                  <dt>Meaning search</dt>
+                  <dd>
+                    @if (r.vectorRank) {
+                      #{{ r.vectorRank }}
+                    } @else {
+                      <span class="text-muted">not in its top results</span>
+                    }
+                  </dd>
+                </div>
+                <div class="score">
+                  <dt>Keyword search</dt>
+                  <dd>
+                    @if (r.keywordRank) {
+                      #{{ r.keywordRank }}
+                      <span class="text-muted">({{ fixed(r.keywordScore, 3) }})</span>
+                    } @else {
+                      <span class="text-muted">no matching words</span>
+                    }
+                  </dd>
+                </div>
+                <div class="score">
+                  <dt>Combined</dt>
+                  <dd>{{ fixed(r.score, 4) }}</dd>
+                </div>
+              </dl>
+
+              <!-- Bound, not interpolated: shown with its exact line breaks and no template whitespace. -->
+              <p
+                class="content"
+                [class.clipped]="isLong(r) && !isExpanded(r)"
+                [textContent]="r.content"
+              ></p>
+              @if (isLong(r)) {
+                <button
+                  type="button"
+                  class="toggle"
+                  [attr.aria-expanded]="isExpanded(r)"
+                  (click)="toggle(r)"
+                >
+                  {{ isExpanded(r) ? 'Show less' : 'Show all' }}
+                </button>
+              }
+            </li>
+          }
+        </ol>
+      }
+    }
+  }
+</section>

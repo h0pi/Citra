@@ -114,13 +114,15 @@
                   [textContent]="chunk.content"
                 ></p>
                 @if (isLong(chunk)) {
-                  <p-button
-                    [label]="isExpanded(chunk) ? 'Show less' : 'Show all'"
-                    [text]="true"
-                    size="small"
+                  <!-- A plain button: aria-expanded must be on the focusable element itself. -->
+                  <button
+                    type="button"
+                    class="toggle"
                     [attr.aria-expanded]="isExpanded(chunk)"
-                    (onClick)="toggle(chunk)"
-                  />
+                    (click)="toggle(chunk)"
+                  >
+                    {{ isExpanded(chunk) ? 'Show less' : 'Show all' }}
+                  </button>
                 }
               </li>
             }

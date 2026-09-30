@@ -124,3 +124,26 @@
 .load-more {
   display: block;
 }
+
+// Show all / Show less: a small text button (plain <button>, so aria-expanded sits on the focusable element).
+.toggle {
+  align-self: flex-start;
+  padding: var(--citra-space-1) 0;
+  border: 0;
+  background: none;
+  color: var(--citra-primary);
+  font: inherit;
+  font-size: var(--citra-text-sm);
+  font-weight: 500;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--citra-primary);
+    outline-offset: 2px;
+    border-radius: var(--citra-radius-sm);
+  }
+}

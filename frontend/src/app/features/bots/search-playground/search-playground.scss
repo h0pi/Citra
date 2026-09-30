@@ -1,0 +1,175 @@
+:host {
+  display: block;
+}
+
+.settings-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--citra-space-4);
+  padding: var(--citra-space-5);
+  background: var(--citra-surface);
+  border: 1px solid var(--citra-border);
+  border-radius: var(--citra-radius-lg);
+  box-shadow: var(--citra-shadow-sm);
+
+  h2 {
+    margin: 0;
+    font-size: var(--citra-text-lg);
+  }
+}
+
+.intro {
+  margin: var(--citra-space-1) 0 0;
+  font-size: var(--citra-text-sm);
+}
+
+.search-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--citra-space-2);
+}
+
+.query-input {
+  flex: 1 1 18rem;
+  min-width: 0;
+}
+
+:host ::ng-deep .top-k {
+  flex: 0 0 9.5rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.placeholder {
+  margin: 0;
+}
+
+.summary {
+  margin: 0;
+  font-size: var(--citra-text-sm);
+}
+
+:host ::ng-deep .search-error {
+  margin-bottom: var(--citra-space-2);
+}
+
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: var(--citra-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.result {
+  display: flex;
+  flex-direction: column;
+  gap: var(--citra-space-2);
+  padding: var(--citra-space-3) var(--citra-space-4);
+  border: 1px solid var(--citra-border);
+  border-radius: var(--citra-radius-md);
+}
+
+.result-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--citra-space-1) var(--citra-space-3);
+  font-size: var(--citra-text-sm);
+  min-width: 0;
+}
+
+.rank {
+  font-weight: 600;
+  color: var(--citra-primary);
+}
+
+.document {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.heading {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scores {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: var(--citra-space-2) var(--citra-space-4);
+  margin: 0;
+  font-size: var(--citra-text-xs);
+
+  dt {
+    color: var(--citra-text-muted);
+  }
+
+  dd {
+    margin: 0;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.similarity dd {
+  display: flex;
+  align-items: center;
+  gap: var(--citra-space-2);
+}
+
+:host ::ng-deep .similarity-bar {
+  flex: 1;
+  height: 0.5rem;
+}
+
+.content {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: var(--citra-text-sm);
+  line-height: 1.55;
+}
+
+.content.clipped {
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  line-clamp: 6;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// Show all / Show less: a small text button (plain <button>, so aria-expanded sits on the focusable element).
+.toggle {
+  align-self: flex-start;
+  padding: var(--citra-space-1) 0;
+  border: 0;
+  background: none;
+  color: var(--citra-primary);
+  font: inherit;
+  font-size: var(--citra-text-sm);
+  font-weight: 500;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--citra-primary);
+    outline-offset: 2px;
+    border-radius: var(--citra-radius-sm);
+  }
+}

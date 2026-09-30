@@ -11,6 +11,7 @@ import { NotificationService } from '@core/services/notification.service';
 import { Observable, of, throwError } from 'rxjs';
 
 import { DeleteBotDialog } from '../delete-bot-dialog/delete-bot-dialog';
+import { SearchPlayground } from '../search-playground/search-playground';
 import { BotSettingsPage } from './bot-settings-page';
 
 const savedBot: Bot = {
@@ -38,6 +39,15 @@ describe('BotSettingsPage', () => {
   const success = vi.fn();
   const refresh = vi.fn();
   const canEdit = signal(true);
+
+  beforeAll(() => {
+    // jsdom has no ResizeObserver; PrimeNG's tab list watches its size to show scroll buttons.
+    globalThis.ResizeObserver ??= class {
+      observe = () => undefined;
+      unobserve = () => undefined;
+      disconnect = () => undefined;
+    } as unknown as typeof ResizeObserver;
+  });
 
   beforeEach(async () => {
     get.mockReset().mockReturnValue(of(savedBot));
@@ -268,5 +278,44 @@ describe('BotSettingsPage', () => {
     expect(success).toHaveBeenCalledWith('Bot deleted', '"Support" and all its data were removed.');
     expect(navigate).toHaveBeenCalledWith('/bots');
     expect(refresh).toHaveBeenCalled(); // the deleted bot leaves the top-bar selector
+  });
+
+  describe('search playground tab', () => {
+    const tabs = (el: HTMLElement) =>
+      [...el.querySelectorAll<HTMLElement>('p-tab')].map((t) => t.textContent?.trim());
+    const playground = (fixture: { debugElement: import('@angular/core').DebugElement }) =>
+      fixture.debugElement.query(By.directive(SearchPlayground));
+
+    it('gives owners and admins a second tab with the playground for this bot', async () => {
+      const { fixture, el } = await render();
+
+      expect(tabs(el)).toEqual(['Settings', 'Search playground']);
+      expect(el.querySelector('p-tab[aria-selected="true"]')?.textContent).toContain('Settings');
+
+      el.querySelectorAll<HTMLElement>('p-tab')[1].click();
+      await fixture.whenStable();
+
+      expect(el.querySelector('p-tab[aria-selected="true"]')?.textContent).toContain(
+        'Search playground',
+      );
+      const component = playground(fixture).componentInstance as SearchPlayground;
+      expect(component.botId()).toBe('b1');
+    });
+
+    it('keeps the settings form working inside its tab', async () => {
+      const { el, input } = await render();
+
+      expect(input('#name').value).toBe('Support');
+      expect(el.textContent).toContain('Danger zone');
+    });
+
+    it('shows viewers only the settings, without tabs or playground', async () => {
+      canEdit.set(false);
+      const { fixture, el, input } = await render();
+
+      expect(el.querySelector('p-tabs')).toBeNull();
+      expect(playground(fixture)).toBeNull();
+      expect(input('#name').value).toBe('Support');
+    });
   });
 });

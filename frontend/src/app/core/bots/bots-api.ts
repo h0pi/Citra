@@ -1,11 +1,19 @@
 import { HttpContext } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { SKIP_ERROR_TOAST } from '@core/interceptors/error.interceptor';
-import { Bot, BotSummary, CreateBotRequest, UpdateBotRequest } from '@core/models/bot.models';
+import {
+  Bot,
+  BotSearchResult,
+  BotSummary,
+  CreateBotRequest,
+  UpdateBotRequest,
+} from '@core/models/bot.models';
 import { ApiService, RequestOptions } from '@core/services/api.service';
 import { Observable } from 'rxjs';
 
-/** Create, update and delete are sent from forms/dialogs, which show errors themselves instead of a toast. */
+/**
+ * Create, update, delete and search are sent from forms/dialogs, which show errors themselves instead of a toast.
+ */
 const FORM_REQUEST = { context: new HttpContext().set(SKIP_ERROR_TOAST, true) };
 
 /** HTTP calls for /api/bots. Used by the bots pages and the "current bot" selector. */
@@ -36,5 +44,14 @@ export class BotsApi {
 
   delete(id: string): Observable<void> {
     return this.api.delete(`/api/bots/${encodeURIComponent(id)}`, FORM_REQUEST);
+  }
+
+  /** Search playground (owners and admins): the passages the bot would use for a question, with scores. */
+  search(id: string, query: string, topK: number): Observable<BotSearchResult> {
+    return this.api.get<BotSearchResult>(
+      `/api/bots/${encodeURIComponent(id)}/search`,
+      { q: query.trim(), topK },
+      FORM_REQUEST,
+    );
   }
 }

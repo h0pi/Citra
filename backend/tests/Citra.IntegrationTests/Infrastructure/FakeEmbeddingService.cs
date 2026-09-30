@@ -27,7 +27,10 @@ public sealed class FakeEmbeddingService : IEmbeddingService
     /// <summary>The texts of every EmbedDocumentsAsync call, in call order.</summary>
     public IReadOnlyList<IReadOnlyList<string>> DocumentCalls => [.. _documentCalls];
 
-    /// <summary>Runs <paramref name="beforeEmbed"/> before every call until the returned handle is disposed.</summary>
+    /// <summary>
+    /// Runs <paramref name="beforeEmbed"/> before every call (documents and questions) until the returned handle is
+    /// disposed.
+    /// </summary>
     public IDisposable Intercept(Func<IReadOnlyList<string>, CancellationToken, Task> beforeEmbed)
     {
         _beforeEmbed = beforeEmbed;
@@ -45,8 +48,15 @@ public sealed class FakeEmbeddingService : IEmbeddingService
         return new DocumentEmbeddings([.. texts.Select(VectorFor)], texts.Sum(TokensFor));
     }
 
-    public Task<QueryEmbedding> EmbedQueryAsync(string text, CancellationToken cancellationToken) =>
-        Task.FromResult(new QueryEmbedding(VectorFor(text), TokensFor(text)));
+    public async Task<QueryEmbedding> EmbedQueryAsync(string text, CancellationToken cancellationToken)
+    {
+        if (_beforeEmbed is { } hook)
+        {
+            await hook([text], cancellationToken);
+        }
+
+        return new QueryEmbedding(VectorFor(text), TokensFor(text));
+    }
 
     public static int TokensFor(string text) => (text.Length / 4) + 1;
 

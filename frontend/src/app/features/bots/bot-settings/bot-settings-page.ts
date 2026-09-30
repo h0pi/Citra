@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
   ChangeDetectionStrategy,
@@ -28,10 +29,12 @@ import { MessageModule } from 'primeng/message';
 import { SelectModule } from 'primeng/select';
 import { SkeletonModule } from 'primeng/skeleton';
 import { SliderModule } from 'primeng/slider';
+import { TabsModule } from 'primeng/tabs';
 import { TextareaModule } from 'primeng/textarea';
 import { forkJoin } from 'rxjs';
 
 import { DeleteBotDialog } from '../delete-bot-dialog/delete-bot-dialog';
+import { SearchPlayground } from '../search-playground/search-playground';
 
 const HEX_COLOR = /^#[0-9A-Fa-f]{6}$/;
 
@@ -49,21 +52,27 @@ interface ModelOption {
 
 type Field = 'name' | 'description' | 'systemPrompt' | 'welcomeMessage' | 'widgetColor';
 
-/** Edit one bot: name, instructions, model, answer style and widget color. */
+/**
+ * Edit one bot: name, instructions, model, answer style and widget color. Owners and admins also get a second
+ * tab, the search playground, to check what the bot finds for a question.
+ */
 @Component({
   selector: 'app-bot-settings-page',
   imports: [
+    NgTemplateOutlet,
     ReactiveFormsModule,
     RouterLink,
     PageHeader,
     EmptyState,
     DeleteBotDialog,
+    SearchPlayground,
     ButtonModule,
     InputTextModule,
     MessageModule,
     SelectModule,
     SkeletonModule,
     SliderModule,
+    TabsModule,
     TextareaModule,
   ],
   templateUrl: './bot-settings-page.html',
@@ -89,6 +98,8 @@ export class BotSettingsPage implements HasUnsavedChanges {
   protected readonly state = signal<'loading' | 'ready' | 'not-found' | 'error'>('loading');
   protected readonly saving = signal(false);
   protected readonly showDelete = signal(false);
+  /** Open tab (owners and admins): the settings form or the search playground. */
+  protected readonly tab = signal<string | number | undefined>('settings');
   protected readonly errorMessage = signal<string | null>(null);
 
   protected readonly form = inject(NonNullableFormBuilder).group({

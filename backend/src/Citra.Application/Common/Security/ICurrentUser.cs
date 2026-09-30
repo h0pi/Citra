@@ -40,4 +40,19 @@ public static class CurrentUserExtensions
 
         return tenantId;
     }
+
+    /// <summary>
+    /// For admin tools (e.g. the search playground, which shows how retrieval scores): only Owner and Admin.
+    /// Returns the user's tenant.
+    /// </summary>
+    public static Guid RequireAdminTenantId(this ICurrentUser user)
+    {
+        var tenantId = user.RequireTenantId();
+        if (user.Role is not (UserRole.Owner or UserRole.Admin))
+        {
+            throw new ForbiddenException("Only owners and admins can use this.");
+        }
+
+        return tenantId;
+    }
 }

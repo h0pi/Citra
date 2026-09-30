@@ -1,8 +1,12 @@
 using System.Net.Http.Json;
 using System.Security.Cryptography;
 using System.Text.Json;
+using Citra.Application.Common.Embeddings;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Citra.IntegrationTests.Infrastructure;
 
@@ -20,6 +24,13 @@ public sealed class ApiFactory(DatabaseFixture database) : WebApplicationFactory
         builder.UseSetting("ConnectionStrings:Database", database.ConnectionString);
         builder.UseSetting("Jwt:SigningKey", _signingKey);
         builder.UseSetting("Storage:LocalRootPath", database.StorageRoot);
+
+        // Like the database fixture: never Voyage, and every match kept (fake vectors are unrelated). The keyword
+        // minimum differs from the other one only so tests can tell which value the API reports where.
+        builder.UseSetting("Retrieval:MinSimilarity", "-1");
+        builder.UseSetting("Retrieval:MinKeywordSimilarity", "-0.99");
+        builder.ConfigureTestServices(services =>
+            services.Replace(ServiceDescriptor.Singleton<IEmbeddingService>(database.Embeddings)));
     }
 
     /// <summary>Signs up a new company with one owner, as the register page does; returns their access token.</summary>

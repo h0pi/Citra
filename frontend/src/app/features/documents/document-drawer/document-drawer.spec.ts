@@ -191,13 +191,16 @@ describe('DocumentDrawer', () => {
     const { fixture, chunkItems } = await open(doc());
     const [long, short] = chunkItems();
     expect(long.querySelector('.chunk-content')?.classList).toContain('clipped');
-    expect(short.querySelector('p-button')).toBeNull();
+    expect(short.querySelector('button.toggle')).toBeNull();
+    expect(long.querySelector('button.toggle')?.getAttribute('aria-expanded')).toBe('false');
 
-    long.querySelector<HTMLButtonElement>('p-button button')!.click();
+    long.querySelector<HTMLButtonElement>('button.toggle')!.click();
     await fixture.whenStable();
 
     expect(chunkItems()[0].querySelector('.chunk-content')?.classList).not.toContain('clipped');
-    expect(chunkItems()[0].querySelector('p-button button')?.textContent).toContain('Show less');
+    const toggle = chunkItems()[0].querySelector('button.toggle')!;
+    expect(toggle.textContent).toContain('Show less');
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
   });
 
   it('offers a retry when the chunks cannot be loaded', async () => {

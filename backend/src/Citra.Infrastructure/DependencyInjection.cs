@@ -2,6 +2,7 @@ using Citra.Application.Common.Chunking;
 using Citra.Application.Common.Embeddings;
 using Citra.Application.Common.Extraction;
 using Citra.Application.Common.Persistence;
+using Citra.Application.Common.Retrieval;
 using Citra.Application.Common.Storage;
 using Citra.Application.Features.Documents.Processing;
 using Citra.Infrastructure.Chunking;
@@ -13,6 +14,7 @@ using Citra.Infrastructure.Options;
 using Citra.Infrastructure.Persistence;
 using Citra.Infrastructure.Persistence.Interceptors;
 using Citra.Infrastructure.Processing;
+using Citra.Infrastructure.Retrieval;
 using Citra.Infrastructure.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -39,6 +41,7 @@ public static class DependencyInjection
         services.AddValidatedOptions<VoyageOptions>(configuration, VoyageOptions.SectionName);
         services.AddValidatedOptions<StorageOptions>(configuration, StorageOptions.SectionName);
         services.AddValidatedOptions<ProcessingOptions>(configuration, ProcessingOptions.SectionName);
+        services.AddValidatedOptions<RetrievalOptions>(configuration, RetrievalOptions.SectionName);
 
         var connectionString = configuration.GetConnectionString("Database");
         if (string.IsNullOrWhiteSpace(connectionString))
@@ -97,6 +100,10 @@ public static class DependencyInjection
 
         // Background processing: jobs are claimed with row locks, one unit of work per job.
         services.AddScoped<IProcessingJobQueue, ProcessingJobQueue>();
+
+        // Search (vector and keyword) in PostgreSQL. Scoped: runs on the request's DbContext.
+        services.AddScoped<IChunkSearch, ChunkSearch>();
+        services.AddSingleton<IRetrievalSettings, ConfiguredRetrievalSettings>();
 
         services.AddHealthChecks()
             .AddCheck<DatabaseHealthCheck>("database", tags: ["ready"]);

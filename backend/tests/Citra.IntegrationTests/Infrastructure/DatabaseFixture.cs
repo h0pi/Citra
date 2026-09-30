@@ -48,6 +48,10 @@ public sealed class DatabaseFixture : IAsyncLifetime
                 ["Voyage:BatchSize"] = "8",
                 ["Storage:LocalRootPath"] = StorageRoot,
                 ["Storage:MaxUploadSizeMb"] = "20",
+                // Fake vectors are unrelated to each other (similarity about 0): keep every match unless a test
+                // sets its own minimum (see RelevanceThresholdTests).
+                ["Retrieval:MinSimilarity"] = "-1",
+                ["Retrieval:MinKeywordSimilarity"] = "-1",
             })
             .Build();
 
@@ -130,4 +134,14 @@ public sealed class DatabaseCollection : ICollectionFixture<DatabaseFixture>
 public sealed class IsolatedDatabaseCollection : ICollectionFixture<DatabaseFixture>
 {
     public const string Name = "Isolated database";
+}
+
+/// <summary>
+/// A third database container that holds only what its tests put there: the search index's shape depends on every
+/// vector in the table, so tests of how the index behaves must not share it with other tests' made-up vectors.
+/// </summary>
+[CollectionDefinition(Name)]
+public sealed class SearchIndexCollection : ICollectionFixture<DatabaseFixture>
+{
+    public const string Name = "Search index";
 }

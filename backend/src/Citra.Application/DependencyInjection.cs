@@ -1,5 +1,6 @@
 using Citra.Application.Common.Behaviors;
 using Citra.Application.Common.Chunking;
+using Citra.Application.Common.Retrieval;
 using Citra.Application.Features.Auth;
 using Citra.Application.Features.Documents.Processing;
 using FluentValidation;
@@ -37,6 +38,9 @@ public static class DependencyInjection
         services.AddScoped<IProcessingJobRunner, ProcessingJobRunner>();
         services.AddScoped<DocumentPipeline>();
         services.AddSingleton<ProcessingFailures>(); // opens its own scope for every failure
+
+        // Finding the chunks that answer a question (chat, search playground). Scoped like the database search.
+        services.AddScoped<IRetriever, Retriever>();
 
         return services;
     }

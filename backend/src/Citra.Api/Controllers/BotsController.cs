@@ -3,6 +3,7 @@ using Citra.Application.Features.Bots.Create;
 using Citra.Application.Features.Bots.Delete;
 using Citra.Application.Features.Bots.GetById;
 using Citra.Application.Features.Bots.List;
+using Citra.Application.Features.Bots.Search;
 using Citra.Application.Features.Bots.Update;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -68,6 +69,20 @@ public sealed class BotsController(ISender sender) : ControllerBase
                 request.Temperature,
                 request.WidgetColor),
             cancellationToken);
+
+    /// <summary>
+    /// Search playground (Owner and Admin): the passages the bot would use to answer <paramref name="q"/>, best
+    /// first, with every score. Costs the question's embedding tokens.
+    /// </summary>
+    [HttpGet("{id:guid}/search")]
+    [ProducesResponseType<BotSearchResult>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status503ServiceUnavailable)]
+    public Task<BotSearchResult> Search(
+        Guid id, [FromQuery] string? q, [FromQuery] int topK = SearchBotQuery.DefaultTopK, CancellationToken cancellationToken = default) =>
+        sender.Send(new SearchBotQuery(id, q ?? string.Empty, topK), cancellationToken);
 
     /// <summary>Permanently deletes the bot with its documents, chats, evals and files.</summary>
     [HttpDelete("{id:guid}")]

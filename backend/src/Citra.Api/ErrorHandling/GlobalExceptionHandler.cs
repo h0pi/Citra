@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Citra.Application.Common.Embeddings;
 using Citra.Application.Common.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
@@ -67,6 +68,14 @@ public sealed class GlobalExceptionHandler(
                 Detail = conflict.Message,
             },
 
+            // The embedding provider is down or rate-limited even after retries: a temporary problem, not a bug.
+            EmbeddingException => new ProblemDetails
+            {
+                Status = StatusCodes.Status503ServiceUnavailable,
+                Title = "The AI service is not available right now.",
+                Detail = "Please try again in a minute.",
+            },
+
             _ => new ProblemDetails
             {
                 Status = StatusCodes.Status500InternalServerError,
@@ -80,6 +89,13 @@ public sealed class GlobalExceptionHandler(
             logger.LogError(
                 exception,
                 "Unhandled exception for {Method} {Path}",
+                httpContext.Request.Method, httpContext.Request.Path);
+        }
+        else if (problem.Status == StatusCodes.Status503ServiceUnavailable)
+        {
+            logger.LogWarning(
+                exception,
+                "AI provider unavailable for {Method} {Path}",
                 httpContext.Request.Method, httpContext.Request.Path);
         }
 
