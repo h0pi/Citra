@@ -54,7 +54,7 @@ public sealed class UpdateBotTests(DatabaseFixture fixture)
 
         await using (var scope = fixture.OpenScope(tenant.Id))
         {
-            await scope.Send(ValidUpdate(bot) with { SystemPrompt = "Be brief.", Model = "claude-sonnet-5" });
+            await scope.Send(ValidUpdate(bot) with { SystemPrompt = "Be brief.", Model = "claude-sonnet-5-5" });
         }
 
         await using var again = fixture.OpenScope(tenant.Id);

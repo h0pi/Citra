@@ -9,7 +9,7 @@ public static class BotModels
     public static readonly IReadOnlyList<string> Supported =
     [
         "claude-opus-5-5",
-        "claude-sonnet-5",
+        "claude-sonnet-5-5",
         "claude-haiku-4-5",
     ];
 

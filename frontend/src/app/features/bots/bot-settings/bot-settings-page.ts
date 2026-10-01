@@ -41,7 +41,7 @@ const HEX_COLOR = /^#[0-9A-Fa-f]{6}$/;
 /** Friendly names for the model dropdown; unknown ids are shown as they are. */
 const MODEL_LABELS: Record<string, string> = {
   'claude-opus-5-5': 'Claude Opus 5.5 · most capable, highest cost',
-  'claude-sonnet-5': 'Claude Sonnet 5 · balanced quality and cost',
+  'claude-sonnet-5-5': 'Claude Sonnet 5.5 · balanced quality and cost',
   'claude-haiku-4-5': 'Claude Haiku 4.5 · fastest, lowest cost',
 };
 

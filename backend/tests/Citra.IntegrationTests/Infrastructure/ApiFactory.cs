@@ -1,6 +1,7 @@
 using System.Net.Http.Json;
 using System.Security.Cryptography;
 using System.Text.Json;
+using Citra.Application.Common.Chat;
 using Citra.Application.Common.Embeddings;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -30,7 +31,10 @@ public sealed class ApiFactory(DatabaseFixture database) : WebApplicationFactory
         builder.UseSetting("Retrieval:MinSimilarity", "-1");
         builder.UseSetting("Retrieval:MinKeywordSimilarity", "-0.99");
         builder.ConfigureTestServices(services =>
-            services.Replace(ServiceDescriptor.Singleton<IEmbeddingService>(database.Embeddings)));
+        {
+            services.Replace(ServiceDescriptor.Singleton<IEmbeddingService>(database.Embeddings));
+            services.Replace(ServiceDescriptor.Transient<IChatModel>(_ => database.Chat));
+        });
     }
 
     /// <summary>Signs up a new company with one owner, as the register page does; returns their access token.</summary>

@@ -1,4 +1,5 @@
 using Citra.Application;
+using Citra.Application.Common.Chat;
 using Citra.Application.Common.Embeddings;
 using Citra.Application.Common.Security;
 using Citra.Domain.Users;
@@ -32,6 +33,9 @@ public sealed class DatabaseFixture : IAsyncLifetime
     /// <summary>The embedding service every scope gets (see <see cref="FakeEmbeddingService"/>).</summary>
     public FakeEmbeddingService Embeddings { get; } = new();
 
+    /// <summary>The chat model every scope gets (see <see cref="FakeChatModel"/>).</summary>
+    public FakeChatModel Chat { get; } = new();
+
     public async ValueTask InitializeAsync()
     {
         await _container.StartAsync();
@@ -52,6 +56,9 @@ public sealed class DatabaseFixture : IAsyncLifetime
                 // sets its own minimum (see RelevanceThresholdTests).
                 ["Retrieval:MinSimilarity"] = "-1",
                 ["Retrieval:MinKeywordSimilarity"] = "-1",
+                // The model name FakeChatModel's scripted answers report.
+                ["Chat:Prices:claude-test:InputPerMillionUsd"] = "2",
+                ["Chat:Prices:claude-test:OutputPerMillionUsd"] = "10",
             })
             .Build();
 
@@ -66,6 +73,7 @@ public sealed class DatabaseFixture : IAsyncLifetime
 
         // Never Voyage: no network, no cost. (The Voyage client itself is tested with a scripted HTTP handler.)
         services.Replace(ServiceDescriptor.Singleton<IEmbeddingService>(Embeddings));
+        services.Replace(ServiceDescriptor.Transient<IChatModel>(_ => Chat)); // never Claude: no key, no cost
 
         _services = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
 
@@ -111,6 +119,19 @@ public sealed class DbScope(AsyncServiceScope scope) : IAsyncDisposable
     /// <summary>Runs a command or query through MediatR, with the same validation and logging as the API.</summary>
     public Task<TResponse> Send<TResponse>(MediatR.IRequest<TResponse> request) =>
         scope.ServiceProvider.GetRequiredService<MediatR.ISender>().Send(request, TestContext.Current.CancellationToken);
+
+    /// <summary>Runs a streaming request (e.g. a chat answer) through MediatR and collects everything it streams.</summary>
+    public async Task<List<TResponse>> Stream<TResponse>(MediatR.IStreamRequest<TResponse> request)
+    {
+        var items = new List<TResponse>();
+        await foreach (var item in scope.ServiceProvider.GetRequiredService<MediatR.ISender>()
+            .CreateStream(request, TestContext.Current.CancellationToken))
+        {
+            items.Add(item);
+        }
+
+        return items;
+    }
 
     /// <summary>Same, for commands that return nothing.</summary>
     public Task Send(MediatR.IRequest request) =>

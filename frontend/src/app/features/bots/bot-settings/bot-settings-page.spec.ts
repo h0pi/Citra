@@ -51,7 +51,7 @@ describe('BotSettingsPage', () => {
 
   beforeEach(async () => {
     get.mockReset().mockReturnValue(of(savedBot));
-    models.mockReset().mockReturnValue(of(['claude-sonnet-5', 'claude-haiku-4-5']));
+    models.mockReset().mockReturnValue(of(['claude-sonnet-5-5', 'claude-haiku-4-5']));
     update.mockReset();
     success.mockReset();
     refresh.mockReset();
@@ -240,7 +240,7 @@ describe('BotSettingsPage', () => {
       fixture.componentInstance as unknown as { modelOptions: () => { value: string | null }[] }
     ).modelOptions();
 
-    expect(options.map((o) => o.value)).toEqual([null, 'claude-sonnet-5', 'claude-haiku-4-5']);
+    expect(options.map((o) => o.value)).toEqual([null, 'claude-sonnet-5-5', 'claude-haiku-4-5']);
   });
 
   it('has a danger zone for editors that opens the delete dialog', async () => {

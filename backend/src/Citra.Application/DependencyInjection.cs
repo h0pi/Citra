@@ -1,4 +1,5 @@
 using Citra.Application.Common.Behaviors;
+using Citra.Application.Common.Chat;
 using Citra.Application.Common.Chunking;
 using Citra.Application.Common.Retrieval;
 using Citra.Application.Features.Auth;
@@ -25,6 +26,7 @@ public static class DependencyInjection
             // so failed validations are logged with their duration too.
             config.AddOpenBehavior(typeof(LoggingBehavior<,>));
             config.AddOpenBehavior(typeof(ValidationBehavior<,>));
+            config.AddOpenStreamBehavior(typeof(StreamValidationBehavior<,>)); // streamed answers (chat)
         });
 
         services.AddValidatorsFromAssembly(assembly, includeInternalTypes: true);
@@ -41,6 +43,9 @@ public static class DependencyInjection
 
         // Finding the chunks that answer a question (chat, search playground). Scoped like the database search.
         services.AddScoped<IRetriever, Retriever>();
+
+        // Chat: follow-up questions become standalone ones before searching.
+        services.AddScoped<IQueryRewriter, QueryRewriter>();
 
         return services;
     }

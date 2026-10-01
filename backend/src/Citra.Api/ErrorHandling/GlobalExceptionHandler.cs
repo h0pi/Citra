@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Citra.Application.Common.Chat;
 using Citra.Application.Common.Embeddings;
 using Citra.Application.Common.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
@@ -68,8 +69,8 @@ public sealed class GlobalExceptionHandler(
                 Detail = conflict.Message,
             },
 
-            // The embedding provider is down or rate-limited even after retries: a temporary problem, not a bug.
-            EmbeddingException => new ProblemDetails
+            // An AI provider (embeddings or chat) is down or rate-limited even after retries: temporary, not a bug.
+            EmbeddingException or ChatModelException => new ProblemDetails
             {
                 Status = StatusCodes.Status503ServiceUnavailable,
                 Title = "The AI service is not available right now.",

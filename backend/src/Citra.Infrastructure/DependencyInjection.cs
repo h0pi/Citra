@@ -1,3 +1,4 @@
+using Citra.Application.Common.Chat;
 using Citra.Application.Common.Chunking;
 using Citra.Application.Common.Embeddings;
 using Citra.Application.Common.Extraction;
@@ -5,6 +6,7 @@ using Citra.Application.Common.Persistence;
 using Citra.Application.Common.Retrieval;
 using Citra.Application.Common.Storage;
 using Citra.Application.Features.Documents.Processing;
+using Citra.Infrastructure.Chat;
 using Citra.Infrastructure.Chunking;
 using Citra.Infrastructure.Embeddings;
 using Citra.Infrastructure.Extraction;
@@ -38,6 +40,7 @@ public static class DependencyInjection
     {
         // Typed settings, validated at startup (shared by Api and Worker).
         services.AddValidatedOptions<AnthropicOptions>(configuration, AnthropicOptions.SectionName);
+        services.AddValidatedOptions<ChatOptions>(configuration, ChatOptions.SectionName);
         services.AddValidatedOptions<VoyageOptions>(configuration, VoyageOptions.SectionName);
         services.AddValidatedOptions<StorageOptions>(configuration, StorageOptions.SectionName);
         services.AddValidatedOptions<ProcessingOptions>(configuration, ProcessingOptions.SectionName);
@@ -97,6 +100,23 @@ public static class DependencyInjection
                 client.Timeout = Timeout.InfiniteTimeSpan; // the resilience pipeline owns timeouts (retries need time)
             })
             .AddVoyageResilience();
+
+        // Answers: Claude (typed HttpClient with retries before the answer starts; no overall client timeout, a long
+        // answer streams for a while) or the free stand-in, chosen by Chat:Provider.
+        services.AddHttpClient<ClaudeChatModel>((provider, client) =>
+            {
+                var anthropic = provider.GetRequiredService<IOptions<AnthropicOptions>>().Value;
+                client.BaseAddress = new Uri(anthropic.BaseUrl.EndsWith('/') ? anthropic.BaseUrl : anthropic.BaseUrl + "/");
+                client.Timeout = Timeout.InfiniteTimeSpan;
+            })
+            .AddClaudeResilience();
+        services.AddSingleton<ExtractiveChatModel>();
+        services.AddSingleton<IChatSettings, ConfiguredChatSettings>();
+        services.AddSingleton<IChatPricing, ConfiguredChatPricing>();
+        services.AddTransient<IChatModel>(provider =>
+            provider.GetRequiredService<IOptions<ChatOptions>>().Value.Provider == ChatProvider.Anthropic
+                ? provider.GetRequiredService<ClaudeChatModel>()
+                : provider.GetRequiredService<ExtractiveChatModel>());
 
         // Background processing: jobs are claimed with row locks, one unit of work per job.
         services.AddScoped<IProcessingJobQueue, ProcessingJobQueue>();
