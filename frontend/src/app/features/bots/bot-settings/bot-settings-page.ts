@@ -12,7 +12,13 @@ import {
   untracked,
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '@core/auth/auth.service';
 import { BotsApi } from '@core/bots/bots-api';
@@ -50,7 +56,26 @@ interface ModelOption {
   value: string | null;
 }
 
-type Field = 'name' | 'description' | 'systemPrompt' | 'welcomeMessage' | 'widgetColor';
+type Field =
+  'name' | 'description' | 'systemPrompt' | 'welcomeMessage' | 'starterQuestions' | 'widgetColor';
+
+/** Starter questions are typed one per line; empty lines do not count. */
+const lines = (text: string) =>
+  text
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+
+function starterQuestionsValidator(control: AbstractControl<string>): ValidationErrors | null {
+  const questions = lines(control.value);
+  if (questions.length > BOT_LIMITS.starterQuestions) {
+    return { starterQuestions: `Use at most ${BOT_LIMITS.starterQuestions} questions.` };
+  }
+  if (questions.some((q) => q.length > BOT_LIMITS.starterQuestion)) {
+    return { starterQuestions: `Keep each question to ${BOT_LIMITS.starterQuestion} characters.` };
+  }
+  return null;
+}
 
 /**
  * Edit one bot: name, instructions, model, answer style and widget color. Owners and admins also get a second
@@ -106,6 +131,7 @@ export class BotSettingsPage implements HasUnsavedChanges {
     name: ['', [Validators.required, Validators.maxLength(BOT_LIMITS.name)]],
     description: ['', [Validators.maxLength(BOT_LIMITS.description)]],
     welcomeMessage: ['', [Validators.required, Validators.maxLength(BOT_LIMITS.welcomeMessage)]],
+    starterQuestions: ['', [starterQuestionsValidator]],
     systemPrompt: ['', [Validators.maxLength(BOT_LIMITS.systemPrompt)]],
     model: [null as string | null],
     temperature: [0.2],
@@ -190,6 +216,7 @@ export class BotSettingsPage implements HasUnsavedChanges {
         // The slider works in 0.1 steps; avoid values like 0.30000000000000004.
         temperature: Math.round(value.temperature * 10) / 10,
         widgetColor: value.widgetColor.toUpperCase(),
+        starterQuestions: lines(value.starterQuestions),
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -259,6 +286,7 @@ export class BotSettingsPage implements HasUnsavedChanges {
     if (errors['server']) return errors['server'] as string;
     if (errors['required']) return 'This field is required.';
     if (errors['pattern']) return 'Use a hex color like #6366F1.';
+    if (errors['starterQuestions']) return errors['starterQuestions'] as string;
     if (errors['maxlength']) {
       return `Use at most ${(errors['maxlength'] as { requiredLength: number }).requiredLength} characters.`;
     }
@@ -273,6 +301,7 @@ export class BotSettingsPage implements HasUnsavedChanges {
       name: bot.name,
       description: bot.description ?? '',
       welcomeMessage: bot.welcomeMessage,
+      starterQuestions: bot.starterQuestions.join('\n'),
       systemPrompt: bot.systemPrompt ?? '',
       model: bot.model,
       temperature: bot.temperature,

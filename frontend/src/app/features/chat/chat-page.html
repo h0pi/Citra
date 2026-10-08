@@ -1,0 +1,224 @@
+@let bot = currentBot.bot();
+
+@switch (currentBot.status()) {
+  @case ('error') {
+    <app-empty-state
+      icon="pi-exclamation-triangle"
+      title="Couldn't load your bots"
+      message="Check your connection and try again."
+    >
+      <p-button label="Try again" icon="pi pi-refresh" (onClick)="currentBot.refresh()" />
+    </app-empty-state>
+  }
+  @case ('ready') {
+    @if (!bot) {
+      <h1 class="sr-only">Chat</h1>
+      <app-empty-state
+        icon="pi-microchip-ai"
+        title="Create a bot first"
+        message="Chats are with a bot. Create one, add its documents, then ask it questions here."
+      >
+        <p-button label="Go to bots" icon="pi pi-arrow-right" iconPos="right" routerLink="/bots" />
+      </app-empty-state>
+    } @else {
+      <div class="chat-layout" [class.list-open]="listOpen()" [class.sources-open]="sourcesOpen()">
+        <aside class="list-panel" aria-label="Your chats">
+          <header class="panel-header">
+            <h2>Chats</h2>
+            <p-button
+              label="New chat"
+              icon="pi pi-plus"
+              size="small"
+              [text]="true"
+              routerLink="/chat"
+              (onClick)="listOpen.set(false)"
+            />
+            <p-button
+              class="small-screen-only"
+              icon="pi pi-times"
+              [text]="true"
+              [rounded]="true"
+              severity="secondary"
+              ariaLabel="Close chats"
+              (onClick)="listOpen.set(false)"
+            />
+          </header>
+          <app-conversation-list
+            [conversations]="conversations()"
+            [selectedId]="conversationId() ?? null"
+            [state]="listState()"
+            [hasMore]="hasMore()"
+            [loadingMore]="loadingMore()"
+            (retry)="retryLoadingList()"
+            (loadMore)="loadMoreConversations()"
+            (picked)="listOpen.set(false)"
+          />
+        </aside>
+
+        <section class="thread-panel">
+          <header class="thread-header">
+            <p-button
+              class="small-screen-only"
+              icon="pi pi-bars"
+              [text]="true"
+              severity="secondary"
+              ariaLabel="Show chats"
+              [attr.aria-expanded]="listOpen()"
+              (onClick)="toggleList()"
+            />
+            @if (renaming()) {
+              <input
+                #titleInput
+                pInputText
+                class="thread-title"
+                aria-label="Chat name"
+                maxlength="200"
+                [value]="conversation()?.title ?? ''"
+                (keydown.enter)="saveTitle(titleInput.value)"
+                (keydown.escape)="renaming.set(false)"
+                (blur)="saveTitle(titleInput.value)"
+              />
+            } @else {
+              <h1 class="thread-title" [title]="conversation()?.title ?? ''">
+                {{ conversation()?.title ?? 'Chat with ' + bot.name }}
+              </h1>
+            }
+            @if (conversation()) {
+              <p-button
+                icon="pi pi-pencil"
+                [text]="true"
+                [rounded]="true"
+                severity="secondary"
+                ariaLabel="Rename chat"
+                (onClick)="startRename()"
+              />
+              <p-button
+                icon="pi pi-trash"
+                [text]="true"
+                [rounded]="true"
+                severity="secondary"
+                ariaLabel="Delete chat"
+                (onClick)="confirmDelete()"
+              />
+            }
+            <p-button
+              class="medium-screen-only"
+              label="Sources"
+              icon="pi pi-book"
+              [text]="true"
+              severity="secondary"
+              [attr.aria-expanded]="sourcesOpen()"
+              (onClick)="toggleSources()"
+            />
+          </header>
+
+          <div class="thread-body">
+            @switch (chatState()) {
+              @case ('none') {
+                @if (live()) {
+                  <app-message-thread
+                    [live]="live()"
+                    [botName]="bot.name"
+                    (retry)="retryAnswer()"
+                  />
+                } @else {
+                  <div class="welcome">
+                    <span class="welcome-icon" aria-hidden="true"
+                      ><i class="pi pi-comments"></i
+                    ></span>
+                    <h2>Ask {{ bot.name }} anything</h2>
+                    <p class="text-muted">
+                      Answers come only from {{ bot.name }}'s documents, with a link to every
+                      source.
+                    </p>
+                    <div class="starters">
+                      @for (question of bot.starterQuestions; track $index) {
+                        <p-button
+                          [label]="question"
+                          severity="secondary"
+                          [outlined]="true"
+                          size="small"
+                          (onClick)="ask(question)"
+                        />
+                      }
+                    </div>
+                  </div>
+                }
+              }
+              @case ('loading') {
+                <div class="thread-skeleton" aria-busy="true" aria-label="Loading the chat">
+                  @for (s of skeletons; track s) {
+                    <p-skeleton width="45%" height="2.5rem" styleClass="skeleton-question" />
+                    <p-skeleton width="70%" height="4rem" />
+                  }
+                </div>
+              }
+              @case ('not-found') {
+                <app-empty-state
+                  icon="pi-search"
+                  title="Chat not found"
+                  message="It may have been deleted, or the link is wrong."
+                >
+                  <p-button label="New chat" icon="pi pi-plus" routerLink="/chat" />
+                </app-empty-state>
+              }
+              @case ('error') {
+                <app-empty-state
+                  icon="pi-exclamation-triangle"
+                  title="Couldn't load this chat"
+                  message="Check your connection and try again."
+                >
+                  <p-button label="Try again" icon="pi pi-refresh" (onClick)="retryLoadingChat()" />
+                </app-empty-state>
+              }
+              @case ('ready') {
+                @if (conversation(); as chat) {
+                  <app-message-thread
+                    [messages]="chat.messages"
+                    [live]="live()"
+                    [botName]="bot.name"
+                    (retry)="retryAnswer()"
+                    (cite)="showSource($event)"
+                    (rate)="rate($event)"
+                  />
+                }
+              }
+            }
+          </div>
+
+          @if (chatState() === 'none' || chatState() === 'ready') {
+            <footer class="composer-area">
+              <app-message-composer
+                [busy]="sending()"
+                [placeholder]="'Ask ' + bot.name + ' a question…'"
+                (send)="ask($event)"
+                (stop)="stopGenerating()"
+              />
+            </footer>
+          }
+        </section>
+
+        <aside class="sources-wrap">
+          <app-sources-panel
+            [sources]="sources()"
+            [selected]="selectedSource()"
+            (closed)="closeSources()"
+          />
+        </aside>
+
+        <p class="sr-only" aria-live="polite">{{ announcement() }}</p>
+
+        @if (listOpen() || sourcesOpen()) {
+          <div class="backdrop" (click)="closePanels()" aria-hidden="true"></div>
+        }
+      </div>
+    }
+  }
+  @default {
+    <div class="page-loading" aria-busy="true" aria-label="Loading">
+      <p-skeleton height="100%" />
+    </div>
+  }
+}
+
+<p-confirmdialog [style]="{ width: '28rem' }" [breakpoints]="{ '575px': '95vw' }" />

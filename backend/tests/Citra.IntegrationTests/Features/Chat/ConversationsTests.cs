@@ -256,6 +256,46 @@ public sealed class ConversationsTests(DatabaseFixture fixture)
         await Should.ThrowAsync<UnauthorizedException>(() => scope.Send(new GetConversationsQuery(seed.Bot.Id)));
         await Should.ThrowAsync<UnauthorizedException>(() => scope.Send(new GetConversationQuery(Guid.NewGuid())));
         await Should.ThrowAsync<UnauthorizedException>(() => scope.Send(new DeleteConversationCommand(Guid.NewGuid())));
+        await Should.ThrowAsync<UnauthorizedException>(() => scope.Send(new RenameConversationCommand(Guid.NewGuid(), "x")));
+    }
+
+    [Fact]
+    public async Task Renames_a_chat()
+    {
+        var seed = await SeedAsync(fixture, [VacationChunk]);
+        var conversationId = await AskAsync(fixture, seed, "How many vacation days?");
+
+        await using var scope = Scope(fixture, seed);
+        await scope.Send(new RenameConversationCommand(conversationId, "  Vacation  "));
+
+        (await scope.Send(new GetConversationQuery(conversationId))).Title.ShouldBe("Vacation");
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task A_chat_needs_a_name_of_at_most_200_characters(string title)
+    {
+        var seed = await SeedAsync(fixture, [VacationChunk]);
+        var conversationId = await AskAsync(fixture, seed, "Name me?");
+
+        await using var scope = Scope(fixture, seed);
+        await Should.ThrowAsync<ValidationException>(() => scope.Send(new RenameConversationCommand(conversationId, title)));
+        await Should.ThrowAsync<ValidationException>(
+            () => scope.Send(new RenameConversationCommand(conversationId, new string('a', Conversation.TitleMaxLength + 1))));
+        await scope.Send(new RenameConversationCommand(conversationId, new string('a', Conversation.TitleMaxLength)));
+    }
+
+    [Fact]
+    public async Task Another_users_chat_cannot_be_renamed()
+    {
+        var seed = await SeedAsync(fixture, [VacationChunk]);
+        var conversationId = await AskAsync(fixture, seed, "Private?");
+        var colleague = seed with { UserId = await CreateUserAsync(fixture, seed.Tenant.Id, UserRole.Owner), Role = UserRole.Owner };
+
+        await using var scope = Scope(fixture, colleague);
+        await Should.ThrowAsync<NotFoundException>(() => scope.Send(new RenameConversationCommand(conversationId, "Mine")));
+        await Should.ThrowAsync<NotFoundException>(() => scope.Send(new RenameConversationCommand(Guid.NewGuid(), "Mine")));
     }
 
     // ---------- C-186: titles ----------

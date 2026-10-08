@@ -14,4 +14,5 @@ public sealed record UpdateBotCommand(
     string WelcomeMessage,
     string? Model,
     double Temperature,
-    string WidgetColor) : IRequest<BotDto>;
+    string WidgetColor,
+    IReadOnlyList<string> StarterQuestions) : IRequest<BotDto>;

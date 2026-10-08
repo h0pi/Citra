@@ -25,5 +25,11 @@ internal sealed class UpdateBotCommandValidator : AbstractValidator<UpdateBotCom
             .NotEmpty()
             .Matches("^#[0-9A-Fa-f]{6}$")
             .WithMessage("Widget color must be a hex color like #6366F1.");
+
+        RuleFor(x => x.StarterQuestions)
+            .NotNull()
+            .Must(q => q.Count(s => !string.IsNullOrWhiteSpace(s)) <= Bot.MaxStarterQuestions)
+            .WithMessage($"At most {Bot.MaxStarterQuestions} starter questions.");
+        RuleForEach(x => x.StarterQuestions).MaximumLength(Bot.StarterQuestionMaxLength);
     }
 }

@@ -1,0 +1,71 @@
+@for (block of blocks(); track $index) {
+  @switch (block.kind) {
+    @case ('paragraph') {
+      <p><app-markdown-inlines [content]="block.content" /></p>
+    }
+    @case ('heading') {
+      <!-- Styled as a heading, not one for the page outline: the answer is not a section of the page. -->
+      <p class="heading"><app-markdown-inlines [content]="block.content" /></p>
+    }
+    @case ('code') {
+      <pre tabindex="0"><code>{{ block.text }}</code></pre>
+    }
+    @case ('list') {
+      @if (block.ordered) {
+        <ol [attr.start]="block.start === 1 ? null : block.start">
+          @for (item of block.items; track $index) {
+            <li [class.task]="item.checked !== null">
+              @if (item.checked !== null) {
+                <input type="checkbox" disabled [checked]="item.checked" />
+              }
+              <app-markdown-blocks [blocks]="item.blocks" />
+            </li>
+          }
+        </ol>
+      } @else {
+        <ul>
+          @for (item of block.items; track $index) {
+            <li [class.task]="item.checked !== null">
+              @if (item.checked !== null) {
+                <input type="checkbox" disabled [checked]="item.checked" />
+              }
+              <app-markdown-blocks [blocks]="item.blocks" />
+            </li>
+          }
+        </ul>
+      }
+    }
+    @case ('table') {
+      <div class="table-scroll" role="region" aria-label="Table" tabindex="0">
+        <table>
+          <thead>
+            <tr>
+              @for (cell of block.header; track $index) {
+                <th scope="col" [style.text-align]="block.align[$index]">
+                  <app-markdown-inlines [content]="cell" />
+                </th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of block.rows; track $index) {
+              <tr>
+                @for (cell of row; track $index) {
+                  <td [style.text-align]="block.align[$index]">
+                    <app-markdown-inlines [content]="cell" />
+                  </td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+    @case ('quote') {
+      <blockquote><app-markdown-blocks [blocks]="block.blocks" /></blockquote>
+    }
+    @case ('rule') {
+      <hr />
+    }
+  }
+}

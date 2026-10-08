@@ -1,4 +1,4 @@
-import { Routes } from '@angular/router';
+import { Routes, UrlMatchResult, UrlSegment } from '@angular/router';
 import { authChildGuard, authGuard, guestGuard } from '@core/guards/auth.guards';
 import { unsavedChangesGuard } from '@core/guards/unsaved-changes.guard';
 import { Shell } from '@core/layout/shell/shell';
@@ -53,7 +53,9 @@ export const routes: Routes = [
           import('@features/documents/documents-page').then((m) => m.DocumentsPage),
       },
       {
-        path: 'chat',
+        // /chat and /chat/{id} (one chat, from the list or a link; the id arrives as the page's conversationId
+        // input). One route for both, so the page stays when a new chat gets its address mid-answer.
+        matcher: chatMatcher,
         title: 'Chat',
         loadComponent: () => import('@features/chat/chat-page').then((m) => m.ChatPage),
       },
@@ -77,3 +79,14 @@ export const routes: Routes = [
     ],
   },
 ];
+
+/** Matches /chat and /chat/{conversationId}. */
+export function chatMatcher(segments: UrlSegment[]): UrlMatchResult | null {
+  if (segments[0]?.path !== 'chat' || segments.length > 2) {
+    return null;
+  }
+
+  return segments.length === 2
+    ? { consumed: segments, posParams: { conversationId: segments[1] } }
+    : { consumed: segments };
+}

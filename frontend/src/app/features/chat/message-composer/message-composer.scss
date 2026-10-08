@@ -1,0 +1,50 @@
+:host {
+  display: block;
+}
+
+.composer {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--citra-space-2);
+  padding: var(--citra-space-2) var(--citra-space-2) var(--citra-space-2) var(--citra-space-4);
+  background: var(--citra-surface);
+  border: 1px solid var(--citra-border);
+  border-radius: var(--citra-radius-lg);
+
+  &:focus-within {
+    border-color: var(--citra-primary);
+    box-shadow: 0 0 0 1px var(--citra-primary);
+  }
+}
+
+.box {
+  flex: 1;
+  min-width: 0;
+  max-height: 200px;
+  padding: var(--citra-space-2) 0;
+  border: 0;
+  outline: none;
+  resize: none;
+  overflow-y: auto;
+  background: transparent;
+  color: var(--citra-text);
+  font: inherit;
+  line-height: 1.5;
+}
+
+.hint {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--citra-space-3);
+  margin: var(--citra-space-1) var(--citra-space-2) 0;
+  font-size: var(--citra-text-xs);
+}
+
+.counter {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+
+  &.full {
+    color: var(--p-red-500);
+  }
+}

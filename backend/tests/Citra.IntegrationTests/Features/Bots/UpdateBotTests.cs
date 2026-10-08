@@ -29,6 +29,7 @@ public sealed class UpdateBotTests(DatabaseFixture fixture)
             Model = "claude-haiku-4-5",
             Temperature = 0.7,
             WidgetColor = "#10b981",
+            StarterQuestions = ["  How many vacation days?  ", " ", "Where do I park?"],
         });
 
         updated.Name.ShouldBe("Sales Assistant");
@@ -39,6 +40,7 @@ public sealed class UpdateBotTests(DatabaseFixture fixture)
         updated.Model.ShouldBe("claude-haiku-4-5");
         updated.Temperature.ShouldBe(0.7);
         updated.WidgetColor.ShouldBe("#10B981");
+        updated.StarterQuestions.ShouldBe(["How many vacation days?", "Where do I park?"]);
         updated.UpdatedAt.ShouldBeGreaterThanOrEqualTo(bot.UpdatedAt);
 
         await using var check = fixture.OpenScope(tenant.Id);
@@ -86,7 +88,7 @@ public sealed class UpdateBotTests(DatabaseFixture fixture)
 
         await using var scope = fixture.OpenScope(tenant.Id);
         await Should.ThrowAsync<NotFoundException>(() =>
-            scope.Send(new UpdateBotCommand(Guid.NewGuid(), "X", null, null, "Hi", null, 0.2, "#6366F1")));
+            scope.Send(new UpdateBotCommand(Guid.NewGuid(), "X", null, null, "Hi", null, 0.2, "#6366F1", [])));
     }
 
     [Theory]
@@ -113,16 +115,31 @@ public sealed class UpdateBotTests(DatabaseFixture fixture)
             Model = "gpt-4o",
             Temperature = 1.5,
             WidgetColor = "red",
+            StarterQuestions = ["1", "2", "3", "4", "5", "6", "7"],
         }));
 
-        error.Errors.Keys.ShouldBe(["Name", "WelcomeMessage", "Model", "Temperature", "WidgetColor"], ignoreOrder: true);
+        error.Errors.Keys.ShouldBe(
+            ["Name", "WelcomeMessage", "Model", "Temperature", "WidgetColor", "StarterQuestions"], ignoreOrder: true);
         error.Errors["WidgetColor"].Length.ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task A_starter_question_longer_than_200_characters_is_rejected()
+    {
+        var (tenant, bot) = await SeedBotAsync("Support");
+
+        await using var scope = fixture.OpenScope(tenant.Id);
+        var error = await Should.ThrowAsync<ValidationException>(
+            () => scope.Send(ValidUpdate(bot) with { StarterQuestions = [new string('a', 201)] }));
+
+        error.Errors.Keys.ShouldBe(["StarterQuestions[0]"]);
     }
 
     // ---------- helpers ----------
 
     private static UpdateBotCommand ValidUpdate(BotDto bot) => new(
-        bot.Id, bot.Name, bot.Description, bot.SystemPrompt, bot.WelcomeMessage, bot.Model, bot.Temperature, bot.WidgetColor);
+        bot.Id, bot.Name, bot.Description, bot.SystemPrompt, bot.WelcomeMessage, bot.Model, bot.Temperature, bot.WidgetColor,
+        bot.StarterQuestions);
 
     private async Task<(Tenant Tenant, BotDto Bot)> SeedBotAsync(string botName)
     {

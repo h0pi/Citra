@@ -16,6 +16,7 @@ function bot(id: string, name = id): BotSummary {
     description: null,
     isPublic: false,
     widgetColor: '#6366F1',
+    starterQuestions: [],
     documentCount: 0,
     messageCount: 0,
     createdAt: '2026-09-26T10:00:00Z',

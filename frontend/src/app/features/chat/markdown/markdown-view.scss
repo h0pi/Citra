@@ -1,0 +1,147 @@
+// The answer's own elements: compact spacing inside a chat bubble, wide content scrolls on its own.
+:host {
+  display: block;
+  white-space: normal;
+  overflow-wrap: anywhere;
+
+  > :first-child {
+    margin-top: 0;
+  }
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+}
+
+:host ::ng-deep {
+  p,
+  ul,
+  ol,
+  pre,
+  blockquote,
+  .table-scroll {
+    margin: 0 0 var(--citra-space-3);
+  }
+
+  li > p,
+  li > ul,
+  li > ol {
+    margin: 0;
+  }
+
+  ul,
+  ol {
+    padding-left: 1.5rem;
+  }
+
+  li + li {
+    margin-top: var(--citra-space-1);
+  }
+
+  li.task {
+    list-style: none;
+    margin-left: -1.25rem;
+
+    // The box floats, so the item's first line of text sits next to it.
+    > input {
+      float: left;
+      margin: 0.35em var(--citra-space-2) 0 0;
+    }
+  }
+
+  .heading {
+    font-weight: 600;
+  }
+
+  code {
+    padding: 0.1em 0.35em;
+    border-radius: var(--citra-radius-sm);
+    background: var(--citra-surface-hover);
+    font-family: var(--citra-font-mono);
+    font-size: 0.9em;
+  }
+
+  pre {
+    padding: var(--citra-space-3);
+    overflow-x: auto;
+    border-radius: var(--citra-radius-md);
+    background: var(--citra-surface-hover);
+    white-space: pre;
+    overflow-wrap: normal;
+
+    code {
+      padding: 0;
+      background: none;
+    }
+  }
+
+  blockquote {
+    padding-left: var(--citra-space-3);
+    border-left: 3px solid var(--citra-border);
+    color: var(--citra-text-muted);
+  }
+
+  hr {
+    margin: var(--citra-space-3) 0;
+    border: 0;
+    border-top: 1px solid var(--citra-border);
+  }
+
+  .table-scroll {
+    overflow-x: auto;
+  }
+
+  table {
+    border-collapse: collapse;
+    font-size: var(--citra-text-sm);
+    overflow-wrap: normal;
+  }
+
+  th,
+  td {
+    padding: var(--citra-space-1) var(--citra-space-2);
+    border: 1px solid var(--citra-border);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    font-weight: 600;
+  }
+
+  a {
+    color: var(--citra-primary);
+    text-decoration: underline;
+  }
+}
+
+// A citation marker: a small numbered chip that shows its source.
+:host ::ng-deep .citation {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.4em;
+  height: 1.4em;
+  margin: 0 0.1em;
+  padding: 0 0.35em;
+  border: 0;
+  border-radius: 999px;
+  background: var(--citra-primary-soft);
+  color: var(--citra-primary);
+  font: inherit;
+  font-size: 0.75em;
+  font-weight: 600;
+  line-height: 1;
+  vertical-align: 0.15em;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--citra-primary);
+    color: var(--p-primary-contrast-color);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--citra-primary);
+    outline-offset: 1px;
+  }
+}

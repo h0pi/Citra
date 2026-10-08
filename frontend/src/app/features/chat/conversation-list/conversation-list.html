@@ -1,0 +1,60 @@
+<nav class="conversation-list" aria-label="Chats">
+  @switch (state()) {
+    @case ('loading') {
+      <div aria-busy="true" aria-label="Loading chats">
+        @for (s of skeletons; track s) {
+          <div class="skeleton-row">
+            <p-skeleton width="80%" />
+            <p-skeleton width="35%" height="0.75rem" />
+          </div>
+        }
+      </div>
+    }
+    @case ('error') {
+      <div class="list-message">
+        <p class="error-text">The chats could not be loaded.</p>
+        <p-button
+          label="Try again"
+          icon="pi pi-refresh"
+          size="small"
+          [outlined]="true"
+          (onClick)="retry.emit()"
+        />
+      </div>
+    }
+    @case ('ready') {
+      @if (conversations().length === 0) {
+        <p class="list-message text-muted">No chats yet. Your questions will appear here.</p>
+      } @else {
+        <ul>
+          @for (chat of conversations(); track chat.id) {
+            <li>
+              <a
+                class="conversation"
+                [class.active]="chat.id === selectedId()"
+                [attr.aria-current]="chat.id === selectedId() ? 'page' : null"
+                [routerLink]="['/chat', chat.id]"
+                [title]="chat.title"
+                (click)="picked.emit()"
+              >
+                <span class="title">{{ chat.title }}</span>
+                <span class="date text-muted">{{ chat.updatedAt | date: 'MMM d, HH:mm' }}</span>
+              </a>
+            </li>
+          }
+        </ul>
+        @if (hasMore()) {
+          <p-button
+            class="load-more"
+            label="Show older chats"
+            icon="pi pi-angle-down"
+            size="small"
+            [text]="true"
+            [loading]="loadingMore()"
+            (onClick)="loadMore.emit()"
+          />
+        }
+      }
+    }
+  }
+</nav>

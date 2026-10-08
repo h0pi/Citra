@@ -1,0 +1,44 @@
+<form class="composer" (submit)="$event.preventDefault(); submit()" novalidate>
+  <textarea
+    #box
+    class="box"
+    rows="1"
+    [attr.maxlength]="maxLength"
+    [placeholder]="placeholder()"
+    aria-label="Your question"
+    aria-describedby="composer-hint"
+    [value]="text()"
+    (input)="onInput($any($event.target).value)"
+    (keydown)="onKeydown($event)"
+  ></textarea>
+  @if (busy()) {
+    <p-button
+      type="button"
+      icon="pi pi-stop"
+      [rounded]="true"
+      severity="secondary"
+      ariaLabel="Stop answering"
+      (onClick)="stopAnswer()"
+    />
+  } @else {
+    <p-button
+      type="submit"
+      icon="pi pi-send"
+      [rounded]="true"
+      ariaLabel="Send"
+      [disabled]="!canSend()"
+    />
+  }
+</form>
+<p id="composer-hint" class="hint text-muted">
+  @if (busy()) {
+    <span>Wait for the answer to finish before sending, or stop it.</span>
+  } @else {
+    <span>Enter to send, Shift+Enter for a new line.</span>
+  }
+  @if (showCounter()) {
+    <span class="counter" [class.full]="text().length >= maxLength">
+      {{ text().length }} / {{ maxLength }}
+    </span>
+  }
+</p>

@@ -13,6 +13,7 @@ public sealed class Bot : Entity, ITenantOwned
     public const int SystemPromptMaxLength = 4000;
     public const int WelcomeMessageMaxLength = 500;
     public const int MaxStarterQuestions = 6;
+    public const int StarterQuestionMaxLength = 200;
     public const int MaxAllowedDomains = 20;
 
     public const string DefaultWelcomeMessage = "Hi! Ask me anything about our documentation.";
@@ -125,9 +126,12 @@ public sealed class Bot : Entity, ITenantOwned
         IsPublic = isPublic;
         ChangeWidgetColor(widgetColor);
         AllowedDomains = CleanList(allowedDomains, MaxAllowedDomains, toLower: true);
-        StarterQuestions = CleanList(starterQuestions, MaxStarterQuestions, toLower: false);
+        ChangeStarterQuestions(starterQuestions);
         DailyMessageLimit = dailyMessageLimit;
     }
+
+    public void ChangeStarterQuestions(IEnumerable<string> starterQuestions) =>
+        StarterQuestions = CleanList(starterQuestions, MaxStarterQuestions, toLower: false);
 
     private static List<string> CleanList(IEnumerable<string> values, int max, bool toLower) =>
         values

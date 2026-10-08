@@ -6,6 +6,8 @@ export interface BotSummary {
   description: string | null;
   isPublic: boolean;
   widgetColor: string;
+  /** Suggested first questions, shown when a new chat starts. */
+  starterQuestions: string[];
   documentCount: number;
   messageCount: number;
   createdAt: string;
@@ -45,6 +47,7 @@ export interface UpdateBotRequest {
   model: string | null;
   temperature: number;
   widgetColor: string;
+  starterQuestions: string[];
 }
 
 /** Same limits as the backend (Bot entity constants). */
@@ -53,6 +56,8 @@ export const BOT_LIMITS = {
   description: 500,
   systemPrompt: 4000,
   welcomeMessage: 500,
+  starterQuestions: 6,
+  starterQuestion: 200,
 } as const;
 
 /** What GET /api/bots/{id}/search found (the search playground). */

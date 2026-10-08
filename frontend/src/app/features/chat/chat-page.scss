@@ -1,0 +1,217 @@
+// The chat fills the page's height; each panel scrolls on its own.
+:host {
+  display: block;
+  height: calc(100dvh - var(--citra-topbar-height) - 2 * var(--citra-space-6));
+  min-height: 28rem;
+}
+
+.chat-layout,
+.page-loading {
+  position: relative;
+  height: 100%;
+}
+
+.chat-layout {
+  display: grid;
+  grid-template-columns: 16rem minmax(0, 1fr) 19rem;
+  gap: var(--citra-space-4);
+}
+
+.list-panel,
+.sources-wrap,
+.thread-panel {
+  min-height: 0;
+  background: var(--citra-surface);
+  border: 1px solid var(--citra-border);
+  border-radius: var(--citra-radius-lg);
+}
+
+.list-panel,
+.sources-wrap {
+  overflow-y: auto;
+  padding: var(--citra-space-3);
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--citra-space-2) var(--citra-space-2);
+
+  h2 {
+    flex: 1;
+    margin: 0;
+    font-size: var(--citra-text-md);
+  }
+}
+
+.thread-panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.thread-header {
+  display: flex;
+  align-items: center;
+  gap: var(--citra-space-2);
+  padding: var(--citra-space-3) var(--citra-space-4);
+  border-bottom: 1px solid var(--citra-border);
+}
+
+.thread-title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--citra-text-lg);
+}
+
+.thread-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--citra-space-5);
+}
+
+.composer-area {
+  padding: var(--citra-space-3) var(--citra-space-4) var(--citra-space-4);
+  border-top: 1px solid var(--citra-border);
+}
+
+.welcome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+
+  h2 {
+    margin: var(--citra-space-4) 0 var(--citra-space-2);
+  }
+
+  p {
+    max-width: 28rem;
+    margin: 0;
+  }
+}
+
+.welcome-icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--citra-primary-soft);
+  color: var(--citra-primary);
+  font-size: 1.5rem;
+}
+
+.thread-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--citra-space-4);
+
+  :host ::ng-deep .skeleton-question {
+    align-self: flex-end;
+  }
+}
+
+.backdrop {
+  display: none;
+}
+
+// Wide screens always show the sources: their close button only appears where the panel opens over the chat.
+:host ::ng-deep .sources-wrap .close {
+  display: none;
+}
+
+.small-screen-only,
+.medium-screen-only {
+  display: none;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+// Side panels over the chat: the sources first (medium screens), then also the chat list (small screens).
+@mixin overlay-panel($side) {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  #{$side}: 0;
+  z-index: 20;
+  width: min(20rem, 90%);
+  box-shadow: var(--citra-shadow-md);
+  visibility: hidden;
+}
+
+@media (max-width: 1199.98px) {
+  .chat-layout {
+    grid-template-columns: 16rem minmax(0, 1fr);
+  }
+
+  .sources-wrap {
+    @include overlay-panel(right);
+  }
+
+  .chat-layout.sources-open .sources-wrap {
+    visibility: visible;
+  }
+
+  .medium-screen-only,
+  :host ::ng-deep .sources-wrap .close {
+    display: inline-flex;
+  }
+
+  .backdrop {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    border-radius: var(--citra-radius-lg);
+    background: rgb(0 0 0 / 0.3);
+  }
+}
+
+@media (max-width: 991.98px) {
+  :host {
+    height: calc(100dvh - var(--citra-topbar-height) - 2 * var(--citra-space-4));
+  }
+
+  .chat-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .list-panel {
+    @include overlay-panel(left);
+  }
+
+  .chat-layout.list-open .list-panel {
+    visibility: visible;
+  }
+
+  .small-screen-only {
+    display: inline-flex;
+  }
+
+  .thread-body {
+    padding: var(--citra-space-4);
+  }
+}
+
+.starters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--citra-space-2);
+}

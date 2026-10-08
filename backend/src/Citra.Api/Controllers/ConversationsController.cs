@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Citra.Api.Controllers;
 
 /// <summary>
-/// The current user's chats: the list per bot, one chat with its messages, deleting a chat and rating answers.
+/// The current user's chats: the list per bot, one chat with its messages, renaming and deleting a chat and rating answers.
 /// Chats are private: another user's chat answers 404, like one that does not exist.
 /// </summary>
 [ApiController]
@@ -48,6 +48,17 @@ public sealed class ConversationsController(ISender sender) : ControllerBase
         return NoContent();
     }
 
+    /// <summary>Renames a chat.</summary>
+    [HttpPut("conversations/{id:guid}/title")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Rename(Guid id, RenameConversationRequest request, CancellationToken cancellationToken)
+    {
+        await sender.Send(new RenameConversationCommand(id, request.Title), cancellationToken);
+        return NoContent();
+    }
+
     /// <summary>Thumbs up ("Positive"), down ("Negative") or no rating ("None") for an answer.</summary>
     [HttpPut("messages/{id:guid}/feedback")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -62,3 +73,6 @@ public sealed class ConversationsController(ISender sender) : ControllerBase
 
 /// <summary>Body of PUT /api/messages/{id}/feedback.</summary>
 public sealed record RateAnswerRequest(MessageFeedback Feedback);
+
+/// <summary>Body of PUT /api/conversations/{id}/title.</summary>
+public sealed record RenameConversationRequest(string Title);

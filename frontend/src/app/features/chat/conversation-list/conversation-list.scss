@@ -1,0 +1,71 @@
+:host {
+  display: block;
+}
+
+ul {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.conversation {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--citra-space-2) var(--citra-space-3);
+  border-radius: var(--citra-radius-md);
+  color: var(--citra-text);
+  text-decoration: none;
+
+  &:hover {
+    background: var(--citra-surface-hover);
+  }
+
+  &.active {
+    background: var(--citra-primary-soft);
+    color: var(--citra-primary);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--citra-primary);
+    outline-offset: -2px;
+  }
+}
+
+.title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--citra-text-sm);
+  font-weight: 500;
+}
+
+.date {
+  font-size: var(--citra-text-xs);
+}
+
+.skeleton-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--citra-space-2);
+  padding: var(--citra-space-2) var(--citra-space-3);
+}
+
+.list-message {
+  margin: 0;
+  padding: var(--citra-space-3);
+  font-size: var(--citra-text-sm);
+}
+
+.error-text {
+  margin: 0 0 var(--citra-space-2);
+  color: var(--p-red-500);
+}
+
+.load-more {
+  display: block;
+  margin-top: var(--citra-space-2);
+}

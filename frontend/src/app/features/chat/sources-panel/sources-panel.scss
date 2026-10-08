@@ -1,0 +1,123 @@
+:host {
+  display: block;
+}
+
+// Stays at the top while the sources scroll, so the close button is always at hand.
+.panel-header {
+  position: sticky;
+  top: calc(-1 * var(--citra-space-3)); // the scrolling panel's padding
+  z-index: 1;
+  margin-top: calc(-1 * var(--citra-space-3));
+  padding-top: var(--citra-space-3);
+  padding-bottom: var(--citra-space-2);
+  background: var(--citra-surface);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--citra-space-2);
+  margin-bottom: var(--citra-space-3);
+
+  h2 {
+    margin: 0;
+    font-size: var(--citra-text-md);
+  }
+}
+
+.hint {
+  margin: 0;
+  font-size: var(--citra-text-sm);
+}
+
+.source-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--citra-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+// One passage; the chosen one (from a citation chip) is outlined.
+.source {
+  padding: var(--citra-space-3);
+  border: 1px solid var(--citra-border);
+  border-radius: var(--citra-radius-md);
+  scroll-margin: var(--citra-space-3);
+  scroll-margin-top: 4rem; // below the pinned header
+
+  &.chosen {
+    border-color: var(--citra-primary);
+    box-shadow: 0 0 0 1px var(--citra-primary);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--citra-primary);
+    outline-offset: 2px;
+  }
+}
+
+.source-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--citra-space-1) var(--citra-space-2);
+  margin-bottom: var(--citra-space-2);
+  font-size: var(--citra-text-sm);
+}
+
+// Same look as the chips in the answer.
+.number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.4rem;
+  height: 1.4rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: var(--citra-primary-soft);
+  color: var(--citra-primary);
+  font-size: var(--citra-text-xs);
+  font-weight: 600;
+}
+
+.document {
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1 1 auto;
+}
+
+.page {
+  font-size: var(--citra-text-xs);
+}
+
+.snippet {
+  margin: 0;
+  font-size: var(--citra-text-sm);
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.more {
+  margin-top: var(--citra-space-2);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--citra-primary);
+  font: inherit;
+  font-size: var(--citra-text-sm);
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--citra-primary);
+    outline-offset: 2px;
+    border-radius: var(--citra-radius-sm);
+  }
+}

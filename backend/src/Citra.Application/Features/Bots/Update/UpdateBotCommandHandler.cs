@@ -23,6 +23,7 @@ internal sealed class UpdateBotCommandHandler(
         bot.UpdateDetails(request.Name, request.Description, request.SystemPrompt, request.WelcomeMessage);
         bot.ConfigureModel(request.Model, request.Temperature);
         bot.ChangeWidgetColor(request.WidgetColor);
+        bot.ChangeStarterQuestions(request.StarterQuestions);
 
         await db.SaveChangesAsync(cancellationToken);
 

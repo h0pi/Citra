@@ -27,6 +27,7 @@ internal sealed class GetBotsQueryHandler(
                 b.Description,
                 b.IsPublic,
                 b.WidgetColor,
+                b.StarterQuestions,
                 db.Documents.Count(d => d.BotId == b.Id),
                 db.Conversations.Where(c => c.BotId == b.Id).SelectMany(c => c.Messages).Count(),
                 b.CreatedAt,

@@ -133,6 +133,28 @@
           </div>
 
           <div class="field">
+            <label for="starterQuestions"
+              >Starter questions <span class="text-muted">(optional)</span></label
+            >
+            <textarea
+              pTextarea
+              id="starterQuestions"
+              formControlName="starterQuestions"
+              rows="4"
+              placeholder="e.g. How many vacation days do I get?"
+              [attr.aria-invalid]="showError('starterQuestions')"
+              fluid
+            ></textarea>
+            @if (showError('starterQuestions')) {
+              <small class="field-error">{{ errorFor('starterQuestions') }}</small>
+            } @else {
+              <small class="text-muted hint"
+                >Up to 6, one per line. Suggested when a new chat starts.</small
+              >
+            }
+          </div>
+
+          <div class="field">
             <label for="systemPrompt"
               >Instructions <span class="text-muted">(optional)</span></label
             >

@@ -1,0 +1,53 @@
+<section class="sources-panel" aria-labelledby="sources-heading">
+  <header class="panel-header">
+    <h2 id="sources-heading">Sources</h2>
+    <p-button
+      class="close"
+      icon="pi pi-times"
+      [text]="true"
+      [rounded]="true"
+      severity="secondary"
+      ariaLabel="Close sources"
+      (onClick)="closed.emit()"
+    />
+  </header>
+
+  @if (sources().length === 0) {
+    <p class="text-muted hint">
+      The passages an answer is based on appear here, with their document and page.
+    </p>
+  } @else {
+    <ol class="source-list">
+      @for (source of sources(); track source.number) {
+        @let chosen = source.number === selected();
+        <li
+          class="source"
+          tabindex="-1"
+          [attr.data-number]="source.number"
+          [class.chosen]="chosen"
+          [attr.aria-current]="chosen ? 'true' : null"
+        >
+          <div class="source-head">
+            <span class="number" [textContent]="source.number"></span>
+            <span class="document" [title]="source.documentName">{{ source.documentName }}</span>
+            @if (source.pageNumber !== null) {
+              <span class="page text-muted">Page {{ source.pageNumber }}</span>
+            }
+          </div>
+          <!-- Bound, not interpolated: the passage keeps its line breaks. -->
+          <p class="snippet" [textContent]="text(source)"></p>
+          @if (isLong(source)) {
+            <button
+              type="button"
+              class="more"
+              [attr.aria-expanded]="expanded().has(source.number)"
+              (click)="toggle(source.number)"
+            >
+              {{ expanded().has(source.number) ? 'Show less' : 'Show more' }}
+            </button>
+          }
+        </li>
+      }
+    </ol>
+  }
+</section>

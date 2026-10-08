@@ -1,0 +1,49 @@
+@for (piece of content(); track $index) {
+  @switch (piece.kind) {
+    @case ('text') {
+      <!-- In a container so no spaces from this template get around the words. -->
+      <ng-container>{{ piece.text }}</ng-container>
+    }
+    @case ('strong') {
+      <strong><app-markdown-inlines [content]="piece.content" /></strong>
+    }
+    @case ('em') {
+      <em><app-markdown-inlines [content]="piece.content" /></em>
+    }
+    @case ('del') {
+      <del><app-markdown-inlines [content]="piece.content" /></del>
+    }
+    @case ('code') {
+      <code>{{ piece.text }}</code>
+    }
+    @case ('link') {
+      <a [href]="piece.href" target="_blank" rel="noopener noreferrer"
+        ><app-markdown-inlines [content]="piece.content"
+      /></a>
+    }
+    @case ('break') {
+      <br />
+    }
+    @case ('citation') {
+      @let marker = parts(piece.numbers);
+      @if (marker) {
+        @for (part of marker; track $index) {
+          @if (part.source; as source) {
+            <button
+              type="button"
+              class="citation"
+              [attr.aria-label]="label(source)"
+              [title]="label(source)"
+              [textContent]="source.number"
+              (click)="citations.pick(source.number)"
+            ></button>
+          } @else {
+            <ng-container>[{{ part.number }}]</ng-container>
+          }
+        }
+      } @else {
+        <ng-container>{{ piece.text }}</ng-container>
+      }
+    }
+  }
+}

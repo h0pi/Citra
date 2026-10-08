@@ -81,6 +81,7 @@ export class BotsPage {
       description: bot.description,
       isPublic: bot.isPublic,
       widgetColor: bot.widgetColor,
+      starterQuestions: [],
       documentCount: 0,
       messageCount: 0,
       createdAt: bot.createdAt,

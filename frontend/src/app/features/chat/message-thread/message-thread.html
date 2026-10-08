@@ -1,0 +1,103 @@
+<ol class="thread" aria-label="Messages">
+  @for (message of messages(); track message.id) {
+    <li
+      class="message"
+      [class.question]="message.role === 'User'"
+      [class.answer]="message.role === 'Assistant'"
+    >
+      @if (message.role === 'Assistant') {
+        <span class="author text-muted">{{ botName() }}</span>
+      } @else {
+        <span class="sr-only">You</span>
+      }
+      @if (message.role === 'Assistant') {
+        <div class="bubble">
+          <app-markdown
+            [text]="message.content"
+            [sources]="message.citations"
+            (cite)="citeSaved(message, $event)"
+          />
+        </div>
+        <div class="actions">
+          <button
+            type="button"
+            aria-label="Good answer"
+            [attr.aria-pressed]="message.feedback === 'Positive'"
+            (click)="rateAnswer(message, 'Positive')"
+          >
+            <i
+              [class]="message.feedback === 'Positive' ? 'pi pi-thumbs-up-fill' : 'pi pi-thumbs-up'"
+            ></i>
+          </button>
+          <button
+            type="button"
+            aria-label="Bad answer"
+            [attr.aria-pressed]="message.feedback === 'Negative'"
+            (click)="rateAnswer(message, 'Negative')"
+          >
+            <i
+              [class]="
+                message.feedback === 'Negative' ? 'pi pi-thumbs-down-fill' : 'pi pi-thumbs-down'
+              "
+            ></i>
+          </button>
+          <button type="button" aria-label="Copy answer" (click)="copy(message)">
+            <i class="pi pi-copy"></i>
+          </button>
+        </div>
+      } @else {
+        <!-- Bound, not interpolated: exact line breaks, no template whitespace. -->
+        <div class="bubble" [textContent]="message.content"></div>
+      }
+    </li>
+  }
+
+  @if (live(); as live) {
+    @if (live.question !== null) {
+      <li class="message question">
+        <span class="sr-only">You</span>
+        <div class="bubble" [textContent]="live.question"></div>
+      </li>
+    }
+    <li class="message answer live" [attr.aria-busy]="live.status === 'answering'">
+      <span class="author text-muted">{{ botName() }}</span>
+      @if (live.answer) {
+        <div class="bubble">
+          <app-markdown
+            [text]="live.answer"
+            [sources]="live.sources"
+            (cite)="citeLive(live, $event)"
+          />
+        </div>
+      } @else if (live.status === 'answering') {
+        <div class="bubble waiting text-muted">Searching the documents…</div>
+      }
+      @if (live.status === 'failed') {
+        <div class="answer-error" role="alert">
+          <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+          <span>{{ live.error }}</span>
+          <p-button
+            label="Try again"
+            icon="pi pi-refresh"
+            size="small"
+            [text]="true"
+            (onClick)="retry.emit()"
+          />
+        </div>
+      }
+      @if (live.status === 'stopped') {
+        <div class="answer-stopped text-muted">
+          <i class="pi pi-stop-circle" aria-hidden="true"></i>
+          <span>You stopped this answer, so it isn't saved.</span>
+          <p-button
+            label="Ask again"
+            icon="pi pi-refresh"
+            size="small"
+            [text]="true"
+            (onClick)="retry.emit()"
+          />
+        </div>
+      }
+    </li>
+  }
+</ol>

@@ -101,16 +101,33 @@ describe('BotSettingsPage', () => {
     expect(el.textContent).not.toContain('Unsaved changes');
   });
 
+  it('allows at most 6 starter questions of up to 200 characters', async () => {
+    const { fixture, el, type, button } = await render();
+
+    await type('#starterQuestions', '1\n2\n3\n4\n5\n6\n7');
+    button('Save changes')!.click();
+    await fixture.whenStable();
+    expect(el.textContent).toContain('Use at most 6 questions.');
+    expect(update).not.toHaveBeenCalled();
+
+    await type('#starterQuestions', 'a'.repeat(201));
+    expect(el.textContent).toContain('Keep each question to 200 characters.');
+
+    await type('#starterQuestions', '1\n2\n3\n4\n5\n\n' + 'a'.repeat(200));
+    expect(el.querySelector('#starterQuestions')!.getAttribute('aria-invalid')).toBe('false');
+  });
+
   it('saves trimmed values, then shows the saved bot and confirms', async () => {
     update.mockImplementation((_id, request) =>
       of({ ...savedBot, ...request, updatedAt: '2026-09-26T12:00:00Z' }),
     );
-    const { fixture, el, type, button } = await render();
+    const { fixture, el, input, type, button } = await render();
 
     await type('#name', '  Sales  ');
     await type('#systemPrompt', '  Be brief.  ');
     await type('#description', '   ');
     await type('#widgetColor', '#10b981');
+    await type('#starterQuestions', '  Vacation?  \n\n Parking? ');
     expect(el.textContent).toContain('Unsaved changes');
 
     button('Save changes')!.click();
@@ -124,7 +141,9 @@ describe('BotSettingsPage', () => {
       model: null,
       temperature: 0.2,
       widgetColor: '#10B981',
+      starterQuestions: ['Vacation?', 'Parking?'],
     });
+    expect(input('#starterQuestions').value).toBe('Vacation?\nParking?');
     expect(success).toHaveBeenCalledWith('Settings saved');
     expect(refresh).toHaveBeenCalled(); // top-bar selector shows the new name
     expect(el.querySelector('h1')?.textContent).toContain('Sales');

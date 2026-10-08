@@ -42,6 +42,7 @@ describe('BotsApi', () => {
         model: null,
         temperature: 0.2,
         widgetColor: '#6366F1',
+        starterQuestions: [],
       })
       .subscribe();
     api.delete('b1').subscribe();

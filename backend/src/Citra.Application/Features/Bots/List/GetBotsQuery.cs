@@ -13,6 +13,7 @@ public sealed record BotSummaryDto(
     string? Description,
     bool IsPublic,
     string WidgetColor,
+    IReadOnlyList<string> StarterQuestions,
     int DocumentCount,
     int MessageCount,
     DateTimeOffset CreatedAt,
