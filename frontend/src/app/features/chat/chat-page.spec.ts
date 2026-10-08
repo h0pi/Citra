@@ -572,6 +572,7 @@ describe('ChatPage', () => {
       'A: Searching the documents…',
     ]);
     expect(live()!.getAttribute('aria-busy')).toBe('true');
+    expect(live()!.querySelectorAll('.dots i')).toHaveLength(3); // typing indicator
     expect(el.textContent).toContain('Wait for the answer to finish before sending, or stop it.');
 
     await stream(started('new1'), {

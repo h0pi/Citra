@@ -70,7 +70,10 @@
           />
         </div>
       } @else if (live.status === 'answering') {
-        <div class="bubble waiting text-muted">Searching the documents…</div>
+        <div class="bubble waiting text-muted">
+          <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span>Searching the documents…</span>
+        </div>
       }
       @if (live.status === 'failed') {
         <div class="answer-error" role="alert">
