@@ -977,6 +977,38 @@ describe('ChatPage', () => {
     expect(bubbles()[0]).toBe('Q: Parking?');
   });
 
+  it('follows new words unless the reader scrolled up, and jumps back on request', async () => {
+    const { fixture, el, send, stream, button } = await render('c1');
+    const body = el.querySelector<HTMLElement>('.thread-body')!;
+    let height = 1000;
+    let top = 0;
+    Object.defineProperty(body, 'scrollHeight', { get: () => height });
+    Object.defineProperty(body, 'clientHeight', { get: () => 400 });
+    Object.defineProperty(body, 'scrollTop', { get: () => top, set: (v: number) => (top = v) });
+    const scroll = async (to: number) => {
+      top = to;
+      body.dispatchEvent(new Event('scroll'));
+      await fixture.whenStable();
+    };
+
+    await scroll(100);
+    await send('More?'); // asking goes to the latest message
+    expect(top).toBe(1000);
+
+    await scroll(100); // reading further up
+    await stream(started('c1', 'q9'), { type: 'token', text: 'Words' });
+    expect(top).toBe(100);
+
+    button('Jump to latest')!.click();
+    await scroll(top);
+    expect(top).toBe(1000);
+    expect(button('Jump to latest')).toBeUndefined();
+
+    height = 1200;
+    await stream({ type: 'token', text: ' more' });
+    expect(top).toBe(1200);
+  });
+
   it('starts a new chat from the list', async () => {
     const { fixture, el } = await render('c1');
 

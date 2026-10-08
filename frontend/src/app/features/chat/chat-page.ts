@@ -1,6 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import {
   afterNextRender,
+  afterRenderEffect,
   ChangeDetectionStrategy,
   Component,
   ElementRef,
@@ -130,6 +131,10 @@ export class ChatPage {
   protected readonly renaming = signal(false);
   private readonly titleInput = viewChild<ElementRef<HTMLInputElement>>('titleInput');
 
+  /** The messages scroll; new words keep it at the latest message unless the reader scrolled up. */
+  private readonly threadBody = viewChild<ElementRef<HTMLElement>>('threadBody');
+  protected readonly atLatest = signal(true);
+
   /** The question being answered (until its answer is saved and joins the chat's messages). */
   protected readonly live = signal<LiveAnswer | null>(null);
   /** An answer is being written: the composer waits until it is done. */
@@ -222,6 +227,7 @@ export class ChatPage {
             return EMPTY;
           }
           this.stopAnswering();
+          this.atLatest.set(true);
           this.conversation.set(null);
           this.forgetChosenSource();
           if (!id) {
@@ -291,6 +297,15 @@ export class ChatPage {
       )
       .subscribe();
 
+    // Follows new messages and words while the reader is at the latest message.
+    afterRenderEffect(() => {
+      this.conversation();
+      this.live();
+      if (this.atLatest()) {
+        this.jumpToLatest();
+      }
+    });
+
     // A question for one bot is not answered after another bot was chosen.
     effect(() => {
       const answering = this.answeringBotId();
@@ -323,7 +338,20 @@ export class ChatPage {
   }
 
   protected ask(question: string): void {
+    this.atLatest.set(true);
     this.questions.next(question);
+  }
+
+  protected onThreadScroll(): void {
+    const body = this.threadBody()!.nativeElement;
+    this.atLatest.set(body.scrollHeight - body.scrollTop - body.clientHeight < 80);
+  }
+
+  protected jumpToLatest(): void {
+    const body = this.threadBody()?.nativeElement;
+    if (body) {
+      body.scrollTop = body.scrollHeight;
+    }
   }
 
   protected startRename(): void {

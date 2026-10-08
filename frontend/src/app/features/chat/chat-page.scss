@@ -215,3 +215,11 @@
   justify-content: center;
   gap: var(--citra-space-2);
 }
+
+// Stays at the bottom of the messages while they scroll.
+.jump {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+}

@@ -112,7 +112,7 @@
             />
           </header>
 
-          <div class="thread-body">
+          <div class="thread-body" #threadBody (scroll)="onThreadScroll()">
             @switch (chatState()) {
               @case ('none') {
                 @if (live()) {
@@ -183,6 +183,17 @@
                   />
                 }
               }
+            }
+            @if (!atLatest()) {
+              <div class="jump">
+                <p-button
+                  label="Jump to latest"
+                  icon="pi pi-arrow-down"
+                  size="small"
+                  [rounded]="true"
+                  (onClick)="jumpToLatest()"
+                />
+              </div>
             }
           </div>
 
