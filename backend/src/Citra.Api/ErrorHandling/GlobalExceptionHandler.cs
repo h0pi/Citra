@@ -69,6 +69,13 @@ public sealed class GlobalExceptionHandler(
                 Detail = conflict.Message,
             },
 
+            TooManyRequestsException tooMany => new ProblemDetails
+            {
+                Status = StatusCodes.Status429TooManyRequests,
+                Title = "Too many requests.",
+                Detail = tooMany.Message,
+            },
+
             // An AI provider (embeddings or chat) is down or rate-limited even after retries: temporary, not a bug.
             EmbeddingException or ChatModelException => new ProblemDetails
             {

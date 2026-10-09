@@ -1,3 +1,4 @@
+using Citra.Domain.Conversations;
 using FluentValidation;
 using MediatR;
 
@@ -11,6 +12,19 @@ public sealed record SendMessageCommand(Guid BotId, Guid? ConversationId, string
     : IStreamRequest<SendMessageEvent>
 {
     public const int QuestionMaxLength = 4000;
+}
+
+/// <summary>
+/// Asks a public bot a question from the website widget, without a login. A visitor is known only by the random
+/// id the widget keeps in the browser; a conversation can only be continued with the same visitor id. Only
+/// websites the bot allows may ask (<paramref name="Origin"/> is the browser's Origin header).
+/// </summary>
+public sealed record SendPublicMessageCommand(
+    string TenantSlug, string BotSlug, string VisitorId, Guid? ConversationId, string Question, string? Origin = null)
+    : IStreamRequest<SendMessageEvent>
+{
+    /// <summary>A visitor may ask this many questions a minute (the API also limits each IP address, more loosely).</summary>
+    public const int QuestionsPerVisitorPerMinute = 10;
 }
 
 /// <summary>What happens while a question is answered, in this order: started, sources, tokens…, completed.</summary>
@@ -53,6 +67,16 @@ internal sealed class SendMessageCommandValidator : AbstractValidator<SendMessag
     public SendMessageCommandValidator()
     {
         RuleFor(x => x.BotId).NotEmpty();
+        RuleFor(x => x.ConversationId).NotEqual(Guid.Empty);
+        RuleFor(x => x.Question).NotEmpty().MaximumLength(SendMessageCommand.QuestionMaxLength);
+    }
+}
+
+internal sealed class SendPublicMessageCommandValidator : AbstractValidator<SendPublicMessageCommand>
+{
+    public SendPublicMessageCommandValidator()
+    {
+        RuleFor(x => x.VisitorId).NotEmpty().MaximumLength(Conversation.VisitorIdMaxLength);
         RuleFor(x => x.ConversationId).NotEqual(Guid.Empty);
         RuleFor(x => x.Question).NotEmpty().MaximumLength(SendMessageCommand.QuestionMaxLength);
     }

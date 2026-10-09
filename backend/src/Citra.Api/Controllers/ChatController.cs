@@ -25,32 +25,12 @@ public sealed class ChatController(ISender sender, ILogger<ChatController> logge
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status503ServiceUnavailable, "application/problem+json")]
-    public async Task<IResult> Send(Guid botId, SendMessageRequest request, CancellationToken cancellationToken)
-    {
-        // cancellationToken is the request's: it fires when the browser disconnects, which cancels the model call.
-        var answer = sender
-            .CreateStream(new SendMessageCommand(botId, request.ConversationId, request.Question ?? string.Empty), cancellationToken)
-            .GetAsyncEnumerator(cancellationToken);
-
-        bool started;
-        try
-        {
-            started = await answer.MoveNextAsync();
-        }
-        catch
-        {
-            await answer.DisposeAsync();
-            throw; // still before the response started: the exception handler turns it into 400/404/503
-        }
-
-        if (!started)
-        {
-            await answer.DisposeAsync();
-            throw new InvalidOperationException("The chat ended before it started.");
-        }
-
-        return TypedResults.ServerSentEvents(ChatEvents.ToSse(answer.Current, answer, logger, cancellationToken));
-    }
+    public Task<IResult> Send(Guid botId, SendMessageRequest request, CancellationToken cancellationToken) =>
+        ChatEvents.StreamAsync(
+            sender.CreateStream(
+                new SendMessageCommand(botId, request.ConversationId, request.Question ?? string.Empty), cancellationToken),
+            logger,
+            cancellationToken);
 }
 
 /// <summary>Body of POST /api/bots/{botId}/chat. Without a conversation id a new conversation starts.</summary>

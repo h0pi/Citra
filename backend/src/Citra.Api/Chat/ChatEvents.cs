@@ -31,6 +31,37 @@ public static class ChatEvents
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
 
     /// <summary>
+    /// Streams an answer as server-sent events. The first event is read before the response starts, so checks,
+    /// saving the question and the search fail as ordinary HTTP errors (400, 404, 503); later failures arrive as
+    /// an <c>error</c> event. <paramref name="cancellationToken"/> is the request's: closing the connection stops
+    /// the answer (and the model) at once.
+    /// </summary>
+    public static async Task<IResult> StreamAsync(
+        IAsyncEnumerable<SendMessageEvent> answer, ILogger logger, CancellationToken cancellationToken)
+    {
+        var events = answer.GetAsyncEnumerator(cancellationToken);
+
+        bool started;
+        try
+        {
+            started = await events.MoveNextAsync();
+        }
+        catch
+        {
+            await events.DisposeAsync();
+            throw; // still before the response started: the exception handler turns it into 400/404/503
+        }
+
+        if (!started)
+        {
+            await events.DisposeAsync();
+            throw new InvalidOperationException("The chat ended before it started.");
+        }
+
+        return TypedResults.ServerSentEvents(ToSse(events.Current, events, logger, cancellationToken));
+    }
+
+    /// <summary>
     /// The events, starting with <paramref name="first"/> (already read by the caller). A failure after that point
     /// cannot change the HTTP status any more (200 was sent), so it becomes a final <c>error</c> event. A cancelled
     /// request (the user left) simply ends.

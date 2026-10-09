@@ -7,6 +7,7 @@ using Citra.Application.Common.Persistence;
 using Citra.Application.Common.Retrieval;
 using Citra.Application.Common.Security;
 using Citra.Application.Features.Bots;
+using Citra.Application.Features.Public;
 using Citra.Domain.Bots;
 using Citra.Domain.Conversations;
 using Citra.Domain.Usage;
@@ -20,7 +21,7 @@ namespace Citra.Application.Features.Chat.SendMessage;
 /// save the question → rewrite a follow-up into a standalone question → search the bot's documents → ask the
 /// model with the numbered sources → stream the answer → save it with the sources it cites, whether the documents
 /// had the answer, and what it cost. Any role may chat (viewers and the demo account too); admin-app chats are
-/// private to the user who started them.
+/// private to the user who started them. Website visitors chat with public bots the same way, without a login.
 /// </summary>
 internal sealed class SendMessageCommandHandler(
     IApplicationDbContext db,
@@ -33,7 +34,9 @@ internal sealed class SendMessageCommandHandler(
     Common.Chunking.ITokenCounter tokens,
     IChatPricing pricing,
     TimeProvider timeProvider,
-    ILogger<SendMessageCommandHandler> logger) : IStreamRequestHandler<SendMessageCommand, SendMessageEvent>
+    ILogger<SendMessageCommandHandler> logger)
+    : IStreamRequestHandler<SendMessageCommand, SendMessageEvent>,
+      IStreamRequestHandler<SendPublicMessageCommand, SendMessageEvent>
 {
     /// <summary>Saved when the model only wrote the "not found" marker.</summary>
     internal const string NotFoundFallback = "I could not find this in the documents.";
@@ -44,16 +47,50 @@ internal sealed class SendMessageCommandHandler(
         var startedAt = timeProvider.GetTimestamp(); // latency: from the question to the saved answer
         var tenantId = currentUser.RequireTenantId();
         var userId = currentUser.RequireUserId();
-        var question = request.Question.Trim();
 
         // Another company's bot is hidden by the tenant filter: 404, the retriever is never reached with it.
         var bot = await db.Bots.AsNoTracking().SingleOrDefaultAsync(b => b.Id == request.BotId, cancellationToken)
             ?? throw new NotFoundException(nameof(Bot), request.BotId);
 
         var conversation = await ConversationAsync(request, bot, tenantId, userId, cancellationToken);
-        IReadOnlyList<ChatMessage> history = request.ConversationId is null
-            ? []
-            : await HistoryAsync(conversation.Id, cancellationToken);
+        await foreach (var answerEvent in AnswerAsync(
+            bot, conversation, request.ConversationId is not null, request.Question, startedAt, cancellationToken))
+        {
+            yield return answerEvent;
+        }
+    }
+
+    public async IAsyncEnumerable<SendMessageEvent> Handle(
+        SendPublicMessageCommand request, [EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+        var startedAt = timeProvider.GetTimestamp();
+
+        // Only public bots; anything else is a 404, as if it did not exist.
+        var bot = await db.PublicBot(request.TenantSlug, request.BotSlug).AsNoTracking().SingleOrDefaultAsync(cancellationToken)
+            ?? throw new NotFoundException(nameof(Bot), $"{request.TenantSlug}/{request.BotSlug}");
+        PublicBots.EnsureOriginAllowed(bot, request.Origin);
+        await EnsureVisitorNotTooFastAsync(request, bot, cancellationToken);
+        await EnsureDailyLimitNotReachedAsync(bot, cancellationToken);
+
+        var conversation = await VisitorConversationAsync(request, bot, cancellationToken);
+        await foreach (var answerEvent in AnswerAsync(
+            bot, conversation, request.ConversationId is not null, request.Question, startedAt, cancellationToken))
+        {
+            yield return answerEvent;
+        }
+    }
+
+    /// <summary>Saves the question, then searches, streams and saves the answer (the same for both channels).</summary>
+    private async IAsyncEnumerable<SendMessageEvent> AnswerAsync(
+        Bot bot,
+        Conversation conversation,
+        bool continuing,
+        string asked,
+        long startedAt,
+        [EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+        var question = asked.Trim();
+        IReadOnlyList<ChatMessage> history = continuing ? await HistoryAsync(conversation.Id, cancellationToken) : [];
 
         // The question is kept even if answering fails below (it shows what people asked).
         var questionMessage = conversation.AddUserMessage(question);
@@ -64,7 +101,7 @@ internal sealed class SendMessageCommandHandler(
 
         // Voyage billed the search: record it now, whatever happens to the answer (and even if the user left).
         db.EmbeddingUsages.Add(EmbeddingUsage.ForQuery(
-            tenantId, bot.Id, embeddings.Model, found.QueryTokens,
+            bot.TenantId, bot.Id, embeddings.Model, found.QueryTokens,
             EmbeddingCost.Calculate(found.QueryTokens, embeddings.PricePerMillionTokensUsd)));
         await db.SaveChangesAsync(CancellationToken.None);
 
@@ -171,6 +208,78 @@ internal sealed class SendMessageCommandHandler(
             ?? throw new NotFoundException(nameof(Conversation), id);
 
         conversation.UpdatedAt = timeProvider.GetUtcNow(); // newest activity first in the chat list
+        return conversation;
+    }
+
+    /// <summary>
+    /// Protects the company's AI costs: website visitors may ask a bot at most its daily number of questions
+    /// (counted per UTC day; no limit set = unlimited).
+    /// </summary>
+    private async Task EnsureDailyLimitNotReachedAsync(Bot bot, CancellationToken cancellationToken)
+    {
+        if (bot.DailyMessageLimit is not { } limit)
+        {
+            return;
+        }
+
+        var today = new DateTimeOffset(timeProvider.GetUtcNow().UtcDateTime.Date, TimeSpan.Zero);
+        var widgetChats = db.Conversations
+            .IgnoreQueryFilters([QueryFilters.Tenant])
+            .Where(c => c.BotId == bot.Id && c.Channel == ConversationChannel.Widget)
+            .Select(c => c.Id);
+        var asked = await db.Messages.CountAsync(
+            m => m.Role == MessageRole.User && m.CreatedAt >= today && widgetChats.Contains(m.ConversationId),
+            cancellationToken);
+
+        if (asked >= limit)
+        {
+            throw new TooManyRequestsException("This assistant has answered all the questions it can today. Please try again tomorrow.");
+        }
+    }
+
+    /// <summary>Counts the visitor's questions to this bot in the last minute (each one costs search and model calls).</summary>
+    private async Task EnsureVisitorNotTooFastAsync(
+        SendPublicMessageCommand request, Bot bot, CancellationToken cancellationToken)
+    {
+        var since = timeProvider.GetUtcNow().AddMinutes(-1);
+        var visitorChats = db.Conversations
+            .IgnoreQueryFilters([QueryFilters.Tenant])
+            .Where(c => c.BotId == bot.Id && c.VisitorId == request.VisitorId)
+            .Select(c => c.Id);
+        var recent = await db.Messages.CountAsync(
+            m => m.Role == MessageRole.User && m.CreatedAt > since && visitorChats.Contains(m.ConversationId),
+            cancellationToken);
+
+        if (recent >= SendPublicMessageCommand.QuestionsPerVisitorPerMinute)
+        {
+            throw new TooManyRequestsException("You are asking very quickly. Please wait a minute and try again.");
+        }
+    }
+
+    /// <summary>
+    /// A new widget conversation, or the visitor's own existing one with this bot (anything else is a 404).
+    /// There is no user, so the tenant filter is lifted; the bot and the visitor id decide what is found.
+    /// </summary>
+    private async Task<Conversation> VisitorConversationAsync(
+        SendPublicMessageCommand request, Bot bot, CancellationToken cancellationToken)
+    {
+        if (request.ConversationId is not { } id)
+        {
+            var started = Conversation.StartInWidget(bot.TenantId, bot.Id, request.VisitorId);
+            started.Rename(ConversationTitle.FromQuestion(request.Question));
+            db.Conversations.Add(started);
+            return started;
+        }
+
+        var conversation = await db.Conversations
+                .IgnoreQueryFilters([QueryFilters.Tenant])
+                .SingleOrDefaultAsync(
+                    // Admin-app chats have no visitor id, so they are never found here.
+                    c => c.Id == id && c.BotId == bot.Id && c.VisitorId == request.VisitorId,
+                    cancellationToken)
+            ?? throw new NotFoundException(nameof(Conversation), id);
+
+        conversation.UpdatedAt = timeProvider.GetUtcNow();
         return conversation;
     }
 

@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 using Citra.Api.Auth;
 using Citra.Api.ErrorHandling;
 using Citra.Api.HealthChecks;
@@ -41,7 +42,8 @@ try
 
     // CORS for the Angular admin app. Origins come from config ("Cors:AllowedOrigins"):
     // localhost:4200 in Development, the real frontend domain in production.
-    // (The public website widget gets its own per-bot policy later.)
+    // The public widget endpoints use their own policy: any website may call them (no cookies are sent), and each
+    // bot then checks the Origin against its allowed websites.
     var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
     builder.Services.AddCors(options => options.AddPolicy(FrontendCorsPolicy, policy => policy
         .WithOrigins(allowedOrigins)
@@ -50,6 +52,24 @@ try
         .AllowCredentials()                        // required by SignalR
         .WithExposedHeaders("Content-Disposition") // lets the browser read download file names
         .SetPreflightMaxAge(TimeSpan.FromMinutes(10))));
+    builder.Services.AddCors(options => options.AddPolicy(Citra.Api.CorsPolicies.PublicWidget, policy => policy
+        .AllowAnyOrigin()
+        .WithMethods("GET", "POST")
+        .WithHeaders("Content-Type")
+        .SetPreflightMaxAge(TimeSpan.FromMinutes(10))));
+
+    // Public widget endpoints: a fixed number of requests per IP address and minute (429 beyond it).
+    builder.Services.AddRateLimiter(options =>
+    {
+        options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+        options.AddPolicy(Citra.Api.RateLimits.PublicWidget, context => RateLimitPartition.GetFixedWindowLimiter(
+            context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = Citra.Api.RateLimits.PublicRequestsPerIpPerMinute,
+                Window = TimeSpan.FromMinutes(1),
+            }));
+    });
 
     // Enums travel as text ("Owner", "Ready"), not numbers: readable, and safe if an enum's order changes.
     builder.Services.AddControllers()
@@ -97,6 +117,7 @@ try
     app.UseHttpsRedirection();
 
     app.UseCors(FrontendCorsPolicy);
+    app.UseRateLimiter();
 
     app.UseAuthentication();
     app.UseAuthorization();
