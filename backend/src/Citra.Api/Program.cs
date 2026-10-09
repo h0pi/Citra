@@ -116,6 +116,13 @@ try
 
     app.UseHttpsRedirection();
 
+    // The website widget (/widget.js, built from /widget). Its address never changes, so browsers keep it for an
+    // hour and then check it again (ETag), so a new version reaches websites within the hour.
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        OnPrepareResponse = context => context.Context.Response.Headers.CacheControl = "public, max-age=3600",
+    });
+
     app.UseCors(FrontendCorsPolicy);
     app.UseRateLimiter();
 

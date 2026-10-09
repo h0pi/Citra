@@ -1,0 +1,13 @@
+{
+  "name": "citra-widget",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc && vite build"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.2",
+    "vite": "^8.3.4"
+  }
+}

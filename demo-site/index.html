@@ -1,0 +1,45 @@
+<!doctype html>
+<!--
+  A fake company website with the Citra widget, for trying the widget the way a customer would use it.
+  1. In Citra, open a bot's settings: turn on "Show on websites" and copy the snippet from the Embed tab.
+  2. Replace the <script> at the end of this page with that snippet.
+  3. Serve this folder, e.g. `python -m http.server 8080`, and open http://localhost:8080
+     (add "localhost" to the bot's allowed websites if it has a list).
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Northwind Outdoor</title>
+    <style>
+      body { margin: 0; font-family: Georgia, serif; color: #2d2a26; background: #faf7f2; }
+      header { padding: 16px 32px; background: #2f4f3a; color: #fff; display: flex; justify-content: space-between; }
+      header a { color: #fff; margin-left: 20px; text-decoration: none; }
+      .hero { padding: 80px 32px; text-align: center; background: #e7e0d3; }
+      .hero h1 { margin: 0 0 12px; font-size: 44px; }
+      main { max-width: 900px; margin: 0 auto; padding: 40px 32px; display: grid; gap: 24px;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+      section { padding: 20px; background: #fff; border-radius: 8px; }
+      footer { padding: 24px 32px; text-align: center; color: #6b655c; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <strong>Northwind Outdoor</strong>
+      <nav><a href="#">Shop</a><a href="#">About</a><a href="#">Support</a></nav>
+    </header>
+    <div class="hero">
+      <h1>Gear for every trail</h1>
+      <p>Tents, backpacks and boots, tested in the mountains since 1998.</p>
+    </div>
+    <main>
+      <section><h2>Shipping</h2><p>Free delivery on orders over $50, usually within three working days.</p></section>
+      <section><h2>Returns</h2><p>Changed your mind? Send it back within 30 days.</p></section>
+      <section><h2>Questions?</h2><p>Ask our assistant in the corner. It answers from our policies and manuals.</p></section>
+    </main>
+    <footer>&copy; Northwind Outdoor (a demo website)</footer>
+
+    <!-- The Citra widget: replace with the snippet from your bot's Embed tab. -->
+    <script src="http://localhost:5100/widget.js" data-bot="your-company/your-bot" defer></script>
+  </body>
+</html>

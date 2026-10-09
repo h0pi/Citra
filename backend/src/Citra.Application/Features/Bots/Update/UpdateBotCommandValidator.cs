@@ -31,5 +31,16 @@ internal sealed class UpdateBotCommandValidator : AbstractValidator<UpdateBotCom
             .Must(q => q.Count(s => !string.IsNullOrWhiteSpace(s)) <= Bot.MaxStarterQuestions)
             .WithMessage($"At most {Bot.MaxStarterQuestions} starter questions.");
         RuleForEach(x => x.StarterQuestions).MaximumLength(Bot.StarterQuestionMaxLength);
+
+        RuleFor(x => x.AllowedDomains)
+            .NotNull()
+            .Must(d => d.Count(s => !string.IsNullOrWhiteSpace(s)) <= Bot.MaxAllowedDomains)
+            .WithMessage($"At most {Bot.MaxAllowedDomains} websites.");
+        // Only the domain ("acme.com"), as the Origin check compares hosts; not "https://acme.com/page".
+        RuleForEach(x => x.AllowedDomains)
+            .Matches(@"^\s*([A-Za-z0-9-]+\.)*[A-Za-z0-9-]+\s*$|^\s*$")
+            .WithMessage("Use domain names like acme.com, without https:// or a path.");
+
+        RuleFor(x => x.DailyMessageLimit).GreaterThanOrEqualTo(0);
     }
 }

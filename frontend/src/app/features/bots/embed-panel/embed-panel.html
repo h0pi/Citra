@@ -1,0 +1,22 @@
+<section class="settings-card" aria-labelledby="embed-heading">
+  <h2 id="embed-heading">Add the chat to your website</h2>
+  <p class="text-muted intro">
+    Paste this snippet just before <code>&lt;/body&gt;</code> on every page where the chat should
+    appear.
+  </p>
+  <pre class="snippet"><code>{{ snippet() }}</code></pre>
+  <div>
+    <p-button label="Copy snippet" icon="pi pi-copy" (onClick)="copy()" />
+  </div>
+  @if (!bot().isPublic) {
+    <p-message
+      severity="warn"
+      text="This bot is private: the chat appears on websites only after you make it public."
+    />
+  }
+</section>
+
+<section class="settings-card" aria-labelledby="preview-heading">
+  <h2 id="preview-heading">Preview</h2>
+  <iframe title="Widget preview" class="preview" [srcdoc]="previewPage()"></iframe>
+</section>

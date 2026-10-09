@@ -1,0 +1,44 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--citra-space-4);
+}
+
+.settings-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--citra-space-4);
+  padding: var(--citra-space-5);
+  background: var(--citra-surface);
+  border: 1px solid var(--citra-border);
+  border-radius: var(--citra-radius-lg);
+  box-shadow: var(--citra-shadow-sm);
+
+  h2 {
+    margin: 0;
+    font-size: var(--citra-text-lg);
+  }
+}
+
+.intro {
+  margin: 0;
+  font-size: var(--citra-text-sm);
+}
+
+.snippet {
+  margin: 0;
+  padding: var(--citra-space-3);
+  overflow-x: auto;
+  background: var(--citra-surface-muted);
+  border: 1px solid var(--citra-border);
+  border-radius: var(--citra-radius-md);
+  font-size: var(--citra-text-sm);
+}
+
+.preview {
+  width: 100%;
+  height: 640px;
+  border: 1px solid var(--citra-border);
+  border-radius: var(--citra-radius-md);
+  background: #fff;
+}

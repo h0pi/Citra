@@ -68,7 +68,10 @@ public sealed class BotsController(ISender sender) : ControllerBase
                 request.Model,
                 request.Temperature,
                 request.WidgetColor,
-                request.StarterQuestions),
+                request.StarterQuestions,
+                request.IsPublic,
+                request.AllowedDomains,
+                request.DailyMessageLimit),
             cancellationToken);
 
     /// <summary>
@@ -106,4 +109,7 @@ public sealed record UpdateBotRequest(
     string? Model,
     double Temperature,
     string WidgetColor,
-    IReadOnlyList<string> StarterQuestions);
+    IReadOnlyList<string> StarterQuestions,
+    bool IsPublic,
+    IReadOnlyList<string> AllowedDomains,
+    int? DailyMessageLimit);

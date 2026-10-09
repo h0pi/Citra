@@ -21,6 +21,6 @@ internal sealed class CreateBotCommandHandler(
         db.Bots.Add(bot);
         await db.SaveChangesAsync(cancellationToken);
 
-        return BotDto.From(bot);
+        return await BotDto.FromAsync(bot, db, cancellationToken);
     }
 }

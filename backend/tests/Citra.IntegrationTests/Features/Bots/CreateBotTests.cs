@@ -23,6 +23,7 @@ public sealed class CreateBotTests(DatabaseFixture fixture)
 
         created.Name.ShouldBe("Customer Support");
         created.Slug.ShouldBe("customer-support");
+        created.TenantSlug.ShouldBe(tenant.Slug);
         created.Description.ShouldBe("Answers product questions");
         created.WelcomeMessage.ShouldBe(Bot.DefaultWelcomeMessage);
         created.WidgetColor.ShouldBe(Bot.DefaultWidgetColor);

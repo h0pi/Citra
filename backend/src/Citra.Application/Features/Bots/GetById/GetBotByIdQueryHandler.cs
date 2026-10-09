@@ -22,6 +22,6 @@ internal sealed class GetBotByIdQueryHandler(
             .SingleOrDefaultAsync(b => b.Id == request.Id, cancellationToken)
             ?? throw new NotFoundException(nameof(Bot), request.Id);
 
-        return BotDto.From(bot);
+        return await BotDto.FromAsync(bot, db, cancellationToken);
     }
 }

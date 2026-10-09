@@ -187,3 +187,13 @@ textarea {
 :host ::ng-deep .p-tab i {
   margin-right: var(--citra-space-2);
 }
+
+.switch-row {
+  display: flex;
+  align-items: center;
+  gap: var(--citra-space-3);
+}
+
+.limit-input {
+  max-width: 12rem;
+}

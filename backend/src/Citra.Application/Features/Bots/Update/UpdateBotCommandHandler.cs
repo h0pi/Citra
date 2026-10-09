@@ -22,11 +22,11 @@ internal sealed class UpdateBotCommandHandler(
 
         bot.UpdateDetails(request.Name, request.Description, request.SystemPrompt, request.WelcomeMessage);
         bot.ConfigureModel(request.Model, request.Temperature);
-        bot.ChangeWidgetColor(request.WidgetColor);
-        bot.ChangeStarterQuestions(request.StarterQuestions);
+        bot.ConfigureWidget(
+            request.IsPublic, request.WidgetColor, request.AllowedDomains, request.StarterQuestions, request.DailyMessageLimit);
 
         await db.SaveChangesAsync(cancellationToken);
 
-        return BotDto.From(bot);
+        return await BotDto.FromAsync(bot, db, cancellationToken);
     }
 }

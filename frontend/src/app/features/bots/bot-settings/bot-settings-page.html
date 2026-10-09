@@ -42,6 +42,7 @@
           <p-tab value="search"
             ><i class="pi pi-search" aria-hidden="true"></i> Search playground</p-tab
           >
+          <p-tab value="embed"><i class="pi pi-code" aria-hidden="true"></i> Embed</p-tab>
         </p-tablist>
         <p-tabpanels>
           <p-tabpanel value="settings">
@@ -49,6 +50,12 @@
           </p-tabpanel>
           <p-tabpanel value="search">
             <app-search-playground [botId]="id()" />
+          </p-tabpanel>
+          <p-tabpanel value="embed">
+            <!-- Only while open: the preview loads the real widget. -->
+            @if (tab() === 'embed' && bot(); as current) {
+              <app-embed-panel [bot]="current" />
+            }
           </p-tabpanel>
         </p-tabpanels>
       </p-tabs>
@@ -223,6 +230,61 @@
 
         <section class="settings-card" aria-labelledby="widget-heading">
           <h2 id="widget-heading">Widget</h2>
+
+          <div class="field">
+            <div class="switch-row">
+              <p-toggleswitch inputId="isPublic" formControlName="isPublic" />
+              <label for="isPublic">Show on websites</label>
+            </div>
+            <small class="text-muted hint"
+              >When off, the chat answers no one, even where the snippet is pasted.</small
+            >
+          </div>
+
+          <div class="field">
+            <label for="allowedDomains"
+              >Allowed websites <span class="text-muted">(optional)</span></label
+            >
+            <textarea
+              pTextarea
+              id="allowedDomains"
+              formControlName="allowedDomains"
+              rows="3"
+              placeholder="e.g. acme.com"
+              [attr.aria-invalid]="showError('allowedDomains')"
+              fluid
+            ></textarea>
+            @if (showError('allowedDomains')) {
+              <small class="field-error">{{ errorFor('allowedDomains') }}</small>
+            } @else {
+              <small class="text-muted hint"
+                >One per line; subdomains are included. Empty allows every website.</small
+              >
+            }
+          </div>
+
+          <div class="field">
+            <label for="dailyMessageLimit"
+              >Daily question limit <span class="text-muted">(optional)</span></label
+            >
+            <input
+              pInputText
+              type="number"
+              id="dailyMessageLimit"
+              formControlName="dailyMessageLimit"
+              min="0"
+              class="limit-input"
+              [attr.aria-invalid]="showError('dailyMessageLimit')"
+            />
+            @if (showError('dailyMessageLimit')) {
+              <small class="field-error">{{ errorFor('dailyMessageLimit') }}</small>
+            } @else {
+              <small class="text-muted hint"
+                >Questions website visitors may ask per day, to keep costs in check. Empty means no
+                limit.</small
+              >
+            }
+          </div>
 
           <div class="field">
             <label for="widgetColor">Color</label>

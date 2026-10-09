@@ -43,6 +43,9 @@ describe('BotsApi', () => {
         temperature: 0.2,
         widgetColor: '#6366F1',
         starterQuestions: [],
+        isPublic: false,
+        allowedDomains: [],
+        dailyMessageLimit: null,
       })
       .subscribe();
     api.delete('b1').subscribe();

@@ -30,10 +30,14 @@ public sealed class UpdateBotTests(DatabaseFixture fixture)
             Temperature = 0.7,
             WidgetColor = "#10b981",
             StarterQuestions = ["  How many vacation days?  ", " ", "Where do I park?"],
+            IsPublic = true,
+            AllowedDomains = [" Acme.com ", "", "shop.test"],
+            DailyMessageLimit = 50,
         });
 
         updated.Name.ShouldBe("Sales Assistant");
         updated.Slug.ShouldBe("support", "renaming must not break widget URLs already embedded on websites");
+        updated.TenantSlug.ShouldBe(tenant.Slug);
         updated.Description.ShouldBe("Helps with pricing");
         updated.SystemPrompt.ShouldBe("Be brief.");
         updated.WelcomeMessage.ShouldBe("Hello!");
@@ -41,6 +45,9 @@ public sealed class UpdateBotTests(DatabaseFixture fixture)
         updated.Temperature.ShouldBe(0.7);
         updated.WidgetColor.ShouldBe("#10B981");
         updated.StarterQuestions.ShouldBe(["How many vacation days?", "Where do I park?"]);
+        updated.IsPublic.ShouldBeTrue();
+        updated.AllowedDomains.ShouldBe(["acme.com", "shop.test"]);
+        updated.DailyMessageLimit.ShouldBe(50);
         updated.UpdatedAt.ShouldBeGreaterThanOrEqualTo(bot.UpdatedAt);
 
         await using var check = fixture.OpenScope(tenant.Id);
@@ -88,7 +95,7 @@ public sealed class UpdateBotTests(DatabaseFixture fixture)
 
         await using var scope = fixture.OpenScope(tenant.Id);
         await Should.ThrowAsync<NotFoundException>(() =>
-            scope.Send(new UpdateBotCommand(Guid.NewGuid(), "X", null, null, "Hi", null, 0.2, "#6366F1", [])));
+            scope.Send(new UpdateBotCommand(Guid.NewGuid(), "X", null, null, "Hi", null, 0.2, "#6366F1", [], false, [], null)));
     }
 
     [Theory]
@@ -116,11 +123,27 @@ public sealed class UpdateBotTests(DatabaseFixture fixture)
             Temperature = 1.5,
             WidgetColor = "red",
             StarterQuestions = ["1", "2", "3", "4", "5", "6", "7"],
+            AllowedDomains = ["acme.com", "https://shop.acme.com/page"],
+            DailyMessageLimit = -1,
         }));
 
         error.Errors.Keys.ShouldBe(
-            ["Name", "WelcomeMessage", "Model", "Temperature", "WidgetColor", "StarterQuestions"], ignoreOrder: true);
+            ["Name", "WelcomeMessage", "Model", "Temperature", "WidgetColor", "StarterQuestions", "AllowedDomains[1]",
+                "DailyMessageLimit"],
+            ignoreOrder: true);
         error.Errors["WidgetColor"].Length.ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task At_most_20_websites_are_allowed()
+    {
+        var (tenant, bot) = await SeedBotAsync("Support");
+
+        await using var scope = fixture.OpenScope(tenant.Id);
+        var error = await Should.ThrowAsync<ValidationException>(() => scope.Send(
+            ValidUpdate(bot) with { AllowedDomains = [.. Enumerable.Range(1, 21).Select(i => $"site{i}.test")] }));
+
+        error.Errors.Keys.ShouldBe(["AllowedDomains"]);
     }
 
     [Fact]
@@ -139,7 +162,7 @@ public sealed class UpdateBotTests(DatabaseFixture fixture)
 
     private static UpdateBotCommand ValidUpdate(BotDto bot) => new(
         bot.Id, bot.Name, bot.Description, bot.SystemPrompt, bot.WelcomeMessage, bot.Model, bot.Temperature, bot.WidgetColor,
-        bot.StarterQuestions);
+        bot.StarterQuestions, bot.IsPublic, bot.AllowedDomains, bot.DailyMessageLimit);
 
     private async Task<(Tenant Tenant, BotDto Bot)> SeedBotAsync(string botName)
     {

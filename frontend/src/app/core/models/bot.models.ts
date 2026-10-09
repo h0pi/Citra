@@ -19,6 +19,8 @@ export interface Bot {
   id: string;
   name: string;
   slug: string;
+  /** The company's slug; with `slug` it is the widget address ("acme/support"). */
+  tenantSlug: string;
   description: string | null;
   systemPrompt: string | null;
   welcomeMessage: string;
@@ -48,6 +50,11 @@ export interface UpdateBotRequest {
   temperature: number;
   widgetColor: string;
   starterQuestions: string[];
+  isPublic: boolean;
+  /** Websites the widget works on (empty = every website). */
+  allowedDomains: string[];
+  /** Widget questions per day (null = unlimited). */
+  dailyMessageLimit: number | null;
 }
 
 /** Same limits as the backend (Bot entity constants). */
@@ -58,6 +65,7 @@ export const BOT_LIMITS = {
   welcomeMessage: 500,
   starterQuestions: 6,
   starterQuestion: 200,
+  allowedDomains: 20,
 } as const;
 
 /** What GET /api/bots/{id}/search found (the search playground). */

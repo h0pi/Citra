@@ -18,6 +18,7 @@ const savedBot: Bot = {
   id: 'b1',
   name: 'Support',
   slug: 'support',
+  tenantSlug: 'acme',
   description: 'Customer questions',
   systemPrompt: null,
   welcomeMessage: 'Hi! Ask me anything.',
@@ -128,6 +129,9 @@ describe('BotSettingsPage', () => {
     await type('#description', '   ');
     await type('#widgetColor', '#10b981');
     await type('#starterQuestions', '  Vacation?  \n\n Parking? ');
+    input('#isPublic').click();
+    await type('#allowedDomains', ' acme.com \n\nshop.test');
+    await type('#dailyMessageLimit', '');
     expect(el.textContent).toContain('Unsaved changes');
 
     button('Save changes')!.click();
@@ -142,13 +146,36 @@ describe('BotSettingsPage', () => {
       temperature: 0.2,
       widgetColor: '#10B981',
       starterQuestions: ['Vacation?', 'Parking?'],
+      isPublic: true,
+      allowedDomains: ['acme.com', 'shop.test'],
+      dailyMessageLimit: null,
     });
     expect(input('#starterQuestions').value).toBe('Vacation?\nParking?');
+    expect(input('#allowedDomains').value).toBe('acme.com\nshop.test');
     expect(success).toHaveBeenCalledWith('Settings saved');
     expect(refresh).toHaveBeenCalled(); // top-bar selector shows the new name
     expect(el.querySelector('h1')?.textContent).toContain('Sales');
     expect(el.textContent).not.toContain('Unsaved changes');
     expect(fixture.componentInstance.hasUnsavedChanges()).toBe(false);
+  });
+
+  it('checks the allowed websites and the daily limit', async () => {
+    const { fixture, el, type, button } = await render();
+
+    await type('#allowedDomains', 'acme.com\nhttps://shop.acme.com/page');
+    await type('#dailyMessageLimit', '-1');
+    button('Save changes')!.click();
+    await fixture.whenStable();
+
+    expect(update).not.toHaveBeenCalled();
+    const errors = [...el.querySelectorAll('.field-error')].map((e) => e.textContent?.trim());
+    expect(errors).toEqual([
+      'Use domain names like acme.com, without https:// or a path.',
+      'Use a whole number, or leave it empty.',
+    ]);
+
+    await type('#allowedDomains', Array.from({ length: 21 }, (_, i) => `site${i}.test`).join('\n'));
+    expect(el.textContent).toContain('Use at most 20 websites.');
   });
 
   it('does not send invalid values and explains what is wrong', async () => {
@@ -308,7 +335,7 @@ describe('BotSettingsPage', () => {
     it('gives owners and admins a second tab with the playground for this bot', async () => {
       const { fixture, el } = await render();
 
-      expect(tabs(el)).toEqual(['Settings', 'Search playground']);
+      expect(tabs(el)).toEqual(['Settings', 'Search playground', 'Embed']);
       expect(el.querySelector('p-tab[aria-selected="true"]')?.textContent).toContain('Settings');
 
       el.querySelectorAll<HTMLElement>('p-tab')[1].click();

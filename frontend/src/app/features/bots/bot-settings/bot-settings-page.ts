@@ -37,12 +37,16 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { SliderModule } from 'primeng/slider';
 import { TabsModule } from 'primeng/tabs';
 import { TextareaModule } from 'primeng/textarea';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { forkJoin } from 'rxjs';
 
 import { DeleteBotDialog } from '../delete-bot-dialog/delete-bot-dialog';
+import { EmbedPanel } from '../embed-panel/embed-panel';
 import { SearchPlayground } from '../search-playground/search-playground';
 
 const HEX_COLOR = /^#[0-9A-Fa-f]{6}$/;
+/** Only the domain, as the backend checks it: "acme.com", not "https://acme.com/page". */
+const DOMAIN = /^([A-Za-z0-9-]+\.)*[A-Za-z0-9-]+$/;
 
 /** Friendly names for the model dropdown; unknown ids are shown as they are. */
 const MODEL_LABELS: Record<string, string> = {
@@ -57,7 +61,14 @@ interface ModelOption {
 }
 
 type Field =
-  'name' | 'description' | 'systemPrompt' | 'welcomeMessage' | 'starterQuestions' | 'widgetColor';
+  | 'name'
+  | 'description'
+  | 'systemPrompt'
+  | 'welcomeMessage'
+  | 'starterQuestions'
+  | 'widgetColor'
+  | 'allowedDomains'
+  | 'dailyMessageLimit';
 
 /** Starter questions are typed one per line; empty lines do not count. */
 const lines = (text: string) =>
@@ -77,9 +88,29 @@ function starterQuestionsValidator(control: AbstractControl<string>): Validation
   return null;
 }
 
+function allowedDomainsValidator(control: AbstractControl<string>): ValidationErrors | null {
+  const domains = lines(control.value);
+  if (domains.length > BOT_LIMITS.allowedDomains) {
+    return { allowedDomains: `Use at most ${BOT_LIMITS.allowedDomains} websites.` };
+  }
+  if (domains.some((d) => !DOMAIN.test(d))) {
+    return { allowedDomains: 'Use domain names like acme.com, without https:// or a path.' };
+  }
+  return null;
+}
+
+function dailyMessageLimitValidator(
+  control: AbstractControl<number | null>,
+): ValidationErrors | null {
+  const limit = control.value;
+  return limit === null || (Number.isInteger(limit) && limit >= 0)
+    ? null
+    : { dailyMessageLimit: 'Use a whole number, or leave it empty.' };
+}
+
 /**
- * Edit one bot: name, instructions, model, answer style and widget color. Owners and admins also get a second
- * tab, the search playground, to check what the bot finds for a question.
+ * Edit one bot: name, instructions, model, answer style and widget color. Owners and admins also get the search
+ * playground, to check what the bot finds for a question, and the Embed tab with the website snippet.
  */
 @Component({
   selector: 'app-bot-settings-page',
@@ -90,6 +121,7 @@ function starterQuestionsValidator(control: AbstractControl<string>): Validation
     PageHeader,
     EmptyState,
     DeleteBotDialog,
+    EmbedPanel,
     SearchPlayground,
     ButtonModule,
     InputTextModule,
@@ -99,6 +131,7 @@ function starterQuestionsValidator(control: AbstractControl<string>): Validation
     SliderModule,
     TabsModule,
     TextareaModule,
+    ToggleSwitchModule,
   ],
   templateUrl: './bot-settings-page.html',
   styleUrl: './bot-settings-page.scss',
@@ -123,7 +156,7 @@ export class BotSettingsPage implements HasUnsavedChanges {
   protected readonly state = signal<'loading' | 'ready' | 'not-found' | 'error'>('loading');
   protected readonly saving = signal(false);
   protected readonly showDelete = signal(false);
-  /** Open tab (owners and admins): the settings form or the search playground. */
+  /** Open tab (owners and admins): the settings form, the search playground or the embed snippet. */
   protected readonly tab = signal<string | number | undefined>('settings');
   protected readonly errorMessage = signal<string | null>(null);
 
@@ -136,6 +169,9 @@ export class BotSettingsPage implements HasUnsavedChanges {
     model: [null as string | null],
     temperature: [0.2],
     widgetColor: ['', [Validators.required, Validators.pattern(HEX_COLOR)]],
+    isPublic: [false],
+    allowedDomains: ['', [allowedDomainsValidator]],
+    dailyMessageLimit: [null as number | null, [dailyMessageLimitValidator]],
   });
 
   // Signals from the form, so the template (OnPush, zoneless) updates as the user types.
@@ -217,6 +253,9 @@ export class BotSettingsPage implements HasUnsavedChanges {
         temperature: Math.round(value.temperature * 10) / 10,
         widgetColor: value.widgetColor.toUpperCase(),
         starterQuestions: lines(value.starterQuestions),
+        isPublic: value.isPublic,
+        allowedDomains: lines(value.allowedDomains),
+        dailyMessageLimit: value.dailyMessageLimit,
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -286,7 +325,7 @@ export class BotSettingsPage implements HasUnsavedChanges {
     if (errors['server']) return errors['server'] as string;
     if (errors['required']) return 'This field is required.';
     if (errors['pattern']) return 'Use a hex color like #6366F1.';
-    if (errors['starterQuestions']) return errors['starterQuestions'] as string;
+    if (typeof errors[field] === 'string') return errors[field]; // the field's own validator
     if (errors['maxlength']) {
       return `Use at most ${(errors['maxlength'] as { requiredLength: number }).requiredLength} characters.`;
     }
@@ -306,6 +345,9 @@ export class BotSettingsPage implements HasUnsavedChanges {
       model: bot.model,
       temperature: bot.temperature,
       widgetColor: bot.widgetColor,
+      isPublic: bot.isPublic,
+      allowedDomains: bot.allowedDomains.join('\n'),
+      dailyMessageLimit: bot.dailyMessageLimit,
     });
     if (this.canEdit()) {
       this.form.enable();

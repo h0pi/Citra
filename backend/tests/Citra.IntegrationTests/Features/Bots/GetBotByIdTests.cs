@@ -28,6 +28,7 @@ public sealed class GetBotByIdTests(DatabaseFixture fixture)
         dto.Id.ShouldBe(bot.Id);
         dto.Name.ShouldBe("Support");
         dto.Slug.ShouldBe("support");
+        dto.TenantSlug.ShouldBe(tenant.Slug);
         dto.Description.ShouldBe("Customer questions");
         dto.SystemPrompt.ShouldBe("Be brief.");
         dto.WelcomeMessage.ShouldBe("Welcome!");
