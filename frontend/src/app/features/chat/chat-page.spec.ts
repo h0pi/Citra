@@ -4,6 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { CurrentBot } from '@core/bots/current-bot';
 import { ChatApi } from '@core/chat/chat-api';
+import { DocumentsApi } from '@core/documents/documents-api';
 import { ChatStream, ChatStreamError } from '@core/chat/chat-stream';
 import { BotSummary } from '@core/models/bot.models';
 import {
@@ -16,7 +17,7 @@ import {
 } from '@core/models/chat.models';
 import { PagedResult } from '@core/models/document.models';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { Observable, Subject, of, throwError } from 'rxjs';
+import { NEVER, Observable, Subject, of, throwError } from 'rxjs';
 
 import { NotificationService } from '@core/services/notification.service';
 
@@ -176,6 +177,7 @@ describe('ChatPage', () => {
           { path: 'chat/:conversationId', component: RouteStub },
         ]),
         MessageService,
+        { provide: DocumentsApi, useValue: { file: () => NEVER } },
         {
           provide: ChatApi,
           useValue: { conversations, conversation, rate, rename, delete: remove },
@@ -1008,6 +1010,42 @@ describe('ChatPage', () => {
     height = 1200;
     await stream({ type: 'token', text: ' more' });
     expect(top).toBe(1200);
+  });
+
+  it('opens the original PDF of a source from the sources panel', async () => {
+    conversation.mockReturnValue(
+      of(
+        chat({
+          messages: [
+            message({ id: 'm2', role: 'Assistant', content: 'Yes [1].', citations: [citation(1)] }),
+          ],
+        }),
+      ),
+    );
+    const { fixture, el } = await render('c1');
+    expect(document.body.textContent).not.toContain('Loading the document…');
+    const open = async () => {
+      [...el.querySelectorAll<HTMLButtonElement>('.source button')]
+        .find((b) => b.textContent!.includes('Open document'))!
+        .click();
+      fixture.detectChanges();
+      await new Promise((resolve) => setTimeout(resolve, 300)); // loaded on first use; dialog animation
+      fixture.detectChanges();
+    };
+
+    await open();
+
+    expect(document.querySelector('.p-dialog')!.textContent).toContain('Handbook.pdf');
+    expect(document.body.textContent).toContain('Loading the document…');
+
+    document.querySelector<HTMLButtonElement>('.p-dialog-header button')!.click();
+    fixture.detectChanges();
+    await new Promise((resolve) => setTimeout(resolve, 300)); // the dialog's closing animation
+    expect(document.querySelector('.p-dialog')).toBeNull();
+
+    await open(); // the same document again
+    expect(document.querySelector('.p-dialog')).not.toBeNull();
+    document.body.querySelectorAll('.p-dialog-mask').forEach((m) => m.remove());
   });
 
   it('starts a new chat from the list', async () => {

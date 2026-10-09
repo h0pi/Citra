@@ -46,6 +46,11 @@
               {{ expanded().has(source.number) ? 'Show less' : 'Show more' }}
             </button>
           }
+          @if (canOpen(source)) {
+            <button type="button" class="open-document" (click)="open.emit(source)">
+              Open document
+            </button>
+          }
         </li>
       }
     </ol>

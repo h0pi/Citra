@@ -32,6 +32,8 @@ export class SourcesPanel {
   /** The number of the source whose citation was chosen. */
   readonly selected = input<number | null>(null);
   readonly closed = output<void>();
+  /** Open the original document of a source. */
+  readonly open = output<Citation>();
 
   /** Which sources are shown: the same ones again (a chip chosen again) keep their passages as they are. */
   private readonly shownSources = computed(() =>
@@ -60,6 +62,11 @@ export class SourcesPanel {
       item?.scrollIntoView({ block: 'nearest' });
       item?.focus({ preventScroll: true });
     });
+  }
+
+  /** The original can be shown while the document still exists. */
+  protected canOpen(source: Citation): boolean {
+    return source.documentId !== null;
   }
 
   protected isLong(source: Citation): boolean {

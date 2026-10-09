@@ -160,6 +160,23 @@ describe('SourcesPanel', () => {
     expect(more()).not.toBeNull();
   });
 
+  it('offers to open the original of documents that still exist', async () => {
+    const pdf = citation(1, { documentName: 'Handbook.PDF' });
+    const { fixture, items } = await render([
+      pdf,
+      citation(2, { documentName: 'Policy.docx' }),
+      citation(3, { documentId: null }),
+    ]);
+    const opened: Citation[] = [];
+    fixture.componentInstance.open.subscribe((source) => opened.push(source));
+    const openButton = (item: HTMLElement) =>
+      [...item.querySelectorAll('button')].find((b) => b.textContent!.includes('Open document'));
+
+    expect(items().map((item) => !!openButton(item))).toEqual([true, true, false]);
+    openButton(items()[0])!.click();
+    expect(opened).toEqual([pdf]);
+  });
+
   it('asks the page to close it', async () => {
     const { fixture, el } = await render([citation(1)]);
     let closed = 0;

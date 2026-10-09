@@ -214,6 +214,7 @@
             [sources]="sources()"
             [selected]="selectedSource()"
             (closed)="closeSources()"
+            (open)="viewing.set($event)"
           />
         </aside>
 
@@ -233,3 +234,8 @@
 }
 
 <p-confirmdialog [style]="{ width: '28rem' }" [breakpoints]="{ '575px': '95vw' }" />
+
+<!-- The PDF viewer is large: it is downloaded the first time a document is opened. -->
+@defer (when viewing()) {
+  <app-document-viewer [citation]="viewing()" (closed)="viewing.set(null)" />
+}

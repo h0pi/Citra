@@ -57,6 +57,7 @@ import {
   LiveAnswer,
   MessageThread,
 } from './message-thread/message-thread';
+import { DocumentViewer } from './document-viewer/document-viewer';
 import { SourcesPanel } from './sources-panel/sources-panel';
 
 /**
@@ -77,6 +78,7 @@ import { SourcesPanel } from './sources-panel/sources-panel';
     MessageComposer,
     MessageThread,
     SourcesPanel,
+    DocumentViewer,
   ],
   providers: [ConfirmationService],
   templateUrl: './chat-page.html',
@@ -113,6 +115,8 @@ export class ChatPage {
   /** The sources of the answer whose citation chip was chosen last, and the number of the chosen one. */
   private readonly pickedSources = signal<Citation[] | null>(null);
   protected readonly selectedSource = signal<number | null>(null);
+  /** The source whose original document is open. */
+  protected readonly viewing = signal<Citation | null>(null);
   /** The sources panel shows the chosen answer's sources, otherwise those of the chat's latest answer. */
   protected readonly sources = computed(
     () =>

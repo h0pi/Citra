@@ -1,0 +1,27 @@
+// Text documents: the passage cited is marked; the page numbers of Word documents head their text.
+.text-page h3 {
+  margin: var(--citra-space-4) 0 var(--citra-space-2);
+  font-size: var(--citra-text-sm);
+}
+
+.document-text {
+  margin: 0;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+
+  mark {
+    padding: 0.1em 0;
+    border-radius: var(--citra-radius-sm);
+    background: color-mix(in srgb, var(--citra-primary) 35%, transparent);
+    color: inherit;
+  }
+}
+
+.original-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--citra-space-2);
+  margin-bottom: var(--citra-space-3);
+  color: var(--citra-primary);
+}

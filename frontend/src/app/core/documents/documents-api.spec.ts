@@ -77,6 +77,15 @@ describe('DocumentsApi', () => {
     expect(http.expectOne(`${environment.apiUrl}/api/documents/d2`).request.method).toBe('DELETE');
   });
 
+  it('loads one document and its original file', () => {
+    api.get('d/1').subscribe();
+    api.file('d/1').subscribe();
+
+    expect(http.expectOne(`${environment.apiUrl}/api/documents/d%2F1`).request.method).toBe('GET');
+    const file = http.expectOne(`${environment.apiUrl}/api/documents/d%2F1/file`);
+    expect(file.request.responseType).toBe('blob');
+  });
+
   it('loads a document’s chunks a page at a time', () => {
     api.chunks('d1', 2, 20).subscribe();
 

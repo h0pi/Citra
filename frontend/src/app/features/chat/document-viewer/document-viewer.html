@@ -1,0 +1,45 @@
+<p-dialog
+  [visible]="citation() !== null"
+  (visibleChange)="closed.emit()"
+  [header]="citation()?.documentName ?? ''"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '90vw', height: '90vh' }"
+  [contentStyle]="{ height: '100%' }"
+>
+  @if (file.error() || chunks.error()) {
+    <p class="text-muted">Couldn't open the document. Please try again.</p>
+  } @else if (file.value(); as src) {
+    <ngx-extended-pdf-viewer
+      [src]="src"
+      [page]="citation()?.pageNumber ?? 1"
+      height="100%"
+      [showOpenFileButton]="false"
+      [textLayer]="true"
+      (pdfLoaded)="highlight()"
+    />
+  } @else if (chunks.hasValue()) {
+    @if (details.value()?.sourceUrl; as url) {
+      <a class="original-link" [href]="url" target="_blank" rel="noopener noreferrer">
+        <i class="pi pi-external-link" aria-hidden="true"></i> Open original page
+      </a>
+    }
+    @for (page of pages(); track $index) {
+      <section class="text-page">
+        @if (page.pageNumber !== null) {
+          <h3 class="text-muted">Page {{ page.pageNumber }}</h3>
+        }
+        <!-- Bound, not interpolated: the text keeps its line breaks and gets no extra spaces. -->
+        <p class="document-text">
+          <span [textContent]="page.before"></span>
+          @if (page.passage) {
+            <mark [textContent]="page.passage"></mark>
+          }
+          <span [textContent]="page.after"></span>
+        </p>
+      </section>
+    }
+  } @else {
+    <p class="text-muted">Loading the document…</p>
+  }
+</p-dialog>

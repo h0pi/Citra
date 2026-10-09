@@ -62,6 +62,15 @@ export class DocumentsApi {
     return this.api.post<CitraDocument>(`/api/documents/${encodeURIComponent(id)}/reprocess`);
   }
 
+  get(id: string): Observable<CitraDocument> {
+    return this.api.get<CitraDocument>(`/api/documents/${encodeURIComponent(id)}`);
+  }
+
+  /** The original file (e.g. a PDF for the citation viewer). */
+  file(id: string): Observable<Blob> {
+    return this.api.getBlob(`/api/documents/${encodeURIComponent(id)}/file`);
+  }
+
   /** Deletes a document, its chunks and its stored file. */
   delete(id: string): Observable<void> {
     return this.api.delete(`/api/documents/${encodeURIComponent(id)}`);
