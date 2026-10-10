@@ -1,0 +1,18 @@
+<div class="chart">
+  <div class="header">
+    <h2>Questions per day</h2>
+    <span class="text-muted">{{ total() }} in total, busiest day {{ max() }}</span>
+  </div>
+  <ol class="bars">
+    @for (day of days(); track day.date) {
+      <li [title]="(day.date | date: 'MMM d') + ': ' + day.questions">
+        <span class="bar" [style.height.%]="(day.questions / max()) * 100"></span>
+        <span class="sr-only">{{ day.date | date: 'MMM d' }}: {{ day.questions }}</span>
+      </li>
+    }
+  </ol>
+  <div class="axis text-muted" aria-hidden="true">
+    <span>{{ days()[0]?.date | date: 'MMM d' }}</span>
+    <span>{{ days().at(-1)?.date | date: 'MMM d' }}</span>
+  </div>
+</div>

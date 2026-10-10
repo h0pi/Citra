@@ -1,0 +1,48 @@
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--citra-space-2);
+}
+
+.kpis {
+  margin-bottom: var(--citra-space-4);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--citra-space-4);
+}
+
+.kpi {
+  display: flex;
+  flex-direction: column;
+  gap: var(--citra-space-1);
+  min-height: 92px;
+  padding: var(--citra-space-4) var(--citra-space-5);
+  background: var(--citra-surface);
+  border: 1px solid var(--citra-border);
+  border-radius: var(--citra-radius-lg);
+  box-shadow: var(--citra-shadow-sm);
+
+  .label {
+    color: var(--citra-text-muted);
+    font-size: var(--citra-text-sm);
+  }
+
+  .value {
+    font-size: var(--citra-text-2xl);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.kpis[aria-busy='true'] .value {
+  opacity: 0.5;
+}
+
+:host ::ng-deep .load-error {
+  margin-bottom: var(--citra-space-4);
+}
+
+app-questions-chart,
+app-knowledge-gaps {
+  display: block;
+  margin-bottom: var(--citra-space-4);
+}

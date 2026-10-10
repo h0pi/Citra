@@ -1,0 +1,45 @@
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: var(--citra-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  > li {
+    padding: var(--citra-space-3);
+    border: 1px solid var(--citra-border);
+    border-radius: var(--citra-radius-md);
+  }
+
+  > li.answer {
+    background: var(--citra-surface-muted);
+  }
+}
+
+.role {
+  color: var(--citra-text-muted);
+  font-size: var(--citra-text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.content {
+  margin: var(--citra-space-1) 0 0;
+  white-space: pre-wrap;
+}
+
+.not-found {
+  display: inline-block;
+  margin-top: var(--citra-space-2);
+  color: var(--citra-text-muted);
+  font-size: var(--citra-text-sm);
+  font-style: italic;
+}
+
+.sources {
+  margin: var(--citra-space-2) 0 0;
+  padding-left: var(--citra-space-4);
+  color: var(--citra-text-muted);
+  font-size: var(--citra-text-sm);
+}

@@ -1,0 +1,66 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--citra-space-3);
+  padding: var(--citra-space-5);
+  background: var(--citra-surface);
+  border: 1px solid var(--citra-border);
+  border-radius: var(--citra-radius-lg);
+  box-shadow: var(--citra-shadow-sm);
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--citra-space-2);
+
+  h2 {
+    margin: 0;
+    font-size: var(--citra-text-lg);
+  }
+}
+
+.ratings {
+  display: flex;
+  gap: var(--citra-space-4);
+  font-size: var(--citra-text-sm);
+}
+
+.empty {
+  margin: 0;
+}
+
+.answers {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    padding: var(--citra-space-3) 0;
+    border-bottom: 1px solid var(--citra-border);
+  }
+}
+
+.question {
+  font-weight: 600;
+}
+
+.answer {
+  display: -webkit-box;
+  margin: var(--citra-space-1) 0;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  font-size: var(--citra-text-sm);
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: var(--citra-space-2);
+  font-size: var(--citra-text-xs);
+}

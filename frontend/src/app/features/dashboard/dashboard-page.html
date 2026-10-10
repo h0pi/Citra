@@ -1,0 +1,84 @@
+<app-page-header title="Dashboard" subtitle="Usage, answer quality and costs at a glance.">
+  <div class="filters">
+    <p-select
+      [options]="botOptions()"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="botId()"
+      (ngModelChange)="botId.set($event)"
+      ariaLabel="Bot"
+    />
+    <p-select
+      [options]="periodOptions"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="days()"
+      (ngModelChange)="days.set($event)"
+      ariaLabel="Period"
+    />
+  </div>
+</app-page-header>
+
+@if (stats.error()) {
+  <p-message severity="error" styleClass="load-error">
+    Couldn't load the stats.
+    <p-button label="Try again" [link]="true" (onClick)="stats.reload()" />
+  </p-message>
+} @else {
+  <section class="kpis" aria-label="Headline numbers" [attr.aria-busy]="stats.isLoading()">
+    @let s = stats.value();
+    <div class="kpi">
+      <span class="label">Chats</span>
+      <strong class="value">{{ s ? (s.conversations | number) : '' }}</strong>
+    </div>
+    <div class="kpi">
+      <span class="label">Questions</span>
+      <strong class="value">{{ s ? (s.questions | number) : '' }}</strong>
+    </div>
+    <div class="kpi">
+      <span class="label">Answered</span>
+      <strong class="value">{{ s ? (s.answeredPercent | number: '1.0-1') + '%' : '' }}</strong>
+    </div>
+    <div class="kpi">
+      <span class="label">Avg. answer time</span>
+      <strong class="value">{{
+        s ? (s.averageLatencyMs / 1000 | number: '1.1-1') + ' s' : ''
+      }}</strong>
+    </div>
+    <div class="kpi">
+      <span class="label">AI cost</span>
+      <strong class="value">{{
+        s ? (s.totalCostUsd | currency: 'USD' : 'symbol' : '1.2-4') : ''
+      }}</strong>
+    </div>
+  </section>
+}
+
+@if (perDay.error()) {
+  <p-message severity="error" styleClass="load-error">
+    Couldn't load the chart.
+    <p-button label="Try again" [link]="true" (onClick)="perDay.reload()" />
+  </p-message>
+} @else if (perDay.value(); as days) {
+  <app-questions-chart [days]="days" />
+}
+
+@if (gaps.error()) {
+  <p-message severity="error" styleClass="load-error">
+    Couldn't load the knowledge gaps.
+    <p-button label="Try again" [link]="true" (onClick)="gaps.reload()" />
+  </p-message>
+} @else if (gaps.value(); as list) {
+  <app-knowledge-gaps [gaps]="list" [canView]="canEdit()" (view)="viewing.set($event)" />
+}
+
+@if (feedback.error()) {
+  <p-message severity="error" styleClass="load-error">
+    Couldn't load the feedback.
+    <p-button label="Try again" [link]="true" (onClick)="feedback.reload()" />
+  </p-message>
+} @else if (feedback.value(); as summary) {
+  <app-feedback-summary [summary]="summary" [canView]="canEdit()" (view)="viewing.set($event)" />
+}
+
+<app-transcript-dialog [conversationId]="viewing()" (closed)="viewing.set(null)" />

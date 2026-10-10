@@ -1,0 +1,36 @@
+<p-dialog
+  [visible]="conversationId() !== null"
+  (visibleChange)="closed.emit()"
+  [header]="conversation.hasValue() ? conversation.value().title : 'Conversation'"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: 'min(720px, 95vw)' }"
+>
+  @if (conversation.error()) {
+    <p class="text-muted">Couldn't open this chat. Please try again.</p>
+  } @else if (conversation.value(); as chat) {
+    <ol class="messages">
+      @for (message of chat.messages; track message.id) {
+        <li [class.answer]="message.role === 'Assistant'">
+          <span class="role">{{ message.role === 'User' ? 'Question' : 'Answer' }}</span>
+          <p class="content">{{ message.content }}</p>
+          @if (message.role === 'Assistant' && !message.wasAnswered) {
+            <span class="not-found">Not found in the documents</span>
+          }
+          @if (message.citations.length > 0) {
+            <ul class="sources">
+              @for (citation of message.citations; track citation.number) {
+                <li>
+                  [{{ citation.number }}] {{ citation.documentName
+                  }}{{ citation.pageNumber ? ', page ' + citation.pageNumber : '' }}
+                </li>
+              }
+            </ul>
+          }
+        </li>
+      }
+    </ol>
+  } @else {
+    <p class="text-muted">Loading...</p>
+  }
+</p-dialog>

@@ -21,6 +21,16 @@ internal sealed class GetConversationQueryHandler(IApplicationDbContext db, ICur
         var conversation = await db.Own(userId).AsNoTracking().SingleOrDefaultAsync(c => c.Id == request.Id, cancellationToken)
             ?? throw new NotFoundException(nameof(Conversation), request.Id);
 
+        return await ConversationTranscript.LoadAsync(db, conversation, cancellationToken);
+    }
+}
+
+internal static class ConversationTranscript
+{
+    /// <summary>The conversation with all its messages, oldest first, and the sources each answer cites.</summary>
+    public static async Task<ConversationDto> LoadAsync(
+        IApplicationDbContext db, Conversation conversation, CancellationToken cancellationToken)
+    {
         // A question and its answer are saved separately, the question first; the role orders exact ties.
         var messages = await db.Messages.AsNoTracking()
             .Where(m => m.ConversationId == conversation.Id)

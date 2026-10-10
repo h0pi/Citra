@@ -1,0 +1,35 @@
+<section class="card" aria-labelledby="feedback-heading">
+  <div class="header">
+    <h2 id="feedback-heading">Feedback</h2>
+    <span class="ratings">
+      <span><i class="pi pi-thumbs-up" aria-hidden="true"></i> {{ summary().positive }} good</span>
+      <span><i class="pi pi-thumbs-down" aria-hidden="true"></i> {{ summary().negative }} bad</span>
+      @if (goodPercent() !== null) {
+        <strong>{{ goodPercent() }}% good</strong>
+      }
+    </span>
+  </div>
+  @if (summary().badAnswers.length === 0) {
+    <p class="text-muted empty">No badly rated answers in this period.</p>
+  } @else {
+    <ul class="answers">
+      @for (answer of summary().badAnswers; track answer.conversationId + answer.answeredAt) {
+        <li>
+          <div class="question">{{ answer.question }}</div>
+          <p class="answer text-muted">{{ answer.answer }}</p>
+          <div class="meta text-muted">
+            {{ answer.answeredAt | date: 'MMM d, HH:mm' }}
+            @if (canView()) {
+              <p-button
+                label="View conversation"
+                [link]="true"
+                size="small"
+                (onClick)="view.emit(answer.conversationId)"
+              />
+            }
+          </div>
+        </li>
+      }
+    </ul>
+  }
+</section>
