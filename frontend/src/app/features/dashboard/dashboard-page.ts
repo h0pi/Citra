@@ -11,6 +11,7 @@ import { ButtonModule } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
 import { SelectModule } from 'primeng/select';
 
+import { ConversationsBrowser } from './conversations-browser/conversations-browser';
 import { FeedbackSummaryCard } from './feedback-summary/feedback-summary';
 import { KnowledgeGaps } from './knowledge-gaps/knowledge-gaps';
 import { QuestionsChart } from './questions-chart/questions-chart';
@@ -36,6 +37,7 @@ export function lastDays(days: number, now = new Date()): { from: string; to: st
     CurrencyPipe,
     DecimalPipe,
     FormsModule,
+    ConversationsBrowser,
     FeedbackSummaryCard,
     KnowledgeGaps,
     PageHeader,

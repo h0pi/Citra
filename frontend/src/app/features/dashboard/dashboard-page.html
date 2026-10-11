@@ -81,4 +81,9 @@
   <app-feedback-summary [summary]="summary" [canView]="canEdit()" (view)="viewing.set($event)" />
 }
 
+<!-- Chats can hold private questions: only owners and admins browse them. -->
+@if (canEdit()) {
+  <app-conversations-browser [botId]="botId()" (view)="viewing.set($event)" />
+}
+
 <app-transcript-dialog [conversationId]="viewing()" (closed)="viewing.set(null)" />

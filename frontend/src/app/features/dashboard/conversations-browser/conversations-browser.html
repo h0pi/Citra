@@ -1,0 +1,56 @@
+<section class="card" aria-labelledby="conversations-heading">
+  <div class="header">
+    <h2 id="conversations-heading">Conversations</h2>
+    <p-select
+      [options]="channelOptions"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="channel()"
+      (ngModelChange)="channel.set($event)"
+      ariaLabel="Channel"
+    />
+  </div>
+  @if (conversations.error()) {
+    <p-message severity="error" styleClass="load-error">
+      Couldn't load the conversations.
+      <p-button label="Try again" [link]="true" (onClick)="conversations.reload()" />
+    </p-message>
+  } @else if (conversations.value(); as result) {
+    @if (result.items.length === 0) {
+      <p class="text-muted empty">No conversations yet.</p>
+    } @else {
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Chat</th>
+            <th scope="col">Where</th>
+            <th scope="col">Messages</th>
+            <th scope="col">Last activity</th>
+            <th scope="col"><span class="sr-only">Open</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (chat of result.items; track chat.id) {
+            <tr>
+              <td class="title">{{ chat.title }}</td>
+              <td>{{ chat.channel === 'Widget' ? 'Website' : 'Admin app' }}</td>
+              <td>{{ chat.messageCount }}</td>
+              <td class="when">{{ chat.updatedAt | date: 'MMM d, HH:mm' }}</td>
+              <td>
+                <p-button label="View" [link]="true" size="small" (onClick)="view.emit(chat.id)" />
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      @if (totalCount() > pageSize) {
+        <p-paginator
+          [first]="(page() - 1) * pageSize"
+          [rows]="pageSize"
+          [totalRecords]="totalCount()"
+          (onPageChange)="onPage($event)"
+        />
+      }
+    }
+  }
+</section>

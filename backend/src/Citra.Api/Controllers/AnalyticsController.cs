@@ -1,5 +1,7 @@
+using Citra.Application.Common.Paging;
 using Citra.Application.Features.Analytics;
 using Citra.Application.Features.Chat.Conversations;
+using Citra.Domain.Conversations;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -69,6 +71,19 @@ public sealed class AnalyticsController(ISender sender) : ControllerBase
     public Task<FeedbackSummaryDto> GetFeedback(
         [FromQuery] DateOnly from, [FromQuery] DateOnly to, [FromQuery] Guid? botId, CancellationToken cancellationToken) =>
         sender.Send(new GetFeedbackSummaryQuery(botId, from, to), cancellationToken);
+
+    /// <summary>All chats of the company (owners and admins), most recently active first; filter by bot and channel.</summary>
+    [HttpGet("conversations")]
+    [ProducesResponseType<PagedResult<CompanyConversationDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+    public Task<PagedResult<CompanyConversationDto>> GetConversations(
+        [FromQuery] Guid? botId,
+        [FromQuery] ConversationChannel? channel,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = GetCompanyConversationsQuery.DefaultPageSize,
+        CancellationToken cancellationToken = default) =>
+        sender.Send(new GetCompanyConversationsQuery(botId, channel, page, pageSize), cancellationToken);
 
     /// <summary>Any chat of the company, read-only (owners and admins), e.g. to see why a question went unanswered.</summary>
     [HttpGet("conversations/{id:guid}")]

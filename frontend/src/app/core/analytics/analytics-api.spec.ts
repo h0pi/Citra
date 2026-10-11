@@ -34,6 +34,12 @@ describe('AnalyticsApi', () => {
     http.expectOne(`${base}/feedback?from=2026-10-01&to=2026-10-07`);
   });
 
+  it('lists the company chats by bot, channel and page', () => {
+    api.conversations({ botId: null, channel: 'Widget', page: 2, pageSize: 20 }).subscribe();
+
+    http.expectOne(`${base}/conversations?channel=Widget&page=2&pageSize=20`);
+  });
+
   it('loads questions per day for a period', () => {
     api.messagesPerDay({ from: '2026-10-01', to: '2026-10-07', botId: null }).subscribe();
 

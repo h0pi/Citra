@@ -48,3 +48,23 @@ export interface RatedAnswer {
   answer: string;
   answeredAt: string;
 }
+
+/** Admin app or website widget. */
+export type ConversationChannel = 'Admin' | 'Widget';
+
+/** GET /api/analytics/conversations: one chat of the company (owners and admins). */
+export interface CompanyConversation {
+  id: string;
+  botId: string;
+  title: string;
+  channel: ConversationChannel;
+  messageCount: number;
+  updatedAt: string;
+}
+
+export interface CompanyConversationsQuery {
+  botId: string | null;
+  channel: ConversationChannel | null;
+  page: number;
+  pageSize: number;
+}

@@ -15,6 +15,7 @@ import { By } from '@angular/platform-browser';
 import { Observable, of, throwError } from 'rxjs';
 
 import { DashboardPage, lastDays } from './dashboard-page';
+import { ConversationsBrowser } from './conversations-browser/conversations-browser';
 import { FeedbackSummaryCard } from './feedback-summary/feedback-summary';
 import { KnowledgeGaps } from './knowledge-gaps/knowledge-gaps';
 import { QuestionsChart } from './questions-chart/questions-chart';
@@ -63,6 +64,8 @@ describe('DashboardPage', () => {
             messagesPerDay: perDayCall,
             unansweredQuestions: gapsCall,
             feedback: feedbackCall,
+            conversations: () =>
+              of({ items: [], page: 1, pageSize: 20, totalCount: 0, totalPages: 0 }),
             conversation: () => of(),
           },
         },
@@ -175,6 +178,7 @@ describe('DashboardPage', () => {
     expect((table.componentInstance as KnowledgeGaps).canView()).toBe(false);
     const card = fixture.debugElement.query(By.directive(FeedbackSummaryCard));
     expect((card.componentInstance as FeedbackSummaryCard).canView()).toBe(false);
+    expect(fixture.debugElement.query(By.directive(ConversationsBrowser))).toBeNull();
   });
 
   it('offers a retry when the knowledge gaps fail to load', async () => {
@@ -208,6 +212,24 @@ describe('DashboardPage', () => {
     const dialog = fixture.debugElement.query(By.directive(TranscriptDialog))
       .componentInstance as TranscriptDialog;
     expect(dialog.conversationId()).toBe('c7');
+  });
+
+  it('lets owners and admins browse the chats of the chosen bot', async () => {
+    const { fixture } = await render();
+    const browser = () =>
+      fixture.debugElement.query(By.directive(ConversationsBrowser))
+        .componentInstance as ConversationsBrowser;
+    expect(browser().botId()).toBeNull();
+
+    (fixture.componentInstance as unknown as { botId: { set(v: string): void } }).botId.set('b1');
+    fixture.detectChanges();
+    expect(browser().botId()).toBe('b1');
+
+    browser().view.emit('c9');
+    fixture.detectChanges();
+    const dialog = fixture.debugElement.query(By.directive(TranscriptDialog))
+      .componentInstance as TranscriptDialog;
+    expect(dialog.conversationId()).toBe('c9');
   });
 
   it('counts the last days in UTC, today included', () => {

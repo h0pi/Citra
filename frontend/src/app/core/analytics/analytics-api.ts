@@ -1,12 +1,15 @@
 import { Injectable, inject } from '@angular/core';
 import {
   AnalyticsPeriod,
+  CompanyConversation,
+  CompanyConversationsQuery,
   DashboardStats,
   DayCount,
   FeedbackSummary,
   UnansweredQuestion,
 } from '@core/models/analytics.models';
 import { Conversation } from '@core/models/chat.models';
+import { PagedResult } from '@core/models/document.models';
 import { ApiService } from '@core/services/api.service';
 import { Observable } from 'rxjs';
 
@@ -29,6 +32,13 @@ export class AnalyticsApi {
 
   feedback(period: AnalyticsPeriod): Observable<FeedbackSummary> {
     return this.api.get<FeedbackSummary>('/api/analytics/feedback', { ...period });
+  }
+
+  /** All chats of the company, most recently active first (owners and admins). */
+  conversations(query: CompanyConversationsQuery): Observable<PagedResult<CompanyConversation>> {
+    return this.api.get<PagedResult<CompanyConversation>>('/api/analytics/conversations', {
+      ...query,
+    });
   }
 
   /** Any chat of the company, read-only (owners and admins). */
