@@ -1057,6 +1057,17 @@ describe('ChatPage', () => {
     expect(TestBed.inject(Router).url).toBe('/chat');
   });
 
+  it('puts the cursor in the question box after "New chat"', async () => {
+    const { fixture, el } = await render();
+    document.body.appendChild(fixture.nativeElement); // focus works only in the page
+
+    el.querySelector<HTMLButtonElement>('p-button[label="New chat"] button')!.click();
+    await fixture.whenStable();
+
+    expect(document.activeElement).toBe(el.querySelector('app-message-composer textarea'));
+    fixture.nativeElement.remove();
+  });
+
   it('keeps the saved answer with the sources it cites', async () => {
     vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
     const { fixture, send, stream, bubbles } = await render();

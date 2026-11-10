@@ -22,7 +22,59 @@
   right: var(--citra-space-4);
 }
 
+.auth-columns {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--citra-space-7);
+  width: 100%;
+  max-width: var(--citra-content-max-width);
+}
+
+.product {
+  display: none;
+  flex: 1;
+  min-width: 0;
+
+  h2 {
+    font-size: var(--citra-text-2xl);
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    margin-bottom: var(--citra-space-3);
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: var(--citra-space-4) 0 var(--citra-space-5);
+    display: grid;
+    gap: var(--citra-space-2);
+  }
+
+  li i {
+    color: var(--citra-primary);
+    margin-right: var(--citra-space-2);
+  }
+
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--citra-border);
+    border-radius: var(--citra-radius-lg);
+    box-shadow: var(--citra-shadow-md);
+  }
+}
+
+// Only wide screens have room for it next to the form.
+@media (min-width: 1024px) {
+  .product {
+    display: block;
+  }
+}
+
 .auth-card {
+  flex-shrink: 0;
   width: 100%;
   max-width: 420px;
   padding: var(--citra-space-6);
@@ -40,13 +92,7 @@
 }
 
 .brand-mark {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--citra-radius-md);
-  background: var(--p-primary-500);
-  color: var(--p-primary-contrast-color, #fff);
+  display: block;
 }
 
 .brand-name {

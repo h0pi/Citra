@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
+using Citra.Api;
 using Citra.Api.Auth;
 using Citra.Api.ErrorHandling;
 using Citra.Api.HealthChecks;
@@ -87,6 +88,8 @@ try
         options.AddOperationTransformer<BearerSecurityRequirementTransformer>();
     });
 
+    builder.Services.AddHsts(options => options.MaxAge = TimeSpan.FromDays(365));
+
     var app = builder.Build();
 
     // Development only: bring the local database schema up to date on startup.
@@ -100,6 +103,9 @@ try
     // Registered first (outermost) so it records the final status code set by the exception handler.
     app.UseSerilogRequestLogging();
 
+    // nosniff, no referrer and a "run nothing" Content-Security-Policy on every response (see SecurityHeaders).
+    app.UseSecurityHeaders();
+
     app.UseExceptionHandler();
     // Empty error responses (e.g. 404 for unknown routes) also get a ProblemDetails body.
     app.UseStatusCodePages();
@@ -112,6 +118,12 @@ try
         app.MapScalarApiReference(options => options
             .WithTitle("Citra API")
             .AddPreferredSecuritySchemes(BearerSecuritySchemeTransformer.SchemeName));
+    }
+
+    // Browsers that reached the API over HTTPS keep using HTTPS for a year (not in development: localhost).
+    if (!app.Environment.IsDevelopment())
+    {
+        app.UseHsts();
     }
 
     app.UseHttpsRedirection();

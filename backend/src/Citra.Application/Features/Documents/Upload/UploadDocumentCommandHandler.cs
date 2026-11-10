@@ -113,10 +113,13 @@ internal sealed class UploadDocumentCommandHandler(
     private static ValidationException DuplicateError(string existingFileName) =>
         new(FileField, $"This file is already in this bot as \"{existingFileName}\".");
 
-    /// <summary>"C:\Users\me\Handbook.pdf" or "../../Handbook.pdf" → "Handbook.pdf" (display only, never a path).</summary>
+    /// <summary>
+    /// "C:\Users\me\Handbook.pdf" or "../../Handbook.pdf" → "Handbook.pdf" (display only, never a path), without
+    /// invisible characters, so the file type is decided on the name people will see.
+    /// </summary>
     private static string CleanFileName(string fileName)
     {
         var name = fileName.Replace('\\', '/');
-        return name[(name.LastIndexOf('/') + 1)..].Trim();
+        return Document.CleanName(name[(name.LastIndexOf('/') + 1)..]);
     }
 }

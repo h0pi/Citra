@@ -15,6 +15,8 @@
       Couldn't load the conversations.
       <p-button label="Try again" [link]="true" (onClick)="conversations.reload()" />
     </p-message>
+  } @else if (conversations.isLoading() && !conversations.value()) {
+    <p-skeleton height="8rem" aria-label="Loading the conversations" />
   } @else if (conversations.value(); as result) {
     @if (result.items.length === 0) {
       <p class="text-muted empty">No conversations yet.</p>

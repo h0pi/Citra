@@ -147,6 +147,6 @@ describe('RunResultsPage', () => {
     api.run.mockReturnValueOnce(throwError(() => new Error('404')));
     const el = await render();
 
-    expect(el.textContent).toContain('Run not found');
+    expect(el.textContent).toContain("Couldn't load this run");
   });
 });

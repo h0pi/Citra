@@ -159,3 +159,24 @@
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+
+// Phones: only name, status and actions; the other columns would make the table scroll sideways.
+@media (max-width: 767.98px) {
+  .wide-only {
+    display: none;
+  }
+
+  // Long file names and addresses wrap instead of widening the table.
+  .doc-title,
+  .doc-url {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}
+
+// Wider screens show every column; below that width the table scrolls inside its card.
+@media (min-width: 768px) {
+  :host ::ng-deep .documents-table table {
+    min-width: 52rem;
+  }
+}

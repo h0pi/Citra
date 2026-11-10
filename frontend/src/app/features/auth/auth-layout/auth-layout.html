@@ -9,19 +9,43 @@
     (onClick)="toggleTheme()"
   />
 
-  <main class="auth-card">
-    <div class="brand">
-      <span class="brand-mark" aria-hidden="true"><i class="pi pi-sparkles"></i></span>
-      <span class="brand-name">Citra</span>
-    </div>
+  <div class="auth-columns">
+    <!-- What Citra is, for first-time visitors. Wide screens only; phones show just the form. -->
+    <section class="product" aria-labelledby="product-heading">
+      <h2 id="product-heading">Answers from your company's documents, with exact citations.</h2>
+      <p class="text-muted">
+        Upload your PDFs, Word files and web pages. Citra answers your team's and your customers'
+        questions from them, and every answer shows where it comes from.
+      </p>
+      <ul>
+        <li>
+          <i class="pi pi-check" aria-hidden="true"></i> Citations open the exact page of the source
+        </li>
+        <li><i class="pi pi-check" aria-hidden="true"></i> A chat widget for your website</li>
+        <li><i class="pi pi-check" aria-hidden="true"></i> Analytics and accuracy tests</li>
+      </ul>
+      <img
+        src="screenshot-chat.png"
+        width="1280"
+        height="800"
+        alt="Citra chat: an answer about returns with numbered citations and the source passages next to it"
+      />
+    </section>
 
-    <h1>{{ title() }}</h1>
-    @if (subtitle()) {
-      <p class="text-muted subtitle">{{ subtitle() }}</p>
-    }
+    <main class="auth-card">
+      <div class="brand">
+        <img class="brand-mark" src="favicon.svg" width="32" height="32" alt="" />
+        <span class="brand-name">Citra</span>
+      </div>
 
-    <ng-content />
-  </main>
+      <h1>{{ title() }}</h1>
+      @if (subtitle()) {
+        <p class="text-muted subtitle">{{ subtitle() }}</p>
+      }
+
+      <ng-content />
+    </main>
+  </div>
 
   <p class="footer text-muted">AI knowledge assistant — answers with exact citations.</p>
 </div>

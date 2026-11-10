@@ -28,8 +28,6 @@ export class UserMenu {
   });
 
   protected readonly items: MenuItem[] = [
-    { label: 'Settings', icon: 'pi pi-cog', routerLink: '/settings' },
-    { separator: true },
     { label: 'Log out', icon: 'pi pi-sign-out', command: () => this.auth.logout() },
   ];
 }

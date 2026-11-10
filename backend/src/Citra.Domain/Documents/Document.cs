@@ -1,3 +1,4 @@
+using System.Globalization;
 using Citra.Domain.Common;
 
 namespace Citra.Domain.Documents;
@@ -84,7 +85,7 @@ public sealed class Document : Entity, ITenantOwned
             Id = id ?? Guid.CreateVersion7(),
             TenantId = tenantId,
             BotId = botId,
-            FileName = fileName.Trim(),
+            FileName = CleanName(fileName),
             ContentType = contentType,
             SizeBytes = sizeBytes,
             SourceType = sourceType,
@@ -170,12 +171,23 @@ public sealed class Document : Entity, ITenantOwned
 
     public void SetTitle(string title)
     {
-        if (!string.IsNullOrWhiteSpace(title))
+        var name = CleanName(title ?? string.Empty);
+        if (name.Length > 0)
         {
-            FileName = title.Trim().Length > FileNameMaxLength
-                ? title.Trim()[..FileNameMaxLength]
-                : title.Trim();
+            FileName = name.Length > FileNameMaxLength ? name[..FileNameMaxLength] : name;
         }
+    }
+
+    /// <summary>
+    /// A name as people see it: invisible control and formatting characters removed (a right-to-left mark can make
+    /// "photo[U+202E]gpj.pdf" show as "photofdp.jpg"), and runs of spaces, tabs or line breaks become one space.
+    /// </summary>
+    public static string CleanName(string name)
+    {
+        ArgumentNullException.ThrowIfNull(name);
+        var visible = name.Where(c => char.IsWhiteSpace(c)
+            || char.GetUnicodeCategory(c) is not (UnicodeCategory.Control or UnicodeCategory.Format));
+        return string.Join(' ', new string([.. visible]).Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries));
     }
 
     private void MoveTo(DocumentStatus next, DocumentStatus[] from)

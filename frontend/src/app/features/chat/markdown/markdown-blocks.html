@@ -16,7 +16,12 @@
           @for (item of block.items; track $index) {
             <li [class.task]="item.checked !== null">
               @if (item.checked !== null) {
-                <input type="checkbox" disabled [checked]="item.checked" />
+                <input
+                  type="checkbox"
+                  disabled
+                  [checked]="item.checked"
+                  [attr.aria-label]="item.checked ? 'Done' : 'Not done'"
+                />
               }
               <app-markdown-blocks [blocks]="item.blocks" />
             </li>
@@ -27,7 +32,12 @@
           @for (item of block.items; track $index) {
             <li [class.task]="item.checked !== null">
               @if (item.checked !== null) {
-                <input type="checkbox" disabled [checked]="item.checked" />
+                <input
+                  type="checkbox"
+                  disabled
+                  [checked]="item.checked"
+                  [attr.aria-label]="item.checked ? 'Done' : 'Not done'"
+                />
               }
               <app-markdown-blocks [blocks]="item.blocks" />
             </li>

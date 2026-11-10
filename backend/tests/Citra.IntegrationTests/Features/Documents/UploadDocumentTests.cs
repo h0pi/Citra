@@ -67,6 +67,10 @@ public sealed class UploadDocumentTests(DatabaseFixture fixture)
     [InlineData("C:\\Users\\me\\Desktop\\Handbook.pdf", "Handbook.pdf")]
     [InlineData("../../../etc/Handbook.pdf", "Handbook.pdf")]
     [InlineData("  Handbook.pdf  ", "Handbook.pdf")]
+    // C-270: invisible characters are removed, so the name shown is the real one.
+    [InlineData("photo‮gpj.pdf", "photogpj.pdf")] // right-to-left override: would show as "photofdp.jpg"
+    [InlineData("Hand​book\u0007.pdf", "Handbook.pdf")]
+    [InlineData("Q1 \t report\r\n.pdf", "Q1 report .pdf")]
     public async Task Keeps_only_the_file_name_from_paths(string sent, string stored)
     {
         var (tenant, bot) = await SeedBotAsync();

@@ -150,20 +150,15 @@
           [class.refreshing]="refreshing()"
           [attr.aria-busy]="refreshing()"
         >
-          <p-table
-            [value]="documents()"
-            dataKey="id"
-            [tableStyle]="{ 'min-width': '52rem' }"
-            styleClass="documents-table"
-          >
+          <p-table [value]="documents()" dataKey="id" styleClass="documents-table">
             <ng-template #header>
               <tr>
                 <th scope="col">Name</th>
-                <th scope="col" class="num">Size</th>
-                <th scope="col" class="num">Pages</th>
-                <th scope="col" class="num">Chunks</th>
+                <th scope="col" class="num wide-only">Size</th>
+                <th scope="col" class="num wide-only">Pages</th>
+                <th scope="col" class="num wide-only">Chunks</th>
                 <th scope="col">Status</th>
-                <th scope="col">Uploaded</th>
+                <th scope="col" class="wide-only">Uploaded</th>
                 @if (canEdit()) {
                   <th scope="col"><span class="sr-only">Actions</span></th>
                 }
@@ -198,9 +193,9 @@
                     </div>
                   </div>
                 </td>
-                <td class="num">{{ fileSize(document) }}</td>
-                <td class="num">{{ pageCount(document) }}</td>
-                <td class="num">{{ chunkCount(document) }}</td>
+                <td class="num wide-only">{{ fileSize(document) }}</td>
+                <td class="num wide-only">{{ pageCount(document) }}</td>
+                <td class="num wide-only">{{ chunkCount(document) }}</td>
                 <td>
                   @if (document.status === 'Failed' && document.errorMessage) {
                     <!-- Focusable, so keyboard users get the reason too; screen readers hear it via the label. -->
@@ -227,7 +222,7 @@
                     />
                   }
                 </td>
-                <td class="text-muted nowrap">
+                <td class="text-muted nowrap wide-only">
                   {{ document.createdAt | date: 'MMM d, y, HH:mm' }}
                 </td>
                 @if (canEdit()) {

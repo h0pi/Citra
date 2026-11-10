@@ -27,14 +27,7 @@
 }
 
 .brand-mark {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--citra-radius-md);
-  background: var(--p-primary-500);
-  color: var(--p-primary-contrast-color, #fff);
-  font-size: 1rem;
+  display: block;
 }
 
 .brand-name {

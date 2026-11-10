@@ -6,6 +6,8 @@ import { EvaluationApi } from '@core/evaluation/evaluation-api';
 import { EvalGrade, EvalResult, EvalRun } from '@core/models/evaluation.models';
 import { EmptyState } from '@shared/components/empty-state/empty-state';
 import { PageHeader } from '@shared/components/page-header/page-header';
+import { ButtonModule } from 'primeng/button';
+import { SkeletonModule } from 'primeng/skeleton';
 import { TagModule } from 'primeng/tag';
 import { forkJoin } from 'rxjs';
 
@@ -49,7 +51,16 @@ interface Side {
 /** Two runs of a test set side by side: did a change (instructions, model, documents) improve the score? */
 @Component({
   selector: 'app-run-compare-page',
-  imports: [DatePipe, DecimalPipe, RouterLink, EmptyState, PageHeader, TagModule],
+  imports: [
+    DatePipe,
+    DecimalPipe,
+    RouterLink,
+    EmptyState,
+    PageHeader,
+    ButtonModule,
+    SkeletonModule,
+    TagModule,
+  ],
   templateUrl: './run-compare-page.html',
   styleUrl: './run-compare-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

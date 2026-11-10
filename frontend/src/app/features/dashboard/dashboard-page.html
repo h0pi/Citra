@@ -61,6 +61,8 @@
   </p-message>
 } @else if (perDay.value(); as days) {
   <app-questions-chart [days]="days" />
+} @else if (perDay.isLoading()) {
+  <p-skeleton height="10rem" styleClass="load-placeholder" />
 }
 
 @if (gaps.error()) {
@@ -70,6 +72,8 @@
   </p-message>
 } @else if (gaps.value(); as list) {
   <app-knowledge-gaps [gaps]="list" [canView]="canEdit()" (view)="viewing.set($event)" />
+} @else if (gaps.isLoading()) {
+  <p-skeleton height="10rem" styleClass="load-placeholder" />
 }
 
 @if (feedback.error()) {
@@ -79,6 +83,8 @@
   </p-message>
 } @else if (feedback.value(); as summary) {
   <app-feedback-summary [summary]="summary" [canView]="canEdit()" (view)="viewing.set($event)" />
+} @else if (feedback.isLoading()) {
+  <p-skeleton height="10rem" styleClass="load-placeholder" />
 }
 
 <!-- Chats can hold private questions: only owners and admins browse them. -->

@@ -78,11 +78,6 @@ export const routes: Routes = [
           import('@features/evaluation/evaluation-page').then((m) => m.EvaluationPage),
       },
       {
-        path: 'settings',
-        title: 'Settings',
-        loadComponent: () => import('@features/settings/settings-page').then((m) => m.SettingsPage),
-      },
-      {
         path: '**',
         title: 'Page not found',
         loadComponent: () =>

@@ -4,10 +4,17 @@
 
 @if (run.error()) {
   <app-empty-state
-    icon="pi-search"
-    title="Run not found"
+    icon="pi-exclamation-triangle"
+    title="Couldn't load this run"
     message="It may have been deleted with its test set, or the link is wrong."
-  />
+  >
+    <p-button label="Try again" icon="pi pi-refresh" (onClick)="run.reload(); results.reload()" />
+  </app-empty-state>
+} @else if (run.isLoading()) {
+  <div aria-busy="true" aria-label="Loading the run">
+    <p-skeleton width="40%" height="2rem" [style]="{ 'margin-bottom': '1rem' }" />
+    <p-skeleton height="12rem" />
+  </div>
 } @else if (run.hasValue()) {
   @let current = run.value();
   <app-page-header
@@ -67,7 +74,14 @@
 
   <section class="card" aria-labelledby="results-heading">
     <h2 id="results-heading">Questions</h2>
-    @if (results.value().length === 0) {
+    @if (results.error()) {
+      <p class="text-muted empty">
+        Couldn't load the answers.
+        <p-button label="Try again" [link]="true" (onClick)="results.reload()" />
+      </p>
+    } @else if (results.isLoading() && results.value().length === 0) {
+      <p-skeleton height="8rem" aria-label="Loading the answers" />
+    } @else if (results.value().length === 0) {
       <p class="text-muted empty">No answers yet.</p>
     } @else {
       <ol class="results">

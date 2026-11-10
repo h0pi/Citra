@@ -37,7 +37,8 @@
   opacity: 0.5;
 }
 
-:host ::ng-deep .load-error {
+:host ::ng-deep .load-error,
+:host ::ng-deep .load-placeholder {
   margin-bottom: var(--citra-space-4);
 }
 

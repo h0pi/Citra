@@ -10,6 +10,7 @@ import { PageHeader } from '@shared/components/page-header/page-header';
 import { ButtonModule } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
 import { SelectModule } from 'primeng/select';
+import { SkeletonModule } from 'primeng/skeleton';
 
 import { ConversationsBrowser } from './conversations-browser/conversations-browser';
 import { FeedbackSummaryCard } from './feedback-summary/feedback-summary';
@@ -46,6 +47,7 @@ export function lastDays(days: number, now = new Date()): { from: string; to: st
     ButtonModule,
     MessageModule,
     SelectModule,
+    SkeletonModule,
   ],
   templateUrl: './dashboard-page.html',
   styleUrl: './dashboard-page.scss',

@@ -28,8 +28,4 @@ export const NAV_SECTIONS: NavSection[] = [
     heading: 'Quality',
     items: [{ label: 'Evaluation', icon: 'pi pi-verified', route: '/evaluation' }],
   },
-  {
-    heading: 'Account',
-    items: [{ label: 'Settings', icon: 'pi pi-cog', route: '/settings' }],
-  },
 ];

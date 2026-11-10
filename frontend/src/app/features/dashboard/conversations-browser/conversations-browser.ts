@@ -17,6 +17,7 @@ import { ButtonModule } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { SelectModule } from 'primeng/select';
+import { SkeletonModule } from 'primeng/skeleton';
 
 export const CHANNEL_OPTIONS = [
   { label: 'All chats', value: null },
@@ -29,7 +30,15 @@ export const CONVERSATIONS_PAGE_SIZE = 20;
 /** All chats of the company (owners and admins), newest activity first, to open read-only. */
 @Component({
   selector: 'app-conversations-browser',
-  imports: [DatePipe, FormsModule, ButtonModule, MessageModule, PaginatorModule, SelectModule],
+  imports: [
+    DatePipe,
+    FormsModule,
+    ButtonModule,
+    MessageModule,
+    PaginatorModule,
+    SelectModule,
+    SkeletonModule,
+  ],
   templateUrl: './conversations-browser.html',
   styleUrl: './conversations-browser.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

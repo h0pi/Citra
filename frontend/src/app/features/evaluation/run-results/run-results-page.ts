@@ -7,7 +7,9 @@ import { EvaluationApi } from '@core/evaluation/evaluation-api';
 import { EvalGrade } from '@core/models/evaluation.models';
 import { EmptyState } from '@shared/components/empty-state/empty-state';
 import { PageHeader } from '@shared/components/page-header/page-header';
+import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
+import { SkeletonModule } from 'primeng/skeleton';
 import { TagModule } from 'primeng/tag';
 import { of } from 'rxjs';
 
@@ -34,7 +36,9 @@ const GRADE_SEVERITY: Record<EvalGrade, 'success' | 'warn' | 'danger'> = {
     RouterLink,
     EmptyState,
     PageHeader,
+    ButtonModule,
     SelectModule,
+    SkeletonModule,
     TagModule,
   ],
   templateUrl: './run-results-page.html',

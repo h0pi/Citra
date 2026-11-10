@@ -137,6 +137,7 @@ export class ChatPage {
 
   /** The messages scroll; new words keep it at the latest message unless the reader scrolled up. */
   private readonly threadBody = viewChild<ElementRef<HTMLElement>>('threadBody');
+  private readonly composer = viewChild(MessageComposer);
   protected readonly atLatest = signal(true);
 
   /** The question being answered (until its answer is saved and joins the chat's messages). */
@@ -583,6 +584,14 @@ export class ChatPage {
     if (!shown) {
       this.totalConversations.update((total) => total + 1);
     }
+  }
+
+  /** Opens an empty chat; keyboard users land in the question box, ready to type. */
+  protected newChat(): void {
+    this.listOpen.set(false);
+    void this.router
+      .navigate(['/chat'])
+      .then(() => afterNextRender(() => this.composer()?.focus(), { injector: this.injector }));
   }
 
   private lastQuestion(): string | null {

@@ -65,7 +65,10 @@
 
     <section class="card detail" aria-labelledby="set-heading">
       @if (set.error()) {
-        <p class="text-muted">Couldn't load this test set.</p>
+        <p class="text-muted">
+          Couldn't load this test set.
+          <p-button label="Try again" [link]="true" (onClick)="set.reload()" />
+        </p>
       } @else if (set.hasValue() && selectedId()) {
         @let open = set.value();
         <div class="detail-header">
