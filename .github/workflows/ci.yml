@@ -24,8 +24,8 @@ jobs:
       run:
         working-directory: backend
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 10.0.x
       - run: dotnet restore
@@ -39,12 +39,14 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 24
           cache: npm
           cache-dependency-path: frontend/package-lock.json
+      # The npm named in package.json ("packageManager"): newer ones read the lock file differently.
+      - run: npm install -g "$(node -p "require('./package.json').packageManager")"
       - run: npm ci
       - run: npm run lint
       - run: npm run format:check
@@ -58,8 +60,8 @@ jobs:
       run:
         working-directory: widget
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 24
           cache: npm

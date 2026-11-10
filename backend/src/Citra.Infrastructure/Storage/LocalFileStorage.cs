@@ -95,9 +95,17 @@ internal sealed class LocalFileStorage(IOptions<StorageOptions> options) : IFile
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(relativePath);
 
+        // The same rules on Windows and Linux: "\" is a separator everywhere (on Linux it would be part of a name,
+        // so "..\x" slipped through), and a drive ("C:") is never part of a storage path.
+        var path = relativePath.Replace('\\', '/');
+        if (path.Contains(':'))
+        {
+            throw new InvalidOperationException($"Storage path '{relativePath}' points outside the storage folder.");
+        }
+
         // Trim trailing separators first: "./" must resolve to the root itself (and be refused),
         // not to "root/", which would pass the check below and let DeleteFolderAsync wipe everything.
-        var fullPath = Path.TrimEndingDirectorySeparator(Path.GetFullPath(Path.Combine(_root, relativePath)));
+        var fullPath = Path.TrimEndingDirectorySeparator(Path.GetFullPath(Path.Combine(_root, path)));
         if (!fullPath.StartsWith(_root + Path.DirectorySeparatorChar, PathComparison))
         {
             throw new InvalidOperationException($"Storage path '{relativePath}' points outside the storage folder.");
