@@ -1,0 +1,97 @@
+<a class="back-link" routerLink="/evaluation"
+  ><i class="pi pi-arrow-left" aria-hidden="true"></i> Evaluation</a
+>
+
+@if (run.error()) {
+  <app-empty-state
+    icon="pi-search"
+    title="Run not found"
+    message="It may have been deleted with its test set, or the link is wrong."
+  />
+} @else if (run.hasValue()) {
+  @let current = run.value();
+  <app-page-header
+    title="Run results"
+    [subtitle]="
+      (current.notes ? current.notes + ' · ' : '') +
+      (current.createdAt | date: 'MMM d, y, HH:mm') +
+      ' · ' +
+      current.model
+    "
+  />
+
+  @if (compareOptions().length > 0) {
+    <div class="compare">
+      <p-select
+        [options]="compareOptions()"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Compare with…"
+        ariaLabel="Compare with another run"
+        [ngModel]="null"
+        (ngModelChange)="compareWith($event)"
+      />
+    </div>
+  }
+
+  <section class="summary" aria-label="Summary">
+    <div class="tile">
+      <span class="label">Score</span>
+      <strong class="value">{{
+        current.score === null ? current.status : (current.score | number: '1.0-1') + '%'
+      }}</strong>
+    </div>
+    <div class="tile">
+      <span class="label">Correct / partly / wrong</span>
+      <strong class="value"
+        >{{ current.correctCount }} / {{ current.partialCount }} / {{ wrongCount() }}</strong
+      >
+    </div>
+    <div class="tile">
+      <span class="label">Right document found</span>
+      <strong class="value">{{
+        retrieval().checked === 0 ? '–' : retrieval().hits + ' of ' + retrieval().checked
+      }}</strong>
+    </div>
+    <div class="tile">
+      <span class="label">Cost</span>
+      <strong class="value">{{
+        current.totalCostUsd | currency: 'USD' : 'symbol' : '1.2-4'
+      }}</strong>
+    </div>
+  </section>
+
+  @if (current.error) {
+    <p class="error">The run failed: {{ current.error }}</p>
+  }
+
+  <section class="card" aria-labelledby="results-heading">
+    <h2 id="results-heading">Questions</h2>
+    @if (results.value().length === 0) {
+      <p class="text-muted empty">No answers yet.</p>
+    } @else {
+      <ol class="results">
+        @for (result of results.value(); track result.questionId) {
+          <li>
+            <div class="result-header">
+              <strong class="question">{{ result.question }}</strong>
+              <p-tag [value]="gradeLabels[result.grade]" [severity]="gradeSeverity[result.grade]" />
+            </div>
+            <dl>
+              <dt>Expected</dt>
+              <dd class="expected">{{ result.expectedAnswer }}</dd>
+              <dt>Bot's answer</dt>
+              <dd class="actual">{{ result.actualAnswer }}</dd>
+              <dt>Why</dt>
+              <dd class="reason">{{ result.judgeReason }}</dd>
+              @if (result.expectedDocumentId) {
+                <dt>Right document</dt>
+                <dd class="document">{{ result.retrievalHit ? 'Found' : 'Not found' }}</dd>
+              }
+            </dl>
+          </li>
+        }
+      </ol>
+    }
+  </section>
+}

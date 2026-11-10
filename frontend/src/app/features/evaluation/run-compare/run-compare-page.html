@@ -1,0 +1,77 @@
+<a class="back-link" [routerLink]="['/evaluation/runs', id()]"
+  ><i class="pi pi-arrow-left" aria-hidden="true"></i> Run results</a
+>
+
+@if (runs.error()) {
+  <app-empty-state
+    icon="pi-search"
+    title="Runs not found"
+    message="One of the runs may have been deleted with its test set, or the link is wrong."
+  />
+} @else if (sides(); as pair) {
+  <app-page-header
+    title="Compare runs"
+    subtitle="The older run on the left, the newer on the right."
+  />
+
+  <section class="summary" aria-label="Scores">
+    @for (side of pair; track side.run.id) {
+      <a class="tile" [routerLink]="['/evaluation/runs', side.run.id]">
+        <span class="label">
+          {{ side.run.createdAt | date: 'MMM d, HH:mm'
+          }}{{ side.run.notes ? ' · ' + side.run.notes : '' }}
+        </span>
+        <strong class="value">{{
+          side.run.score === null ? side.run.status : (side.run.score | number: '1.0-1') + '%'
+        }}</strong>
+        <span class="text-muted model">{{ side.run.model }}</span>
+      </a>
+    }
+    <div class="tile">
+      <span class="label">Change</span>
+      <strong class="value change" [class.up]="scoreChange() > 0" [class.down]="scoreChange() < 0"
+        >{{ scoreChange() > 0 ? '+' : '' }}{{ scoreChange() | number: '1.0-1' }} points</strong
+      >
+      <span class="text-muted">{{ counts().better }} better, {{ counts().worse }} worse</span>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="compare-heading">
+    <h2 id="compare-heading">Questions</h2>
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Question</th>
+          <th scope="col">Before</th>
+          <th scope="col">After</th>
+          <th scope="col">Change</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of rows(); track row.questionId) {
+          <tr [class]="row.change">
+            <td class="question">{{ row.question }}</td>
+            <td>{{ row.before ? gradeLabels[row.before] : '–' }}</td>
+            <td>{{ gradeLabels[row.after] }}</td>
+            <td class="change-cell">
+              @switch (row.change) {
+                @case ('better') {
+                  <p-tag value="Better" severity="success" />
+                }
+                @case ('worse') {
+                  <p-tag value="Worse" severity="danger" />
+                }
+                @case ('new') {
+                  <p-tag value="New" severity="info" />
+                }
+                @default {
+                  <span class="text-muted">Same</span>
+                }
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </section>
+}

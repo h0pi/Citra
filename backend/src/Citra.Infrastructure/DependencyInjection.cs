@@ -6,6 +6,7 @@ using Citra.Application.Common.Persistence;
 using Citra.Application.Common.Retrieval;
 using Citra.Application.Common.Storage;
 using Citra.Application.Features.Documents.Processing;
+using Citra.Application.Features.Evaluation.Runs;
 using Citra.Infrastructure.Chat;
 using Citra.Infrastructure.Chunking;
 using Citra.Infrastructure.Embeddings;
@@ -117,6 +118,12 @@ public static class DependencyInjection
             provider.GetRequiredService<IOptions<ChatOptions>>().Value.Provider == ChatProvider.Anthropic
                 ? provider.GetRequiredService<ClaudeChatModel>()
                 : provider.GetRequiredService<ExtractiveChatModel>());
+
+        // Eval grading: the chat model judges when it is a real model; the free stand-in compares words.
+        services.AddTransient<IAnswerJudge>(provider =>
+            provider.GetRequiredService<IOptions<ChatOptions>>().Value.Provider == ChatProvider.Anthropic
+                ? ActivatorUtilities.CreateInstance<ModelAnswerJudge>(provider)
+                : new WordOverlapJudge());
 
         // Background processing: jobs are claimed with row locks, one unit of work per job.
         services.AddScoped<IProcessingJobQueue, ProcessingJobQueue>();

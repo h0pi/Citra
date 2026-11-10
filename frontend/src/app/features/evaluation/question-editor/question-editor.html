@@ -1,0 +1,56 @@
+<form class="editor" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  @if (error(); as message) {
+    <p-message severity="error" [text]="message" />
+  }
+  <div class="field">
+    <label for="evalQuestion">Question</label>
+    <textarea
+      pTextarea
+      id="evalQuestion"
+      formControlName="question"
+      rows="2"
+      [attr.maxlength]="limits.question"
+      [attr.aria-invalid]="invalid('question')"
+      fluid
+    ></textarea>
+    @if (invalid('question')) {
+      <small class="field-error">Write the question.</small>
+    }
+  </div>
+  <div class="field">
+    <label for="evalExpectedAnswer">Expected answer</label>
+    <textarea
+      pTextarea
+      id="evalExpectedAnswer"
+      formControlName="expectedAnswer"
+      rows="2"
+      [attr.maxlength]="limits.expectedAnswer"
+      [attr.aria-invalid]="invalid('expectedAnswer')"
+      fluid
+    ></textarea>
+    @if (invalid('expectedAnswer')) {
+      <small class="field-error">Write the answer a correct bot gives.</small>
+    }
+  </div>
+  <div class="field">
+    <label for="evalDocument">Expected document <span class="text-muted">(optional)</span></label>
+    <p-select
+      inputId="evalDocument"
+      formControlName="expectedDocumentId"
+      [options]="documentOptions()"
+      optionLabel="label"
+      optionValue="value"
+      appendTo="body"
+      fluid
+    />
+    <small class="text-muted hint">Lets the run check that search finds this document.</small>
+  </div>
+  <div class="actions">
+    <p-button label="Cancel" severity="secondary" [text]="true" (onClick)="closed.emit()" />
+    <p-button
+      type="submit"
+      [label]="question() ? 'Save question' : 'Add question'"
+      [loading]="saving()"
+    />
+  </div>
+</form>

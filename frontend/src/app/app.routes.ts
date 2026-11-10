@@ -60,6 +60,18 @@ export const routes: Routes = [
         loadComponent: () => import('@features/chat/chat-page').then((m) => m.ChatPage),
       },
       {
+        path: 'evaluation/runs/:id/compare/:otherId',
+        title: 'Compare runs',
+        loadComponent: () =>
+          import('@features/evaluation/run-compare/run-compare-page').then((m) => m.RunComparePage),
+      },
+      {
+        path: 'evaluation/runs/:id',
+        title: 'Run results',
+        loadComponent: () =>
+          import('@features/evaluation/run-results/run-results-page').then((m) => m.RunResultsPage),
+      },
+      {
         path: 'evaluation',
         title: 'Evaluation',
         loadComponent: () =>

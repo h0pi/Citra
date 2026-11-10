@@ -1,0 +1,21 @@
+.run {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--citra-space-3);
+  padding: var(--citra-space-3) var(--citra-space-4);
+  border: 1px solid var(--citra-border);
+  border-radius: var(--citra-radius-md);
+  font-size: var(--citra-text-sm);
+}
+
+.score {
+  font-size: var(--citra-text-xl);
+  font-weight: 700;
+}
+
+:host ::ng-deep .bar {
+  flex: 1;
+  min-width: 120px;
+  height: 0.5rem;
+}

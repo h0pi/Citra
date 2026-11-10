@@ -1,0 +1,23 @@
+@let run = state();
+<div class="run" role="status">
+  @switch (run.status) {
+    @case ('Completed') {
+      <span class="score">{{ run.score | number: '1.0-1' }}%</span>
+      <span class="text-muted">
+        {{ run.correctCount }} correct, {{ run.partialCount }} partly correct of
+        {{ run.totalQuestions }} · {{ run.totalCostUsd | currency: 'USD' : 'symbol' : '1.2-4' }}
+      </span>
+      <a [routerLink]="['/evaluation/runs', run.id]">View results</a>
+    }
+    @case ('Failed') {
+      <p-message severity="error" [text]="'The run failed: ' + run.error" />
+    }
+    @default {
+      <span>
+        {{ run.status === 'Pending' ? 'Waiting to start…' : 'Answering questions…' }}
+        {{ run.answeredQuestions }} of {{ run.totalQuestions }}
+      </span>
+      <p-progressbar [value]="percent()" [showValue]="false" styleClass="bar" />
+    }
+  }
+</div>

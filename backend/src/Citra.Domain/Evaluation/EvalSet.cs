@@ -52,7 +52,8 @@ public sealed class EvalSet : Entity, ITenantOwned
 
     public EvalQuestion AddQuestion(string question, string expectedAnswer, Guid? expectedDocumentId = null)
     {
-        var item = EvalQuestion.Create(Id, question, expectedAnswer, expectedDocumentId);
+        var position = _questions.Count == 0 ? 0 : _questions.Max(q => q.Position) + 1;
+        var item = EvalQuestion.Create(Id, position, question, expectedAnswer, expectedDocumentId);
         _questions.Add(item);
         return item;
     }

@@ -1,0 +1,33 @@
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--citra-space-3);
+  padding: var(--citra-space-4);
+  background: var(--citra-surface-muted);
+  border: 1px solid var(--citra-border);
+  border-radius: var(--citra-radius-md);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--citra-space-1);
+
+  label {
+    font-weight: 500;
+  }
+}
+
+.hint {
+  font-size: var(--citra-text-xs);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--citra-space-2);
+}
+
+textarea {
+  resize: vertical;
+}

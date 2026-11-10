@@ -53,7 +53,7 @@ public sealed class EvalResult : Entity
             JudgeReason = Truncate(judgeReason ?? string.Empty, JudgeReasonMaxLength),
             RetrievalHit = retrievalHit,
             LatencyMs = latencyMs,
-            CostUsd = costUsd,
+            CostUsd = Math.Round(costUsd, 6), // as stored, so the run's total equals the sum of its results
         };
     }
 

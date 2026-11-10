@@ -10,6 +10,9 @@ public sealed class EvalQuestion : Entity
 
     public Guid EvalSetId { get; private set; }
 
+    /// <summary>Place in the set (0, 1, 2, …): questions keep the order they were added or imported in.</summary>
+    public int Position { get; private set; }
+
     public string Question { get; private set; } = string.Empty;
 
     public string ExpectedAnswer { get; private set; } = string.Empty;
@@ -22,7 +25,7 @@ public sealed class EvalQuestion : Entity
         // For EF Core.
     }
 
-    internal static EvalQuestion Create(Guid evalSetId, string question, string expectedAnswer, Guid? expectedDocumentId)
+    internal static EvalQuestion Create(Guid evalSetId, int position, string question, string expectedAnswer, Guid? expectedDocumentId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(question);
         ArgumentException.ThrowIfNullOrWhiteSpace(expectedAnswer);
@@ -30,6 +33,7 @@ public sealed class EvalQuestion : Entity
         return new EvalQuestion
         {
             EvalSetId = evalSetId,
+            Position = position,
             Question = question.Trim(),
             ExpectedAnswer = expectedAnswer.Trim(),
             ExpectedDocumentId = expectedDocumentId,

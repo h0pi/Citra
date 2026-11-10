@@ -22,6 +22,7 @@ try
     // Document processing: polls the job table and runs the pipeline for every due job
     // (its settings, section "Processing", are registered and validated by AddInfrastructure).
     builder.Services.AddHostedService<DocumentProcessingService>();
+    builder.Services.AddHostedService<EvalRunService>();
 
     var host = builder.Build();
     host.Run();

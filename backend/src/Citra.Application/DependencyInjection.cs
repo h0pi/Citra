@@ -4,6 +4,7 @@ using Citra.Application.Common.Chunking;
 using Citra.Application.Common.Retrieval;
 using Citra.Application.Features.Auth;
 using Citra.Application.Features.Documents.Processing;
+using Citra.Application.Features.Evaluation.Runs;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -46,6 +47,10 @@ public static class DependencyInjection
 
         // Chat: follow-up questions become standalone ones before searching.
         services.AddScoped<IQueryRewriter, QueryRewriter>();
+
+        // Evaluation: test questions answered like a chat, without saving conversations.
+        services.AddScoped<EvalAnswerer>();
+        services.AddScoped<IEvalRunner, EvalRunner>(); // run by the Worker
 
         return services;
     }
