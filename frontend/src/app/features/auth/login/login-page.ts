@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -58,6 +59,27 @@ export class LoginPage {
       error: (error: unknown) => {
         this.submitting.set(false);
         this.errorMessage.set(toFormError(error).message);
+      },
+    });
+  }
+
+  /** Logs in as the read-only demo user; the server answers 404 when it has no demo. */
+  protected tryDemo(): void {
+    if (this.submitting()) {
+      return;
+    }
+    this.submitting.set(true);
+    this.errorMessage.set(null);
+
+    this.auth.demo().subscribe({
+      next: () => void this.router.navigateByUrl('/dashboard'),
+      error: (error: unknown) => {
+        this.submitting.set(false);
+        this.errorMessage.set(
+          error instanceof HttpErrorResponse && error.status === 404
+            ? 'The demo is not available right now.'
+            : toFormError(error).message,
+        );
       },
     });
   }

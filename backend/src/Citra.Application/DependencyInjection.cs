@@ -3,6 +3,7 @@ using Citra.Application.Common.Chat;
 using Citra.Application.Common.Chunking;
 using Citra.Application.Common.Retrieval;
 using Citra.Application.Features.Auth;
+using Citra.Application.Features.Auth.Demo;
 using Citra.Application.Features.Documents.Processing;
 using Citra.Application.Features.Evaluation.Runs;
 using FluentValidation;
@@ -51,6 +52,9 @@ public static class DependencyInjection
         // Evaluation: test questions answered like a chat, without saving conversations.
         services.AddScoped<EvalAnswerer>();
         services.AddScoped<IEvalRunner, EvalRunner>(); // run by the Worker
+
+        // The nightly clean-up of the public demo (run by the Worker).
+        services.AddScoped<IDemoReset, DemoReset>();
 
         return services;
     }

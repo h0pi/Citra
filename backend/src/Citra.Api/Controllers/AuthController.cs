@@ -1,4 +1,5 @@
 using Citra.Application.Features.Auth;
+using Citra.Application.Features.Auth.Demo;
 using Citra.Application.Features.Auth.Login;
 using Citra.Application.Features.Auth.Logout;
 using Citra.Application.Features.Auth.Me;
@@ -7,6 +8,7 @@ using Citra.Application.Features.Auth.Register;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Citra.Api.Controllers;
 
@@ -32,6 +34,18 @@ public sealed class AuthController(ISender sender) : ControllerBase
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
     public Task<AuthResponse> Login(LoginCommand command, CancellationToken cancellationToken) =>
         sender.Send(command, cancellationToken);
+
+    /// <summary>
+    /// "Try demo": logs in as the demo company's read-only demo user, without a password. 404 when this server
+    /// has no demo. Limited per IP address like the public widget.
+    /// </summary>
+    [AllowAnonymous]
+    [HttpPost("demo")]
+    [EnableRateLimiting(RateLimits.PublicWidget)]
+    [ProducesResponseType<AuthResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public Task<AuthResponse> Demo(CancellationToken cancellationToken) =>
+        sender.Send(new DemoLoginCommand(), cancellationToken);
 
     /// <summary>
     /// Swaps a refresh token for a new access + refresh token pair. Each refresh token works once;

@@ -1,5 +1,7 @@
 using Citra.Application.Common.Security;
+using Citra.Domain.Users;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Citra.Infrastructure.Identity;
 
@@ -58,6 +60,16 @@ internal sealed class IdentityService(UserManager<ApplicationUser> userManager, 
         var user = await userManager.FindByIdAsync(userId.ToString());
         return user is null ? null : ToAccount(user);
     }
+
+    public async Task<IReadOnlyList<Guid>> FindUserIdsAsync(
+        Guid tenantId, UserRole role, DateTimeOffset createdBefore, CancellationToken cancellationToken) =>
+        await userManager.Users
+            .Where(u => u.TenantId == tenantId && u.Role == role && u.CreatedAt < createdBefore)
+            .Select(u => u.Id)
+            .ToListAsync(cancellationToken);
+
+    public async Task DeleteUsersAsync(IReadOnlyCollection<Guid> userIds, CancellationToken cancellationToken) =>
+        await userManager.Users.Where(u => userIds.Contains(u.Id)).ExecuteDeleteAsync(cancellationToken);
 
     private static UserAccount ToAccount(ApplicationUser user) =>
         new(user.Id, user.TenantId, user.Email ?? string.Empty, user.DisplayName, user.Role);

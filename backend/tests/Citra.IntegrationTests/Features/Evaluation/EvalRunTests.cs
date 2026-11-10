@@ -1,4 +1,5 @@
 using Citra.Application.Common.Chat;
+using Citra.Application.Common.Embeddings;
 using Citra.Application.Common.Exceptions;
 using Citra.Application.Features.Evaluation;
 using Citra.Application.Features.Evaluation.Runs;
@@ -153,6 +154,43 @@ public sealed class EvalRunTests(DatabaseFixture fixture)
 
         await using var asViewer = Scope(fixture, viewer);
         await Should.ThrowAsync<ForbiddenException>(() => asViewer.Send(new StartEvalRunCommand(set.Id, null)));
+    }
+
+    [Fact]
+    public async Task A_refused_search_is_tried_again_and_a_lasting_one_fails_the_run()
+    {
+        var seed = await SeedAsync(fixture, [VacationChunk]);
+        await using var scope = Scope(fixture, seed);
+        var set = await scope.Send(new CreateEvalSetCommand(seed.Bot.Id, "HR", null));
+        await scope.Send(new AddEvalQuestionCommand(set.Id, "How many vacation days?", "25 days.", null));
+        var searches = 0;
+        var delay = EvalRunner.SearchRetryDelay;
+        EvalRunner.SearchRetryDelay = TimeSpan.Zero;
+        try
+        {
+            EvalRunDto recovered;
+            using (fixture.Chat.Script(_ => FakeChatModel.Stream(Usage, "You get 25 days [1].")))
+            using (fixture.Embeddings.Intercept((_, _) => ++searches < 3
+                ? throw new EmbeddingException("Voyage AI rate limit reached (429).")
+                : Task.CompletedTask))
+            {
+                recovered = await StartAndRunAsync(seed, set.Id, null);
+            }
+
+            (recovered.Status, recovered.AnsweredQuestions, searches).ShouldBe((EvalRunStatus.Completed, 1, 3));
+
+            EvalRunDto failed;
+            using (fixture.Embeddings.Intercept((_, _) => throw new EmbeddingException("Voyage AI rate limit reached (429).")))
+            {
+                failed = await StartAndRunAsync(seed, set.Id, null);
+            }
+
+            (failed.Status, failed.Error).ShouldBe((EvalRunStatus.Failed, "The AI service failed: Voyage AI rate limit reached (429)."));
+        }
+        finally
+        {
+            EvalRunner.SearchRetryDelay = delay;
+        }
     }
 
     [Fact]

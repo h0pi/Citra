@@ -23,6 +23,7 @@ try
     // (its settings, section "Processing", are registered and validated by AddInfrastructure).
     builder.Services.AddHostedService<DocumentProcessingService>();
     builder.Services.AddHostedService<EvalRunService>();
+    builder.Services.AddHostedService<DemoResetService>();
 
     var host = builder.Build();
     host.Run();

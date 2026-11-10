@@ -1,0 +1,23 @@
+question,expected_answer,expected_document
+How much does standard shipping cost within Bosnia and Herzegovina?,Standard shipping costs EUR 4.90 within Bosnia and Herzegovina.,shipping-policy.pdf
+From what order value is shipping free to the European Union?,Standard shipping to the European Union is free for orders over EUR 120.,shipping-policy.pdf
+When does my order leave the warehouse if I order in the morning?,Orders placed before 14:00 on a working day leave the warehouse the same day.,shipping-policy.pdf
+"Do you ship to the United Kingdom, and is express delivery available there?","Yes, the United Kingdom is in zone 3 with delivery in 5–8 working days, but express delivery is not available there.",shipping-policy.pdf
+How many days do I have to return a product?,"You can return a product within 30 days of delivery, unused and in its original packaging.",returns-and-refunds.docx
+How much does a return from Germany cost?,"For returns from outside Bosnia and Herzegovina, EUR 5.90 is deducted from the refund for the return label.",returns-and-refunds.docx
+How long does it take to get my money back after a return?,"The refund is made within 7 days after the return arrives at the warehouse, to the original payment method.",returns-and-refunds.docx
+Can I return a gas cartridge?,"No, gas cartridges and fuel bottles cannot be returned, for safety reasons.",returns-and-refunds.docx
+How long is the warranty on a Northwind backpack?,"Northwind backpacks have a 10-year warranty on fabric, seams, buckles and zippers.",warranty-policy.pdf
+How long is the warranty on Northwind tent poles?,"Northwind tents have a 5-year warranty on poles, frames and seams.",warranty-policy.pdf
+Can I pay cash on delivery for an order to Croatia?,"No, cash on delivery is only available within Bosnia and Herzegovina, for orders up to EUR 500, with a fee of EUR 2.",payment-and-invoices.docx
+How long do you hold an order paid by bank transfer?,"An order paid by bank transfer is held for 5 working days, then cancelled if the payment has not arrived.",payment-and-invoices.docx
+How much does the Basecamp 4 tent cost?,The Basecamp 4 costs EUR 449.,price-list-2026.pdf
+What is the article number of the Summit boot?,The Summit boot has the article number NW-F-301.,price-list-2026.pdf
+How much does a zipper replacement in the workshop cost?,A zipper replacement in the workshop costs from EUR 25; repairs under warranty are free.,price-list-2026.pdf
+What is the comfort temperature of the Ember 0 sleeping bag?,The Ember 0 has a comfort temperature of 0 °C and a limit of -6 °C.,sleeping-bag-guide.pdf
+Which EU boot size fits a foot length of 26.7 cm?,A foot length of 26.7 cm is EU size 42 (UK 8).,boot-size-guide.pdf
+How tall is the Basecamp 4 inside?,"The Basecamp 4 is 190 cm high, so you can stand inside.",tent-basecamp-4-manual.pdf
+How much does the Ridgeline 2 weigh?,The Ridgeline 2 weighs 2.1 kg in total.,tent-ridgeline-2-manual.pdf
+Which torso lengths does the Trailpack 45 fit?,The Trailpack 45 fits torso lengths from 40 to 52 cm.,backpack-trailpack-45-manual.pdf
+How many loyalty points do I need for a 5 euro voucher?,100 points give a voucher of EUR 5; you earn 1 point per euro and points expire after 24 months.,loyalty-programme.docx
+When is the showroom open on Saturday?,On Saturday the showroom is open from 9:00 to 15:00.,showroom.pdf

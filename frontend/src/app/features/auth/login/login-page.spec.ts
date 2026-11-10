@@ -9,13 +9,15 @@ import { LoginPage } from './login-page';
 
 describe('LoginPage', () => {
   let login: ReturnType<typeof vi.fn<(r: unknown) => Observable<CurrentUser>>>;
+  let demo: ReturnType<typeof vi.fn<() => Observable<CurrentUser>>>;
   let router: Router;
 
   beforeEach(async () => {
     login = vi.fn();
+    demo = vi.fn();
     await TestBed.configureTestingModule({
       imports: [LoginPage],
-      providers: [provideRouter([]), { provide: AuthService, useValue: { login } }],
+      providers: [provideRouter([]), { provide: AuthService, useValue: { login, demo } }],
     }).compileComponents();
     router = TestBed.inject(Router);
     vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
@@ -117,5 +119,32 @@ describe('LoginPage', () => {
     await submit(fixture);
 
     expect(el.textContent).toContain('Cannot reach the server');
+  });
+
+  const demoButton = (el: HTMLElement) =>
+    [...el.querySelectorAll<HTMLButtonElement>('button')].find((b) =>
+      b.textContent?.includes('Try the demo'),
+    )!;
+
+  it('logs in as the demo user and opens the dashboard', async () => {
+    demo.mockReturnValue(of({} as CurrentUser));
+    const { fixture, el } = await render();
+
+    demoButton(el).click();
+    await fixture.whenStable();
+
+    expect(demo).toHaveBeenCalled();
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/dashboard');
+  });
+
+  it('says when this server has no demo', async () => {
+    demo.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 404 })));
+    const { fixture, el } = await render();
+
+    demoButton(el).click();
+    await fixture.whenStable();
+
+    expect(el.textContent).toContain('The demo is not available right now.');
+    expect(router.navigateByUrl).not.toHaveBeenCalled();
   });
 });

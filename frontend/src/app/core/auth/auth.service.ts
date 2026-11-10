@@ -51,6 +51,9 @@ export class AuthService {
    * Owner and Admin may create, change and delete bots and documents; Viewer and Demo only look.
    * Used to hide edit buttons. The API enforces the same rule (403), so this is convenience, not security.
    */
+  /** Logged in with "Try the demo": a read-only look at the demo company. */
+  readonly isDemo = computed(() => this._currentUser()?.role === 'Demo');
+
   readonly canEdit = computed(() => {
     const role = this._currentUser()?.role;
     return role === 'Owner' || role === 'Admin';
@@ -90,6 +93,13 @@ export class AuthService {
   login(request: LoginRequest): Observable<CurrentUser> {
     return this.api
       .post<AuthResponse>('/api/auth/login', request, FORM_REQUEST)
+      .pipe(map((response) => this.startSession(response)));
+  }
+
+  /** "Try demo": logs in as the demo company's read-only demo user, without a password. */
+  demo(): Observable<CurrentUser> {
+    return this.api
+      .post<AuthResponse>('/api/auth/demo', undefined, FORM_REQUEST)
       .pipe(map((response) => this.startSession(response)));
   }
 

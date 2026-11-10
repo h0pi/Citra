@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { AuthService } from '@core/auth/auth.service';
 
 import { Sidebar } from '../sidebar/sidebar';
 import { Topbar } from '../topbar/topbar';
@@ -18,6 +19,7 @@ import { Topbar } from '../topbar/topbar';
 export class Shell {
   /** Mobile drawer state (ignored on desktop, where the sidebar is always visible). */
   protected readonly sidebarOpen = signal(false);
+  protected readonly isDemo = inject(AuthService).isDemo;
 
   protected toggleSidebar(): void {
     this.sidebarOpen.update((open) => !open);

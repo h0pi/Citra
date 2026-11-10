@@ -1,0 +1,19 @@
+question,expected_answer,expected_document
+How many days of annual leave do I get?,"Full-time employees get 25 working days of paid annual leave per year, plus 1 day after every 5 years, up to 30 days.",annual-leave.pdf
+How far in advance must I request leave?,"Leave must be requested in the HR portal Peak at least 2 weeks in advance, or 4 weeks for leave longer than 10 working days.",annual-leave.pdf
+Can I carry unused leave days over to next year?,Up to 5 unused days can be carried over and must be used by 31 March.,annual-leave.pdf
+From which day of sick leave do I need a doctor's note?,A doctor's note is needed from the 3rd day of sick leave.,sick-and-parental-leave.pdf
+How many days of paternity leave do fathers get?,"Fathers get 10 working days of paid paternity leave, to be taken within 3 months of the birth.",sick-and-parental-leave.pdf
+What is the daily allowance for a business trip to Germany?,"The daily allowance for other EU countries is EUR 60, with a hotel limit of EUR 130 per night.",travel-and-expenses.pdf
+How much do I get per kilometre when I use my own car?,You are paid EUR 0.30 per kilometre.,travel-and-expenses.pdf
+How many days per week can I work from home?,Office and support employees can work from home up to 2 days per week after the probation period.,remote-work-policy.pdf
+Is there money for a home office chair or desk?,"Yes, a one-time allowance of EUR 200 for a chair, desk or screen.",remote-work-policy.pdf
+How long must passwords be?,"Passwords must be at least 12 characters long, and multi-factor authentication is required.",it-security-rules.pdf
+What should I do with a suspicious email?,Do not click links or open attachments and report it to security@northwind-outdoor.example within 1 hour.,it-security-rules.pdf
+What discount do employees get on Northwind products?,Employees get 30% off Northwind brand products and 15% off partner brands.,benefits-and-discounts.docx
+How much is the yearly gear allowance?,Every employee gets EUR 300 per year for Northwind products.,benefits-and-discounts.docx
+Can I accept a gift from a supplier?,Gifts worth up to EUR 50 may be accepted; more valuable gifts must be reported to your manager.,code-of-conduct.docx
+When are performance reviews held?,"Performance reviews are held twice a year, in March and in September.",performance-reviews.pdf
+What is the salary range for level L2?,"Level L2 is from BAM 1,800 to BAM 2,500 gross per month.",performance-reviews.pdf
+When is the salary paid?,Salaries are paid on the 10th of every month for the previous month.,employee-handbook.pdf
+How long is the probation period?,"The probation period is 3 months, with a notice period of 7 days during probation.",employee-handbook.pdf

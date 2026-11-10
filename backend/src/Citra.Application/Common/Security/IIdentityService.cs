@@ -54,4 +54,11 @@ public interface IIdentityService
     Task<CredentialCheckResult> CheckCredentialsAsync(string email, string password, CancellationToken cancellationToken);
 
     Task<UserAccount?> FindByIdAsync(Guid userId, CancellationToken cancellationToken);
+
+    /// <summary>A company's users with this role, created before <paramref name="createdBefore"/>.</summary>
+    Task<IReadOnlyList<Guid>> FindUserIdsAsync(
+        Guid tenantId, UserRole role, DateTimeOffset createdBefore, CancellationToken cancellationToken);
+
+    /// <summary>Deletes the users with their logins (refresh tokens, roles).</summary>
+    Task DeleteUsersAsync(IReadOnlyCollection<Guid> userIds, CancellationToken cancellationToken);
 }

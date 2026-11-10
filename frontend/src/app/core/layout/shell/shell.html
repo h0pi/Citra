@@ -8,6 +8,14 @@
   <div class="shell-main">
     <app-topbar (menuToggle)="toggleSidebar()" />
 
+    @if (isDemo()) {
+      <p class="demo-banner" role="status">
+        <i class="pi pi-eye" aria-hidden="true"></i>
+        You are exploring a demo company. Look around and chat with its bots; changes are turned
+        off.
+      </p>
+    }
+
     <main class="shell-content" id="main-content">
       <router-outlet />
     </main>

@@ -4,6 +4,7 @@ using Citra.Application.Common.Embeddings;
 using Citra.Application.Common.Security;
 using Citra.Domain.Users;
 using Citra.Infrastructure;
+using Citra.Infrastructure.Options;
 using Citra.Infrastructure.Persistence;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -59,6 +60,10 @@ public sealed class DatabaseFixture : IAsyncLifetime
                 // The model name FakeChatModel's scripted answers report.
                 ["Chat:Prices:claude-test:InputPerMillionUsd"] = "2",
                 ["Chat:Prices:claude-test:OutputPerMillionUsd"] = "10",
+                // Commands that log someone in (register, demo login) issue tokens.
+                ["Jwt:Issuer"] = "citra-tests",
+                ["Jwt:Audience"] = "citra-tests",
+                ["Jwt:SigningKey"] = "test-signing-key-only-for-integration-tests-0123456789",
             })
             .Build();
 
@@ -66,6 +71,7 @@ public sealed class DatabaseFixture : IAsyncLifetime
         services.AddLogging();
         services.AddApplication();
         services.AddInfrastructure(configuration);
+        services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName)); // the API registers these
 
         // Tests decide who the current user is, per scope.
         services.AddScoped<TestCurrentUser>();

@@ -78,6 +78,19 @@ describe('AuthService', () => {
     expect(storage.read()).toBeNull();
   });
 
+  it('the demo login starts a read-only session without a password', () => {
+    expect(auth.isDemo()).toBe(false);
+    auth.demo().subscribe();
+    const request = http.expectOne(`${api}/api/auth/demo`);
+    expect(request.request.method).toBe('POST');
+    const response = authResponse('1');
+    request.flush({ ...response, user: { ...response.user, role: 'Demo' } });
+
+    expect(auth.isAuthenticated()).toBe(true);
+    expect(auth.isDemo()).toBe(true);
+    expect(auth.canEdit()).toBe(false);
+  });
+
   it('register starts a session like login', () => {
     auth
       .register({

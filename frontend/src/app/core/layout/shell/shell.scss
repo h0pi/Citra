@@ -63,3 +63,13 @@
     padding: var(--citra-space-4);
   }
 }
+
+.demo-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--citra-space-2);
+  margin: 0;
+  padding: var(--citra-space-2) var(--citra-space-6);
+  background: var(--citra-primary-soft);
+  font-size: var(--citra-text-sm);
+}

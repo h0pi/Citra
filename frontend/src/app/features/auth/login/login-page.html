@@ -51,6 +51,19 @@
       fluid
     />
 
+    <p-button
+      label="Try the demo"
+      icon="pi pi-eye"
+      severity="secondary"
+      [outlined]="true"
+      [disabled]="submitting()"
+      (onClick)="tryDemo()"
+      fluid
+    />
+    <p class="switch text-muted">
+      Look around a sample company's bots, read-only, without an account.
+    </p>
+
     <p class="switch text-muted">New to Citra? <a routerLink="/register">Create an account</a></p>
   </form>
 </app-auth-layout>

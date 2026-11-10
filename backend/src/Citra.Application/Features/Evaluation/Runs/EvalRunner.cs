@@ -1,5 +1,7 @@
 using Citra.Application.Common.Chat;
+using Citra.Application.Common.Embeddings;
 using Citra.Application.Common.Persistence;
+using Citra.Domain.Bots;
 using Citra.Domain.Evaluation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -25,6 +27,14 @@ internal sealed class EvalRunner(
     TimeProvider timeProvider,
     ILogger<EvalRunner> logger) : IEvalRunner
 {
+    /// <summary>
+    /// Voyage's free tier allows 3 searches a minute, fewer than a run needs: a refused search waits this long and is
+    /// tried again, a few times. (Tests shorten it.)
+    /// </summary>
+    internal static TimeSpan SearchRetryDelay { get; set; } = TimeSpan.FromMinutes(1);
+
+    internal const int SearchAttempts = 4;
+
     public async Task<bool> RunNextAsync(CancellationToken cancellationToken)
     {
         var runs = db.EvalRuns.IgnoreQueryFilters([QueryFilters.Tenant]);
@@ -64,7 +74,7 @@ internal sealed class EvalRunner(
         {
             foreach (var question in questions)
             {
-                var answer = await answerer.AnswerAsync(bot, question.Question, cancellationToken);
+                var answer = await AnswerAsync(bot, question.Question, cancellationToken);
 
                 // Retrieval is scored only for questions that name the document the answer should come from.
                 var retrievalHit = question.ExpectedDocumentId is { } expected && answer.SourceDocumentIds.Contains(expected);
@@ -88,10 +98,26 @@ internal sealed class EvalRunner(
             // In the background nobody would see an exception: the run shows that it failed, and why.
             logger.LogWarning(ex, "Eval run {EvalRunId} failed", run.Id);
             run.Fail(
-                ex is ChatModelException ? $"The AI service failed: {ex.Message}" : "The run failed unexpectedly.",
+                ex is ChatModelException or EmbeddingException ? $"The AI service failed: {ex.Message}" : "The run failed unexpectedly.",
                 timeProvider.GetUtcNow());
         }
 
         await db.SaveChangesAsync(CancellationToken.None);
+    }
+
+    private async Task<EvalAnswer> AnswerAsync(Bot bot, string question, CancellationToken cancellationToken)
+    {
+        for (var attempt = 1; ; attempt++)
+        {
+            try
+            {
+                return await answerer.AnswerAsync(bot, question, cancellationToken);
+            }
+            catch (EmbeddingException ex) when (attempt < SearchAttempts)
+            {
+                logger.LogInformation(ex, "Search refused (attempt {Attempt}); trying again in {Delay}", attempt, SearchRetryDelay);
+                await Task.Delay(SearchRetryDelay, timeProvider, cancellationToken);
+            }
+        }
     }
 }
