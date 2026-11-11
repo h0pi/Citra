@@ -18,7 +18,7 @@ public sealed class GetBotByIdTests(DatabaseFixture fixture)
         var tenant = await SeedTenantAsync();
         var bot = Bot.Create(tenant.Id, "Support", "Customer questions");
         bot.UpdateDetails("Support", "Customer questions", "Be brief.", "Welcome!");
-        bot.ConfigureModel("claude-haiku-4-5", 0.4);
+        bot.ConfigureModel("claude-haiku-5-5");
         bot.ConfigureWidget(true, "#10B981", ["acme.com"], ["How do I reset my password?"], 100);
         await SaveAsSystemAsync(bot);
 
@@ -32,8 +32,7 @@ public sealed class GetBotByIdTests(DatabaseFixture fixture)
         dto.Description.ShouldBe("Customer questions");
         dto.SystemPrompt.ShouldBe("Be brief.");
         dto.WelcomeMessage.ShouldBe("Welcome!");
-        dto.Model.ShouldBe("claude-haiku-4-5");
-        dto.Temperature.ShouldBe(0.4);
+        dto.Model.ShouldBe("claude-haiku-5-5");
         dto.IsPublic.ShouldBeTrue();
         dto.WidgetColor.ShouldBe("#10B981");
         dto.AllowedDomains.ShouldBe(["acme.com"]);

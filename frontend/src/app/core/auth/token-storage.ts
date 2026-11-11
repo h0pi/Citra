@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { AuthResponse, CurrentUser } from '@core/models/auth.models';
 
-const KEY = 'citra.session';
+/** The localStorage key; other tabs see changes to it as a 'storage' event. */
+export const SESSION_KEY = 'citra.session';
 
 /** What we keep in the browser between visits. */
 export interface StoredSession {
@@ -20,7 +21,7 @@ export interface StoredSession {
 export class TokenStorage {
   read(): StoredSession | null {
     try {
-      const raw = localStorage.getItem(KEY);
+      const raw = localStorage.getItem(SESSION_KEY);
       return raw ? (JSON.parse(raw) as StoredSession) : null;
     } catch {
       return null;
@@ -35,7 +36,7 @@ export class TokenStorage {
       user: response.user,
     };
     try {
-      localStorage.setItem(KEY, JSON.stringify(session));
+      localStorage.setItem(SESSION_KEY, JSON.stringify(session));
     } catch {
       // Ignore: the session still lives in memory for this visit.
     }
@@ -45,7 +46,7 @@ export class TokenStorage {
     const session = this.read();
     if (session) {
       try {
-        localStorage.setItem(KEY, JSON.stringify({ ...session, user }));
+        localStorage.setItem(SESSION_KEY, JSON.stringify({ ...session, user }));
       } catch {
         // Ignore.
       }
@@ -54,7 +55,7 @@ export class TokenStorage {
 
   clear(): void {
     try {
-      localStorage.removeItem(KEY);
+      localStorage.removeItem(SESSION_KEY);
     } catch {
       // Ignore.
     }

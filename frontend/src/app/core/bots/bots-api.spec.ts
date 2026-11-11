@@ -40,7 +40,6 @@ describe('BotsApi', () => {
         systemPrompt: null,
         welcomeMessage: 'Hi',
         model: null,
-        temperature: 0.2,
         widgetColor: '#6366F1',
         starterQuestions: [],
         isPublic: false,

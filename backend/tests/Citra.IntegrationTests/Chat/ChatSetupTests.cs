@@ -102,7 +102,7 @@ public sealed class ChatSetupTests(DatabaseFixture fixture)
     [Fact]
     public void Bots_can_choose_the_real_claude_model_ids()
     {
-        BotModels.Supported.ShouldBe(["claude-opus-5-5", "claude-sonnet-5-5", "claude-haiku-4-5"]);
+        BotModels.Supported.ShouldBe(["claude-opus-5-5", "claude-sonnet-5-5", "claude-haiku-5-5"]);
     }
 
     [Fact]

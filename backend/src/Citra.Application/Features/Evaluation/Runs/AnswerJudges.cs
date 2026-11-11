@@ -66,7 +66,6 @@ public sealed class ModelAnswerJudge(IChatModel model, IChatPricing pricing) : I
             <actual_answer>{actualAnswer}</actual_answer>
             """)])
         {
-            Temperature = 0,
         };
 
         var reply = new StringBuilder();

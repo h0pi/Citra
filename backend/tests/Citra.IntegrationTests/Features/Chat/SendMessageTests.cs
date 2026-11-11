@@ -65,7 +65,7 @@ public sealed class SendMessageTests(DatabaseFixture fixture)
     [Fact]
     public async Task Gives_the_model_the_rules_the_bots_settings_and_the_numbered_sources()
     {
-        var seed = await SeedAsync(instructions: "Answer briefly.", model: "claude-haiku-4-5", temperature: 0.4, chunks: [VacationChunk]);
+        var seed = await SeedAsync(instructions: "Answer briefly.", model: "claude-haiku-5-5", chunks: [VacationChunk]);
         var before = fixture.Chat.Requests.Count;
 
         await using var scope = Scope(seed);
@@ -73,7 +73,7 @@ public sealed class SendMessageTests(DatabaseFixture fixture)
 
         var request = fixture.Chat.Requests.Skip(before).ShouldHaveSingleItem(); // a first question needs no rewriting
         request.SystemPrompt.ShouldBe(ChatPrompts.System("Support", "Answer briefly."));
-        (request.Model, request.Temperature, request.MaxOutputTokens).ShouldBe(("claude-haiku-4-5", 0.4, (int?)null));
+        (request.Model, request.MaxOutputTokens).ShouldBe(("claude-haiku-5-5", (int?)null));
         var turn = request.Messages.ShouldHaveSingleItem();
         turn.Role.ShouldBe(ChatRole.User);
         turn.Content.ShouldBe($"""
@@ -293,7 +293,7 @@ public sealed class SendMessageTests(DatabaseFixture fixture)
         await using var scope = Scope(seed);
         AnswerCompleted completed;
         using (fixture.Chat.Script(request => request.SystemPrompt == QueryRewriter.SystemPrompt
-            ? Slowly(new ChatUsage("claude-haiku-4-5-20251001", 300, 20), "Standalone question?")
+            ? Slowly(new ChatUsage("claude-haiku-5-5-20261001", 300, 20), "Standalone question?")
             : FakeChatModel.Stream(new ChatUsage("claude-test", 2000, 150), "Answer [1].")))
         {
             completed = (await scope.Stream(new SendMessageCommand(seed.Bot.Id, conversationId, "And then?")))[^1].ShouldBeOfType<AnswerCompleted>();
@@ -303,7 +303,7 @@ public sealed class SendMessageTests(DatabaseFixture fixture)
         var message = await check.Db.Messages.SingleAsync(m => m.Id == completed.MessageId, Ct);
         (message.InputTokens, message.OutputTokens).ShouldBe((2300, 170));
         // Haiku (dated id, priced by its name): 300 x $1 + 20 x $5; test model: 2000 x $2 + 150 x $10 (per million).
-        message.CostUsd.ShouldBe(((300m * 1) + (20m * 5) + (2000m * 2) + (150m * 10)) / 1_000_000m);
+        message.CostUsd.ShouldBe(((300m * 0.10m) + (20m * 0.50m) + (2000m * 2) + (150m * 10)) / 1_000_000m);
         message.LatencyMs.ShouldBeGreaterThanOrEqualTo(100, "measured from the question, not from the answer's start");
         message.LatencyMs.ShouldBeLessThan(60_000);
     }
@@ -659,8 +659,7 @@ public sealed class SendMessageTests(DatabaseFixture fixture)
         IReadOnlyList<string> chunks,
         UserRole role = UserRole.Admin,
         string? instructions = null,
-        string? model = null,
-        double temperature = 0.2)
+        string? model = null)
     {
         var tenant = Tenant.Create("Chat company");
         tenant.ChangeSlug($"chat-{Guid.NewGuid():N}");
@@ -671,17 +670,17 @@ public sealed class SendMessageTests(DatabaseFixture fixture)
         }
 
         var userId = await CreateUserAsync(tenant.Id, role);
-        var bot = await AddBotAsync(tenant.Id, instructions, model, temperature, chunks);
+        var bot = await AddBotAsync(tenant.Id, instructions, model, chunks);
         return new Seed(tenant, userId, role, bot);
     }
 
     private async Task<Bot> AddBotAsync(
-        Guid tenantId, string? instructions = null, string? model = null, double temperature = 0.2, IReadOnlyList<string>? chunks = null)
+        Guid tenantId, string? instructions = null, string? model = null, IReadOnlyList<string>? chunks = null)
     {
         var bot = Bot.Create(tenantId, "Support");
         bot.ChangeSlug($"support-{Guid.NewGuid():N}");
         bot.UpdateDetails("Support", null, instructions, Bot.DefaultWelcomeMessage);
-        bot.ConfigureModel(model, temperature);
+        bot.ConfigureModel(model);
         var document = Document.FromUpload(
             tenantId, bot.Id, "Handbook.pdf", "application/pdf", 100, DocumentSourceType.Pdf,
             $"{tenantId}/{bot.Id}/{Guid.NewGuid():N}/original.pdf", Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N"));

@@ -59,22 +59,6 @@ textarea {
   resize: vertical;
 }
 
-.temperature-value {
-  margin-left: var(--citra-space-1);
-  color: var(--citra-primary);
-  font-variant-numeric: tabular-nums;
-}
-
-:host ::ng-deep .temperature-slider {
-  margin: var(--citra-space-3) var(--citra-space-2) var(--citra-space-1);
-}
-
-.slider-scale {
-  display: flex;
-  justify-content: space-between;
-  font-size: var(--citra-text-xs);
-}
-
 .color-row {
   display: flex;
   flex-wrap: wrap;

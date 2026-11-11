@@ -2,7 +2,10 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Citra.Api;
+using Citra.Application.Features.Auth.Register;
 using Citra.IntegrationTests.Infrastructure;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Citra.IntegrationTests.Api;
 
@@ -185,6 +188,43 @@ public sealed class AuthEndpointTests(DatabaseFixture fixture)
         logout.StatusCode.ShouldBe(HttpStatusCode.NoContent);
         again.StatusCode.ShouldBe(HttpStatusCode.NoContent);
         refresh.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task With_sign_up_closed_nobody_can_register_but_accounts_still_log_in()
+    {
+        await using var open = new ApiFactory(fixture);
+        var email = UniqueEmail();
+        using (var client = open.CreateClient())
+        {
+            (await RegisterAsync(client, email, "Pass-1234")).EnsureSuccessStatusCode();
+        }
+
+        await using var closed = new ApiFactory(fixture).WithWebHostBuilder(b => b.UseSetting("Registration:Enabled", "false"));
+        using var visitor = closed.CreateClient();
+
+        using var register = await RegisterAsync(visitor, UniqueEmail(), "Pass-1234");
+        using var login = await LoginAsync(visitor, email, "Pass-1234");
+
+        register.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
+        Detail(await BodyAsync(register)).ShouldBe(RegisterCommandHandler.ClosedMessage);
+        login.StatusCode.ShouldBe(HttpStatusCode.OK);
+    }
+
+    [Fact]
+    public async Task One_address_may_try_logging_in_only_so_often_a_minute()
+    {
+        // Guessing passwords across many accounts is stopped per address, not only per account (lockout).
+        await using var api = new ApiFactory(fixture);
+        using var client = api.CreateClient();
+
+        for (var i = 0; i < RateLimits.AuthRequestsPerIpPerMinute; i++)
+        {
+            (await LoginAsync(client, UniqueEmail(), "Pass-1234")).StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+        }
+
+        using var refused = await LoginAsync(client, UniqueEmail(), "Pass-1234");
+        refused.StatusCode.ShouldBe(HttpStatusCode.TooManyRequests);
     }
 
     [Theory]

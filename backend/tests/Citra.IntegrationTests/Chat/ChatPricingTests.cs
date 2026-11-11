@@ -15,9 +15,9 @@ public sealed class ChatPricingTests
         await using var services = Services([]);
         var pricing = services.GetRequiredService<IChatPricing>();
 
-        pricing.Cost(new ChatUsage("claude-sonnet-5-5", 1_000_000, 1_000_000)).ShouldBe(3m + 15m);
-        pricing.Cost(new ChatUsage("claude-opus-5-5", 2000, 500)).ShouldBe(((2000m * 5) + (500m * 25)) / 1_000_000m);
-        pricing.Cost(new ChatUsage("claude-haiku-4-5", 7, 3)).ShouldBe(0.000022m, "tiny amounts are kept exactly");
+        pricing.Cost(new ChatUsage("claude-sonnet-5-5", 1_000_000, 1_000_000)).ShouldBe(2m + 10m);
+        pricing.Cost(new ChatUsage("claude-opus-5-5", 2000, 500)).ShouldBe(((2000m * 4) + (500m * 20)) / 1_000_000m);
+        pricing.Cost(new ChatUsage("claude-haiku-5-5", 70, 30)).ShouldBe(0.000022m, "tiny amounts are kept exactly");
         pricing.Cost(new ChatUsage("citra-extractive", 5000, 300)).ShouldBe(0m);
     }
 
@@ -29,7 +29,7 @@ public sealed class ChatPricingTests
             ("Chat:Prices:claude-x-2:InputPerMillionUsd", "9"), ("Chat:Prices:claude-x-2:OutputPerMillionUsd", "9")]);
         var pricing = services.GetRequiredService<IChatPricing>();
 
-        pricing.Cost(new ChatUsage("claude-haiku-4-5-20251001", 1_000_000, 0)).ShouldBe(1m);
+        pricing.Cost(new ChatUsage("claude-sonnet-5-5-20260901", 1_000_000, 0)).ShouldBe(2m);
         pricing.Cost(new ChatUsage("claude-x-2-20260101", 1_000_000, 0)).ShouldBe(9m, "the longest matching name wins");
         pricing.Cost(new ChatUsage("claude-x2", 1_000_000, 0)).ShouldBe(0m, "only a dash starts a date");
     }
@@ -62,10 +62,10 @@ public sealed class ChatPricingTests
     [Fact]
     public async Task A_negative_price_is_refused_at_startup()
     {
-        await using var services = Services([("Chat:Prices:claude-haiku-4-5:OutputPerMillionUsd", "-1")]);
+        await using var services = Services([("Chat:Prices:claude-haiku-5-5:OutputPerMillionUsd", "-1")]);
 
         Should.Throw<OptionsValidationException>(() => services.GetRequiredService<IChatPricing>())
-            .Message.ShouldContain("The price of claude-haiku-4-5 cannot be negative.");
+            .Message.ShouldContain("The price of claude-haiku-5-5 cannot be negative.");
     }
 
     [Fact]

@@ -17,7 +17,10 @@ import {
   throwError,
 } from 'rxjs';
 
-import { TokenStorage } from './token-storage';
+import { SESSION_KEY, StoredSession, TokenStorage } from './token-storage';
+
+/** Only one tab at a time may refresh: two tabs sending the same refresh token would end the session. */
+const REFRESH_LOCK = 'citra.refresh';
 
 /** Login/register show their own errors in the form, so no global toast for them. */
 const FORM_REQUEST = { context: new HttpContext().set(SKIP_ERROR_TOAST, true) };
@@ -58,6 +61,24 @@ export class AuthService {
     const role = this._currentUser()?.role;
     return role === 'Owner' || role === 'Admin';
   });
+
+  constructor() {
+    // Another tab logged in, refreshed or logged out: follow it, so no tab keeps an outdated refresh token
+    // (sending one would look like a stolen token and end the session in every tab).
+    window.addEventListener('storage', (event) => {
+      if (event.key !== SESSION_KEY && event.key !== null) {
+        return;
+      }
+
+      const saved = this.storage.read();
+      if (saved) {
+        this.adopt(saved);
+      } else if (this._currentUser()) {
+        this.clearSession();
+        void this.router.navigate(['/login']);
+      }
+    });
+  }
 
   /** Current access token for the auth interceptor (null when logged out). */
   getAccessToken(): string | null {
@@ -119,17 +140,7 @@ export class AuthService {
       return throwError(() => new Error('Not logged in.'));
     }
 
-    this.refreshInFlight$ ??= defer(() =>
-      this.api.post<AuthResponse>(
-        '/api/auth/refresh',
-        { refreshToken: this.refreshToken },
-        SILENT_REQUEST,
-      ),
-    ).pipe(
-      map((response) => {
-        this.startSession(response);
-        return response.accessToken;
-      }),
+    this.refreshInFlight$ ??= defer(() => withRefreshLock(() => this.refreshOnce())).pipe(
       catchError((error: unknown) => {
         this.endSession();
         return throwError(() => error);
@@ -139,6 +150,28 @@ export class AuthService {
     );
 
     return this.refreshInFlight$;
+  }
+
+  /**
+   * One refresh, while holding the cross-tab lock. Another tab may have refreshed just before: then its new tokens
+   * (already saved) are used instead of sending the now outdated refresh token.
+   */
+  private async refreshOnce(): Promise<string> {
+    const saved = this.storage.read();
+    if (saved && saved.refreshToken !== this.refreshToken) {
+      this.adopt(saved);
+      return saved.accessToken;
+    }
+
+    const response = await firstValueFrom(
+      this.api.post<AuthResponse>(
+        '/api/auth/refresh',
+        { refreshToken: this.refreshToken },
+        SILENT_REQUEST,
+      ),
+    );
+    this.startSession(response);
+    return response.accessToken;
   }
 
   /** Ends the session on the server (best effort) and locally, then goes to the login page. */
@@ -168,10 +201,23 @@ export class AuthService {
     return response.user;
   }
 
+  /** Uses a session another tab saved. */
+  private adopt(saved: StoredSession): void {
+    this.accessToken = saved.accessToken;
+    this.refreshToken = saved.refreshToken;
+    this._currentUser.set(saved.user);
+  }
+
   private clearSession(): void {
     this.accessToken = null;
     this.refreshToken = null;
     this.storage.clear();
     this._currentUser.set(null);
   }
+}
+
+/** Runs `work` while no other tab of this app refreshes (Web Locks); directly where the browser has no locks. */
+async function withRefreshLock<T>(work: () => Promise<T>): Promise<T> {
+  const locks = typeof navigator === 'undefined' ? undefined : navigator.locks;
+  return locks ? await locks.request(REFRESH_LOCK, work) : work();
 }

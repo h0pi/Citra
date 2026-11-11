@@ -21,7 +21,7 @@ internal sealed class UpdateBotCommandHandler(
             ?? throw new NotFoundException(nameof(Bot), request.Id);
 
         bot.UpdateDetails(request.Name, request.Description, request.SystemPrompt, request.WelcomeMessage);
-        bot.ConfigureModel(request.Model, request.Temperature);
+        bot.ConfigureModel(request.Model);
         bot.ConfigureWidget(
             request.IsPublic, request.WidgetColor, request.AllowedDomains, request.StarterQuestions, request.DailyMessageLimit);
 

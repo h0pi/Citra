@@ -18,7 +18,6 @@ internal sealed class UpdateBotCommandValidator : AbstractValidator<UpdateBotCom
             .When(x => !string.IsNullOrWhiteSpace(x.Model))
             .WithMessage($"Model must be one of: {string.Join(", ", BotModels.Supported)}.");
 
-        RuleFor(x => x.Temperature).InclusiveBetween(0.0, 1.0);
 
         RuleFor(x => x.WidgetColor)
             .Cascade(CascadeMode.Stop)

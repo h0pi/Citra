@@ -18,6 +18,7 @@ class PdfViewerStub {
   readonly src = input<Blob>();
   readonly page = input<number>();
   readonly showOpenFileButton = input<boolean>();
+  readonly useInlineScripts = input<boolean>();
   readonly textLayer = input<boolean>();
   readonly pdfLoaded = output<void>();
 }
@@ -83,6 +84,8 @@ describe('DocumentViewer', () => {
 
     expect(viewer()!.src()).toBe(blob);
     expect(viewer()!.page()).toBe(3);
+    // The site's Content-Security-Policy allows no inline scripts; the viewer loads its probe as a file.
+    expect(viewer()!.useInlineScripts()).toBe(false);
     expect(viewer()!.textLayer()).toBe(true);
 
     viewer()!.pdfLoaded.emit();

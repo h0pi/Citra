@@ -81,10 +81,6 @@ namespace Citra.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(4000)")
                         .HasColumnName("system_prompt");
 
-                    b.Property<double>("Temperature")
-                        .HasColumnType("double precision")
-                        .HasColumnName("temperature");
-
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uuid")
                         .HasColumnName("tenant_id");

@@ -174,7 +174,6 @@ public sealed class ExtractiveChatModelTests
         var model = new ExtractiveChatModel(Tokens);
         var valid = Request("vacation", Chunk("Vacation days."));
 
-        await Should.ThrowAsync<ArgumentException>(() => model.StreamAsync(valid with { Temperature = 1.5 }, Ct).ToListAsync(Ct).AsTask());
         await Should.ThrowAsync<ArgumentException>(() => model.StreamAsync(
             valid with { Messages = [.. valid.Messages, new ChatMessage(ChatRole.Assistant, "An answer.")] }, Ct).ToListAsync(Ct).AsTask());
     }

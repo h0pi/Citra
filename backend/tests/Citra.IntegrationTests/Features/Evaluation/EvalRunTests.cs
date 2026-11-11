@@ -254,6 +254,34 @@ public sealed class EvalRunTests(DatabaseFixture fixture)
         (await scope.Services.GetRequiredService<IEvalRunner>().RunNextAsync(Ct)).ShouldBeFalse();
     }
 
+    [Fact]
+    public async Task A_run_a_restart_interrupted_ends_as_failed_when_the_worker_starts_again()
+    {
+        var seed = await SeedAsync(fixture, [VacationChunk]);
+        await using var scope = Scope(fixture, seed);
+        var set = await scope.Send(new CreateEvalSetCommand(seed.Bot.Id, "HR", null));
+        await scope.Send(new AddEvalQuestionCommand(set.Id, "Q?", "A.", null));
+        var interrupted = await scope.Send(new StartEvalRunCommand(set.Id, null));
+        var waiting = await scope.Send(new StartEvalRunCommand(set.Id, null));
+        await using (var crashed = fixture.OpenScope(tenantId: null))
+        {
+            // The old Worker had claimed the first run when it stopped.
+            var run = await crashed.Db.EvalRuns.IgnoreQueryFilters().SingleAsync(r => r.Id == interrupted.Id, Ct);
+            run.Start(DateTimeOffset.UtcNow);
+            await crashed.Db.SaveChangesAsync(Ct);
+        }
+
+        await using (var worker = fixture.OpenScope(tenantId: null))
+        {
+            (await worker.Services.GetRequiredService<IEvalRunner>().FailInterruptedAsync(Ct)).ShouldBe(1);
+        }
+
+        var ended = await scope.Send(new GetEvalRunQuery(interrupted.Id));
+        (ended.Status, ended.Error).ShouldBe((EvalRunStatus.Failed, EvalRunner.InterruptedMessage));
+        (await scope.Send(new GetEvalRunQuery(waiting.Id))).Status.ShouldBe(EvalRunStatus.Pending, "runs not started yet still run");
+        await RunPendingAsync();
+    }
+
     /// <summary>Starts a run as the seed's user, lets the Worker run every pending run, and reads the run back.</summary>
     private async Task<EvalRunDto> StartAndRunAsync(ChatSeed seed, Guid setId, string? notes)
     {

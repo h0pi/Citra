@@ -37,15 +37,16 @@ public sealed class ChatOptions : IValidatableObject
     /// </summary>
     public Dictionary<string, ModelPriceOptions> Prices { get; init; } = new(StringComparer.Ordinal)
     {
-        ["claude-opus-5-5"] = new() { InputPerMillionUsd = 5m, OutputPerMillionUsd = 25m },
-        ["claude-sonnet-5-5"] = new() { InputPerMillionUsd = 3m, OutputPerMillionUsd = 15m },
-        ["claude-haiku-4-5"] = new() { InputPerMillionUsd = 1m, OutputPerMillionUsd = 5m },
+        ["claude-opus-5-5"] = new() { InputPerMillionUsd = 4m, OutputPerMillionUsd = 20m },
+        ["claude-sonnet-5-5"] = new() { InputPerMillionUsd = 2m, OutputPerMillionUsd = 10m },
+        // Up to 100K prompt tokens; Citra's prompts (rules + a few passages) stay far below that.
+        ["claude-haiku-5-5"] = new() { InputPerMillionUsd = 0.10m, OutputPerMillionUsd = 0.50m },
         ["citra-extractive"] = new() { InputPerMillionUsd = 0m, OutputPerMillionUsd = 0m },
     };
 
     /// <summary>Rewrites follow-up questions: a small task, so the cheapest, fastest model.</summary>
     [Required]
-    public string RewriteModel { get; init; } = "claude-haiku-4-5";
+    public string RewriteModel { get; init; } = "claude-haiku-5-5";
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {

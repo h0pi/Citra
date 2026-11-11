@@ -39,7 +39,7 @@ public sealed class QueryRewriterTests
         result.Usage.ShouldBe(FakeModel.Usage);
         var request = model.Requests.ShouldHaveSingleItem();
         request.SystemPrompt.ShouldBe(QueryRewriter.SystemPrompt);
-        (request.Model, request.Temperature, request.MaxOutputTokens).ShouldBe(("claude-haiku-4-5", 0.0, (int?)200));
+        (request.Model, request.MaxOutputTokens).ShouldBe(("claude-haiku-5-5", (int?)200));
         request.Messages.ShouldHaveSingleItem().ShouldBe(new ChatMessage(ChatRole.User, """
             <conversation>
             User: How many vacation days do I get?
@@ -160,7 +160,7 @@ public sealed class QueryRewriterTests
     {
         await using var defaults = Services([]);
         var settings = defaults.GetRequiredService<IChatSettings>();
-        (settings.MaxHistoryMessages, settings.MaxHistoryTokens, settings.RewriteModel).ShouldBe((10, 3000, "claude-haiku-4-5"));
+        (settings.MaxHistoryMessages, settings.MaxHistoryTokens, settings.RewriteModel).ShouldBe((10, 3000, "claude-haiku-5-5"));
 
         await using var configured = Services([
             ("Chat:MaxHistoryMessages", "4"), ("Chat:MaxHistoryTokens", "500"), ("Chat:RewriteModel", "claude-sonnet-5-5")]);
@@ -194,13 +194,13 @@ public sealed class QueryRewriterTests
         var configuration = new ConfigurationBuilder().AddJsonFile(Path.Combine(directory.FullName, "src", "Citra.Api", "appsettings.json")).Build();
 
         (configuration["Chat:MaxHistoryMessages"], configuration["Chat:MaxHistoryTokens"], configuration["Chat:RewriteModel"])
-            .ShouldBe(("10", "3000", "claude-haiku-4-5"));
+            .ShouldBe(("10", "3000", "claude-haiku-5-5"));
     }
 
     // ---------- helpers ----------
 
     private static QueryRewriter Rewriter(FakeModel model, int maxMessages = 10, int maxTokens = 1000) =>
-        new(model, new FixedSettings(maxMessages, maxTokens, "claude-haiku-4-5"), Words.Instance, NullLogger<QueryRewriter>.Instance);
+        new(model, new FixedSettings(maxMessages, maxTokens, "claude-haiku-5-5"), Words.Instance, NullLogger<QueryRewriter>.Instance);
 
     private static ServiceProvider Services((string Key, string Value)[] values)
     {
@@ -227,7 +227,7 @@ public sealed class QueryRewriterTests
     /// <summary>Streams the given pieces (or throws), and records every request.</summary>
     private sealed class FakeModel : IChatModel
     {
-        public static readonly ChatUsage Usage = new("claude-haiku-4-5", 120, 12);
+        public static readonly ChatUsage Usage = new("claude-haiku-5-5", 120, 12);
 
         private readonly string[] _pieces = [];
         private readonly Exception? _failure;

@@ -15,7 +15,6 @@ public sealed record UpdateBotCommand(
     string? SystemPrompt,
     string WelcomeMessage,
     string? Model,
-    double Temperature,
     string WidgetColor,
     IReadOnlyList<string> StarterQuestions,
     bool IsPublic,

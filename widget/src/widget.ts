@@ -149,7 +149,17 @@ interface SavedChat {
 }
 
 const STORAGE_KEY = `citra-widget:${bot}`;
-const chat: SavedChat = readChat() ?? { visitorId: crypto.randomUUID(), conversationId: null, messages: [] };
+const chat: SavedChat = readChat() ?? { visitorId: newVisitorId(), conversationId: null, messages: [] };
+
+/** A random id. crypto.randomUUID exists only on https:// pages; getRandomValues works on http:// sites too. */
+function newVisitorId(): string {
+  if (typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+
+  const bytes = crypto.getRandomValues(new Uint8Array(16));
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+}
 
 // localStorage can be blocked (private windows, strict settings); the chat then lasts until the page reloads.
 function readChat(): SavedChat | null {

@@ -17,6 +17,17 @@ public sealed class EvalRunService(
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var pollInterval = options.Value.PollInterval;
+        try
+        {
+            await using var scope = scopeFactory.CreateAsyncScope();
+            await scope.ServiceProvider.GetRequiredService<IEvalRunner>().FailInterruptedAsync(stoppingToken);
+        }
+        catch (Exception ex) when (!stoppingToken.IsCancellationRequested)
+        {
+            // Not fatal: new runs still work; the old ones stay "Running" until the next start.
+            logger.LogError(ex, "Could not end eval runs interrupted by a restart");
+        }
+
         while (!stoppingToken.IsCancellationRequested)
         {
             try

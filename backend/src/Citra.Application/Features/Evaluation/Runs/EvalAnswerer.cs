@@ -11,7 +11,7 @@ using Citra.Domain.Usage;
 namespace Citra.Application.Features.Evaluation.Runs;
 
 /// <summary>
-/// A test question's answer, as a chat would give it: the bot's search, prompt, model and temperature.
+/// A test question's answer, as a chat would give it: the bot's search, prompt and model.
 /// </summary>
 /// <param name="SourceDocumentIds">Documents of the passages the search found, best first.</param>
 /// <param name="CostUsd">Model and search cost together.</param>
@@ -44,7 +44,6 @@ internal sealed class EvalAnswerer(
             [new ChatMessage(ChatRole.User, ChatPrompts.UserTurn(sources, question))])
         {
             Model = BotModel(bot),
-            Temperature = bot.Temperature,
         };
 
         var answer = new StringBuilder();

@@ -11,19 +11,8 @@
     />
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <link rel="icon" href="favicon.ico" sizes="48x48" />
-    <script>
-      // Apply the saved (or OS) theme before Angular starts, so dark mode doesn't flash white on load.
-      // Must match ThemeService (key 'citra-theme', class 'app-dark').
-      (function () {
-        try {
-          var saved = localStorage.getItem('citra-theme');
-          var dark = saved
-            ? saved === 'dark'
-            : window.matchMedia('(prefers-color-scheme: dark)').matches;
-          if (dark) document.documentElement.classList.add('app-dark');
-        } catch (e) {}
-      })();
-    </script>
+    <!-- A file, not inline: the Content-Security-Policy (nginx.conf) allows only scripts from this site. -->
+    <script src="theme-init.js"></script>
   </head>
   <body>
     <app-root></app-root>

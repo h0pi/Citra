@@ -70,6 +70,13 @@ try
                 PermitLimit = Citra.Api.RateLimits.PublicRequestsPerIpPerMinute,
                 Window = TimeSpan.FromMinutes(1),
             }));
+        options.AddPolicy(Citra.Api.RateLimits.Auth, context => RateLimitPartition.GetFixedWindowLimiter(
+            context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = Citra.Api.RateLimits.AuthRequestsPerIpPerMinute,
+                Window = TimeSpan.FromMinutes(1),
+            }));
     });
 
     // Enums travel as text ("Owner", "Ready"), not numbers: readable, and safe if an enum's order changes.

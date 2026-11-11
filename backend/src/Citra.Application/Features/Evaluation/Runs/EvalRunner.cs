@@ -13,6 +13,13 @@ public interface IEvalRunner
 {
     /// <summary>Runs the oldest pending eval run, if any. True when one was found (check again right away).</summary>
     Task<bool> RunNextAsync(CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Ends runs a stopped Worker left "Running" (a restart or deploy in the middle of a run): nobody would ever
+    /// finish them and their page would wait forever. Called once when the Worker starts; Citra runs one Worker.
+    /// Returns how many runs were ended.
+    /// </summary>
+    Task<int> FailInterruptedAsync(CancellationToken cancellationToken);
 }
 
 /// <summary>
@@ -58,6 +65,23 @@ internal sealed class EvalRunner(
         }
 
         return true;
+    }
+
+    internal const string InterruptedMessage = "The run was interrupted because the server restarted. Start it again.";
+
+    public async Task<int> FailInterruptedAsync(CancellationToken cancellationToken)
+    {
+        var interrupted = await db.EvalRuns.IgnoreQueryFilters([QueryFilters.Tenant])
+            .Where(r => r.Status == EvalRunStatus.Running)
+            .ToListAsync(cancellationToken);
+        foreach (var run in interrupted)
+        {
+            logger.LogWarning("Eval run {EvalRunId} was interrupted by a restart; marking it failed", run.Id);
+            run.Fail(InterruptedMessage, timeProvider.GetUtcNow());
+        }
+
+        await db.SaveChangesAsync(cancellationToken);
+        return interrupted.Count;
     }
 
     private async Task RunAsync(EvalRun run, CancellationToken cancellationToken)

@@ -58,7 +58,6 @@ internal sealed class QueryRewriter(
         var request = new ChatRequest(SystemPrompt, [new ChatMessage(ChatRole.User, Prompt(context, question))])
         {
             Model = settings.RewriteModel,
-            Temperature = 0,
             MaxOutputTokens = MaxOutputTokens,
         };
 

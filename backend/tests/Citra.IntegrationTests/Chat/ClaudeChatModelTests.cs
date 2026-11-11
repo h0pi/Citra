@@ -23,7 +23,7 @@ public sealed class ClaudeChatModelTests
     {
         var handler = FakeAnthropic.Streaming(Answer("Hi."));
 
-        await Model(handler).StreamAsync(Question with { Temperature = 0.3 }, Ct).ToListAsync(Ct);
+        await Model(handler).StreamAsync(Question, Ct).ToListAsync(Ct);
 
         var request = handler.Requests.ShouldHaveSingleItem();
         request.Method.ShouldBe(HttpMethod.Post);
@@ -34,7 +34,8 @@ public sealed class ClaudeChatModelTests
         body["model"]!.GetValue<string>().ShouldBe("claude-default");
         body["max_tokens"]!.GetValue<int>().ShouldBe(2048);
         body["system"]!.GetValue<string>().ShouldBe("Answer from the sources.");
-        body["temperature"]!.GetValue<double>().ShouldBe(0.3);
+        body.ContainsKey("temperature").ShouldBeFalse("current models refuse a temperature");
+        body["output_config"]!["effort"]!.GetValue<string>().ShouldBe("low");
         body["stream"]!.GetValue<bool>().ShouldBeTrue();
         body["messages"]!.AsArray().Select(m => (m!["role"]!.GetValue<string>(), m["content"]!.GetValue<string>()))
             .ShouldBe([("user", "Earlier question"), ("assistant", "Earlier answer"), ("user", "How many days?")]);
@@ -45,10 +46,10 @@ public sealed class ClaudeChatModelTests
     {
         var handler = FakeAnthropic.Streaming(Answer("Hi."));
 
-        await Model(handler).StreamAsync(Question with { Model = "claude-haiku-4-5", MaxOutputTokens = 300 }, Ct).ToListAsync(Ct);
+        await Model(handler).StreamAsync(Question with { Model = "claude-haiku-5-5", MaxOutputTokens = 300 }, Ct).ToListAsync(Ct);
 
         var body = JsonNode.Parse(handler.Requests[0].Body)!.AsObject();
-        body["model"]!.GetValue<string>().ShouldBe("claude-haiku-4-5");
+        body["model"]!.GetValue<string>().ShouldBe("claude-haiku-5-5");
         body["max_tokens"]!.GetValue<int>().ShouldBe(300);
     }
 

@@ -26,7 +26,6 @@ export interface Bot {
   welcomeMessage: string;
   /** null = the app's default model. */
   model: string | null;
-  temperature: number;
   isPublic: boolean;
   widgetColor: string;
   allowedDomains: string[];
@@ -47,7 +46,6 @@ export interface UpdateBotRequest {
   systemPrompt: string | null;
   welcomeMessage: string;
   model: string | null;
-  temperature: number;
   widgetColor: string;
   starterQuestions: string[];
   isPublic: boolean;

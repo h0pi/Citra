@@ -15,4 +15,10 @@ public static class RateLimits
 
     /// <summary>Loose enough for many visitors behind one office network; each visitor has a stricter limit.</summary>
     public const int PublicRequestsPerIpPerMinute = 60;
+
+    /// <summary>Sign-up, login and token refresh, per IP address: stops password guessing across many accounts.</summary>
+    public const string Auth = "Auth";
+
+    /// <summary>Far above what people logging in need (an office behind one address included), far below an attack.</summary>
+    public const int AuthRequestsPerIpPerMinute = 20;
 }

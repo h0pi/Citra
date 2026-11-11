@@ -18,9 +18,11 @@ namespace Citra.Api.Controllers;
 [Produces("application/json")]
 public sealed class AuthController(ISender sender) : ControllerBase
 {
-    /// <summary>Creates a new company and its owner account, and logs the owner in.</summary>
+    /// <summary>Creates a new company and its owner account, and logs the owner in. 403 when sign-up is closed.</summary>
     [AllowAnonymous]
     [HttpPost("register")]
+    [EnableRateLimiting(RateLimits.Auth)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
     [ProducesResponseType<AuthResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     public Task<AuthResponse> Register(RegisterCommand command, CancellationToken cancellationToken) =>
@@ -29,6 +31,7 @@ public sealed class AuthController(ISender sender) : ControllerBase
     /// <summary>Logs in with email and password. Five wrong attempts lock the account for 15 minutes.</summary>
     [AllowAnonymous]
     [HttpPost("login")]
+    [EnableRateLimiting(RateLimits.Auth)]
     [ProducesResponseType<AuthResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
@@ -53,6 +56,7 @@ public sealed class AuthController(ISender sender) : ControllerBase
     /// </summary>
     [AllowAnonymous]
     [HttpPost("refresh")]
+    [EnableRateLimiting(RateLimits.Auth)]
     [ProducesResponseType<AuthResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]

@@ -7,13 +7,27 @@ using MediatR;
 
 namespace Citra.Application.Features.Auth.Register;
 
+/// <summary>Whether new companies may sign up (section "Registration").</summary>
+public interface IRegistrationSettings
+{
+    bool Enabled { get; }
+}
+
 internal sealed class RegisterCommandHandler(
     IApplicationDbContext db,
     IIdentityService identity,
+    IRegistrationSettings settings,
     AuthSessionIssuer sessions) : IRequestHandler<RegisterCommand, AuthResponse>
 {
+    public const string ClosedMessage = "Sign-up is closed on this site. Use \"Try the demo\" on the login page to look around.";
+
     public async Task<AuthResponse> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
+        if (!settings.Enabled)
+        {
+            throw new ForbiddenException(ClosedMessage);
+        }
+
         var email = request.Email.Trim().ToLowerInvariant();
         var displayName = request.DisplayName.Trim();
 

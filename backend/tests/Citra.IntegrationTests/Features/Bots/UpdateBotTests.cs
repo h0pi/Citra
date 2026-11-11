@@ -26,8 +26,7 @@ public sealed class UpdateBotTests(DatabaseFixture fixture)
             Description = "Helps with pricing",
             SystemPrompt = "Be brief.",
             WelcomeMessage = "Hello!",
-            Model = "claude-haiku-4-5",
-            Temperature = 0.7,
+            Model = "claude-haiku-5-5",
             WidgetColor = "#10b981",
             StarterQuestions = ["  How many vacation days?  ", " ", "Where do I park?"],
             IsPublic = true,
@@ -41,8 +40,7 @@ public sealed class UpdateBotTests(DatabaseFixture fixture)
         updated.Description.ShouldBe("Helps with pricing");
         updated.SystemPrompt.ShouldBe("Be brief.");
         updated.WelcomeMessage.ShouldBe("Hello!");
-        updated.Model.ShouldBe("claude-haiku-4-5");
-        updated.Temperature.ShouldBe(0.7);
+        updated.Model.ShouldBe("claude-haiku-5-5");
         updated.WidgetColor.ShouldBe("#10B981");
         updated.StarterQuestions.ShouldBe(["How many vacation days?", "Where do I park?"]);
         updated.IsPublic.ShouldBeTrue();
@@ -53,7 +51,7 @@ public sealed class UpdateBotTests(DatabaseFixture fixture)
         await using var check = fixture.OpenScope(tenant.Id);
         var saved = await check.Db.Bots.SingleAsync(b => b.Id == bot.Id, Ct);
         saved.Name.ShouldBe("Sales Assistant");
-        saved.Model.ShouldBe("claude-haiku-4-5");
+        saved.Model.ShouldBe("claude-haiku-5-5");
     }
 
     [Fact]
@@ -95,7 +93,7 @@ public sealed class UpdateBotTests(DatabaseFixture fixture)
 
         await using var scope = fixture.OpenScope(tenant.Id);
         await Should.ThrowAsync<NotFoundException>(() =>
-            scope.Send(new UpdateBotCommand(Guid.NewGuid(), "X", null, null, "Hi", null, 0.2, "#6366F1", [], false, [], null)));
+            scope.Send(new UpdateBotCommand(Guid.NewGuid(), "X", null, null, "Hi", null, "#6366F1", [], false, [], null)));
     }
 
     [Theory]
@@ -120,7 +118,6 @@ public sealed class UpdateBotTests(DatabaseFixture fixture)
             Name = "",
             WelcomeMessage = " ",
             Model = "gpt-4o",
-            Temperature = 1.5,
             WidgetColor = "red",
             StarterQuestions = ["1", "2", "3", "4", "5", "6", "7"],
             AllowedDomains = ["acme.com", "https://shop.acme.com/page"],
@@ -128,7 +125,7 @@ public sealed class UpdateBotTests(DatabaseFixture fixture)
         }));
 
         error.Errors.Keys.ShouldBe(
-            ["Name", "WelcomeMessage", "Model", "Temperature", "WidgetColor", "StarterQuestions", "AllowedDomains[1]",
+            ["Name", "WelcomeMessage", "Model", "WidgetColor", "StarterQuestions", "AllowedDomains[1]",
                 "DailyMessageLimit"],
             ignoreOrder: true);
         error.Errors["WidgetColor"].Length.ShouldBe(1);
@@ -161,7 +158,7 @@ public sealed class UpdateBotTests(DatabaseFixture fixture)
     // ---------- helpers ----------
 
     private static UpdateBotCommand ValidUpdate(BotDto bot) => new(
-        bot.Id, bot.Name, bot.Description, bot.SystemPrompt, bot.WelcomeMessage, bot.Model, bot.Temperature, bot.WidgetColor,
+        bot.Id, bot.Name, bot.Description, bot.SystemPrompt, bot.WelcomeMessage, bot.Model, bot.WidgetColor,
         bot.StarterQuestions, bot.IsPublic, bot.AllowedDomains, bot.DailyMessageLimit);
 
     private async Task<(Tenant Tenant, BotDto Bot)> SeedBotAsync(string botName)

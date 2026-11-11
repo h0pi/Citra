@@ -204,27 +204,6 @@
               />
               <small class="text-muted hint">Default uses the app's standard model.</small>
             </div>
-
-            <div class="field">
-              <label id="temperature-label" for="temperature">
-                Creativity <span class="temperature-value">{{ temperature().toFixed(1) }}</span>
-              </label>
-              <p-slider
-                formControlName="temperature"
-                [min]="0"
-                [max]="1"
-                [step]="0.1"
-                ariaLabelledBy="temperature-label"
-                styleClass="temperature-slider"
-              />
-              <div class="slider-scale text-muted">
-                <span>Precise</span>
-                <span>Creative</span>
-              </div>
-              <small class="text-muted hint"
-                >Keep it low (0.1–0.3) for answers from documents.</small
-              >
-            </div>
           </div>
         </section>
 

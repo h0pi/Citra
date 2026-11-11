@@ -27,6 +27,9 @@ function authResponse(suffix: string): AuthResponse {
   };
 }
 
+/** Lets pending async work run (a refresh first waits for the cross-tab lock). */
+const settle = () => new Promise<void>((resolve) => setTimeout(resolve));
+
 describe('authInterceptor', () => {
   let http: HttpClient;
   let controller: HttpTestingController;
@@ -85,13 +88,15 @@ describe('authInterceptor', () => {
     controller.expectNone(`${api}/api/auth/refresh`);
   });
 
-  it('on 401, refreshes the token and retries the request once', () => {
+  it('on 401, refreshes the token and retries the request once', async () => {
     logIn();
     let result: unknown;
     http.get(`${api}/api/bots`).subscribe((r) => (result = r));
 
     controller.expectOne(`${api}/api/bots`).flush(null, unauthorized);
+    await settle();
     controller.expectOne(`${api}/api/auth/refresh`).flush(authResponse('2'));
+    await settle();
 
     const retry = controller.expectOne(`${api}/api/bots`);
     expect(retry.request.headers.get('Authorization')).toBe('Bearer access-2');
@@ -99,7 +104,7 @@ describe('authInterceptor', () => {
     expect(result).toEqual(['bot']);
   });
 
-  it('parallel 401s share ONE refresh, then every request is retried', () => {
+  it('parallel 401s share ONE refresh, then every request is retried', async () => {
     logIn();
     const results: unknown[] = [];
     http.get(`${api}/api/bots`).subscribe((r) => results.push(r));
@@ -107,10 +112,12 @@ describe('authInterceptor', () => {
 
     controller.expectOne(`${api}/api/bots`).flush(null, unauthorized);
     controller.expectOne(`${api}/api/documents`).flush(null, unauthorized);
+    await settle();
 
     const refreshes = controller.match(`${api}/api/auth/refresh`);
     expect(refreshes.length).toBe(1);
     refreshes[0].flush(authResponse('2'));
+    await settle();
 
     controller.expectOne(`${api}/api/bots`).flush('bots');
     controller.expectOne(`${api}/api/documents`).flush('docs');
@@ -125,26 +132,31 @@ describe('authInterceptor', () => {
     controller.expectNone(`${api}/api/auth/refresh`);
   });
 
-  it('retries at most once: a second 401 is returned to the caller', () => {
+  it('retries at most once: a second 401 is returned to the caller', async () => {
     logIn();
     let failed = false;
     http.get(`${api}/api/bots`).subscribe({ error: () => (failed = true) });
 
     controller.expectOne(`${api}/api/bots`).flush(null, unauthorized);
+    await settle();
     controller.expectOne(`${api}/api/auth/refresh`).flush(authResponse('2'));
+    await settle();
     controller.expectOne(`${api}/api/bots`).flush(null, unauthorized);
+    await settle();
 
     controller.expectNone(`${api}/api/auth/refresh`);
     expect(failed).toBe(true);
   });
 
-  it('when the refresh fails, the request fails and the user is sent to login', () => {
+  it('when the refresh fails, the request fails and the user is sent to login', async () => {
     logIn();
     let failed = false;
     http.get(`${api}/api/bots`).subscribe({ error: () => (failed = true) });
 
     controller.expectOne(`${api}/api/bots`).flush(null, unauthorized);
+    await settle();
     controller.expectOne(`${api}/api/auth/refresh`).flush(null, unauthorized);
+    await settle();
 
     expect(failed).toBe(true);
     expect(auth.isAuthenticated()).toBe(false);

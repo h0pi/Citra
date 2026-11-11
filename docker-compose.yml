@@ -1,10 +1,18 @@
 # The whole of Citra in one command:  docker compose up --build   →  http://localhost:8080
 # Secrets come from a .env file next to this one (copy .env.example); none are built into the images.
 # For development with live reload use docker-compose.dev.yml (database only) instead.
+# Container logs are rotated (3 files of 10 MB each), so months of logs cannot fill the server's disk.
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   db:
     image: pgvector/pgvector:pg17
     restart: unless-stopped
+    logging: *logging
     environment:
       POSTGRES_DB: citra
       POSTGRES_USER: citra
@@ -23,6 +31,7 @@ services:
       context: ./backend
       dockerfile: src/Citra.Api/Dockerfile
     restart: unless-stopped
+    logging: *logging
     environment: &backend
       # No Kerberos (GSS) encryption: not used, and its library is not in the slim images.
       ConnectionStrings__Database: Host=db;Port=5432;Database=citra;Username=citra;Password=${POSTGRES_PASSWORD};Gss Encryption Mode=Disable
@@ -30,6 +39,7 @@ services:
       Anthropic__ApiKey: ${ANTHROPIC_API_KEY:-}
       Chat__Provider: ${CHAT_PROVIDER:-Extractive}
       Demo__TenantSlug: ${DEMO_TENANT_SLUG:-}
+      Registration__Enabled: ${REGISTRATION_ENABLED:-true}
       Jwt__SigningKey: ${JWT_SIGNING_KEY:?Set JWT_SIGNING_KEY in .env}
       # The only API: it brings the database schema up to date when it starts.
       Database__MigrateOnStartup: "true"
@@ -47,6 +57,7 @@ services:
       context: ./backend
       dockerfile: src/Citra.Worker/Dockerfile
     restart: unless-stopped
+    logging: *logging
     environment: *backend
     volumes:
       - storage:/data/storage
@@ -59,6 +70,7 @@ services:
   web:
     build: ./frontend
     restart: unless-stopped
+    logging: *logging
     ports:
       - "${CITRA_PORT:-8080}:8080"
     depends_on:

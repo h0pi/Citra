@@ -27,6 +27,9 @@ function authResponse(suffix: string): AuthResponse {
   };
 }
 
+/** Lets pending async work run (a refresh first waits for the cross-tab lock). */
+const settle = () => new Promise<void>((resolve) => setTimeout(resolve));
+
 describe('AuthService', () => {
   let auth: AuthService;
   let http: HttpTestingController;
@@ -106,43 +109,72 @@ describe('AuthService', () => {
     expect(auth.getAccessToken()).toBe('access-r');
   });
 
-  it('parallel refreshes share ONE request (a reused refresh token would end the session)', () => {
+  it('parallel refreshes share ONE request (a reused refresh token would end the session)', async () => {
     login();
     const results: string[] = [];
 
     auth.refreshAccessToken().subscribe((t) => results.push(t));
     auth.refreshAccessToken().subscribe((t) => results.push(t));
     auth.refreshAccessToken().subscribe((t) => results.push(t));
+    await settle();
 
     const requests = http.match(`${api}/api/auth/refresh`);
     expect(requests.length).toBe(1);
     expect(requests[0].request.body).toEqual({ refreshToken: 'refresh-1' });
     requests[0].flush(authResponse('2'));
+    await settle();
 
     expect(results).toEqual(['access-2', 'access-2', 'access-2']);
     expect(storage.read()?.refreshToken).toBe('refresh-2');
   });
 
-  it('after a refresh completes, the next one sends the NEW refresh token', () => {
+  it('after a refresh completes, the next one sends the NEW refresh token', async () => {
     login();
     auth.refreshAccessToken().subscribe();
+    await settle();
     http.expectOne(`${api}/api/auth/refresh`).flush(authResponse('2'));
+    await settle();
 
     auth.refreshAccessToken().subscribe();
+    await settle();
     const second = http.expectOne(`${api}/api/auth/refresh`);
     expect(second.request.body).toEqual({ refreshToken: 'refresh-2' });
     second.flush(authResponse('3'));
   });
 
-  it('a failed refresh logs out and goes to the login page', () => {
+  it('a failed refresh logs out and goes to the login page', async () => {
     login();
     auth.refreshAccessToken().subscribe({ error: () => undefined });
+    await settle();
     http
       .expectOne(`${api}/api/auth/refresh`)
       .flush({ detail: 'Your session has expired.' }, { status: 401, statusText: 'Unauthorized' });
+    await settle();
 
     expect(auth.isAuthenticated()).toBe(false);
     expect(storage.read()).toBeNull();
+    expect(router.navigate).toHaveBeenCalledWith(['/login']);
+  });
+
+  it('uses the tokens another tab just refreshed instead of sending an outdated refresh token', async () => {
+    login();
+    storage.save(authResponse('9')); // another tab refreshed first and saved its new session
+
+    let token: string | undefined;
+    auth.refreshAccessToken().subscribe((t) => (token = t));
+    await settle();
+
+    http.expectNone(`${api}/api/auth/refresh`);
+    expect(token).toBe('access-9');
+    expect(auth.getAccessToken()).toBe('access-9');
+  });
+
+  it('follows a logout in another tab', () => {
+    login();
+    storage.clear();
+    window.dispatchEvent(new StorageEvent('storage', { key: 'citra.session', newValue: null }));
+
+    expect(auth.isAuthenticated()).toBe(false);
     expect(router.navigate).toHaveBeenCalledWith(['/login']);
   });
 

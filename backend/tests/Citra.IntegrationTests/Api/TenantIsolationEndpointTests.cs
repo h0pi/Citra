@@ -29,7 +29,7 @@ public sealed partial class TenantIsolationEndpointTests(DatabaseFixture fixture
         var updateBot = new
         {
             name = "Taken over", description = (string?)null, systemPrompt = (string?)null, welcomeMessage = "Hi",
-            model = (string?)null, temperature = 0.2, widgetColor = "#6366F1", starterQuestions = Array.Empty<string>(),
+            model = (string?)null, widgetColor = "#6366F1", starterQuestions = Array.Empty<string>(),
             isPublic = true, allowedDomains = Array.Empty<string>(), dailyMessageLimit = (int?)null,
         };
 

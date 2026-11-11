@@ -10,7 +10,7 @@ public static class BotModels
     [
         "claude-opus-5-5",
         "claude-sonnet-5-5",
-        "claude-haiku-4-5",
+        "claude-haiku-5-5",
     ];
 
     public static bool IsSupported(string model) => Supported.Contains(model, StringComparer.Ordinal);

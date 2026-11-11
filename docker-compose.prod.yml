@@ -3,6 +3,13 @@
 # - Caddy serves the app on ports 80/443 with an automatic HTTPS certificate for CITRA_DOMAIN;
 #   the app itself is no longer published on a port of its own.
 # - A nightly database backup into ./backups, keeping the last 7 days.
+# Same log rotation as docker-compose.yml (YAML anchors do not reach across files).
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   web:
     ports: !reset []
@@ -10,6 +17,7 @@ services:
   caddy:
     image: caddy:2.10-alpine
     restart: unless-stopped
+    logging: *logging
     ports:
       - "80:80"
       - "443:443"
@@ -25,6 +33,7 @@ services:
   backup:
     image: pgvector/pgvector:pg17 # same PostgreSQL version as the database, so pg_dump matches
     restart: unless-stopped
+    logging: *logging
     environment:
       PGHOST: db
       PGUSER: citra

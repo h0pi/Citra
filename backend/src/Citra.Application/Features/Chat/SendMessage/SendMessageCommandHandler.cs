@@ -120,7 +120,6 @@ internal sealed class SendMessageCommandHandler(
         {
             // A model saved before it stopped being offered falls back to the app default.
             Model = bot.Model is { } chosen && BotModels.IsSupported(chosen) ? chosen : null,
-            Temperature = bot.Temperature,
         };
 
         var answer = new StringBuilder();

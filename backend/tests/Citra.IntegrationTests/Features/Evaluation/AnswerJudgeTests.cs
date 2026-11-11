@@ -44,8 +44,7 @@ public sealed class AnswerJudgeTests(DatabaseFixture fixture)
         }
 
         verdict.ShouldBe(new JudgeVerdict(EvalGrade.Partial, "The number is missing.", 0.0004m));
-        asked!.Temperature.ShouldBe(0);
-        asked.SystemPrompt.ShouldBe(ModelAnswerJudge.SystemPrompt);
+        asked!.SystemPrompt.ShouldBe(ModelAnswerJudge.SystemPrompt);
         asked.Messages[0].Content.ShouldContain("<expected_answer>25 days.</expected_answer>");
         asked.Messages[0].Content.ShouldContain("<actual_answer>Some days.</actual_answer>");
     }

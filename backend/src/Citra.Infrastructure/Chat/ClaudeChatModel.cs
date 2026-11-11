@@ -115,7 +115,10 @@ internal sealed class ClaudeChatModel(HttpClient http, IOptions<AnthropicOptions
                 role = message.Role == ChatRole.User ? "user" : "assistant",
                 content = message.Content,
             }),
-            temperature = request.Temperature,
+            // Current models choose their own sampling (they refuse "temperature") and think before answering.
+            // Answering from a few given passages is simple work: low effort keeps it fast, cheap and within
+            // max_tokens, which thinking counts toward.
+            output_config = new { effort = "low" },
             stream = true,
         };
 

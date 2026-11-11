@@ -95,7 +95,7 @@ def main():
         api.call('PUT', f"/api/bots/{bot['id']}", {
             'name': settings['name'], 'description': settings['description'],
             'systemPrompt': settings['systemPrompt'], 'welcomeMessage': settings['welcomeMessage'],
-            'model': None, 'temperature': 0.2, 'widgetColor': settings['widgetColor'],
+            'model': None, 'widgetColor': settings['widgetColor'],
             'starterQuestions': settings['starterQuestions'], 'isPublic': settings['isPublic'],
             'allowedDomains': [], 'dailyMessageLimit': 500,
         })

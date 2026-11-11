@@ -34,7 +34,6 @@ import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { SelectModule } from 'primeng/select';
 import { SkeletonModule } from 'primeng/skeleton';
-import { SliderModule } from 'primeng/slider';
 import { TabsModule } from 'primeng/tabs';
 import { TextareaModule } from 'primeng/textarea';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
@@ -128,7 +127,6 @@ function dailyMessageLimitValidator(
     MessageModule,
     SelectModule,
     SkeletonModule,
-    SliderModule,
     TabsModule,
     TextareaModule,
     ToggleSwitchModule,
@@ -167,7 +165,6 @@ export class BotSettingsPage implements HasUnsavedChanges {
     starterQuestions: ['', [starterQuestionsValidator]],
     systemPrompt: ['', [Validators.maxLength(BOT_LIMITS.systemPrompt)]],
     model: [null as string | null],
-    temperature: [0.2],
     widgetColor: ['', [Validators.required, Validators.pattern(HEX_COLOR)]],
     isPublic: [false],
     allowedDomains: ['', [allowedDomainsValidator]],
@@ -180,7 +177,6 @@ export class BotSettingsPage implements HasUnsavedChanges {
     initialValue: this.form.status,
   });
 
-  protected readonly temperature = computed(() => this.formValue().temperature ?? 0);
   protected readonly systemPromptLength = computed(
     () => this.formValue().systemPrompt?.length ?? 0,
   );
@@ -249,8 +245,6 @@ export class BotSettingsPage implements HasUnsavedChanges {
         systemPrompt: value.systemPrompt.trim() || null,
         welcomeMessage: value.welcomeMessage.trim(),
         model: value.model,
-        // The slider works in 0.1 steps; avoid values like 0.30000000000000004.
-        temperature: Math.round(value.temperature * 10) / 10,
         widgetColor: value.widgetColor.toUpperCase(),
         starterQuestions: lines(value.starterQuestions),
         isPublic: value.isPublic,
@@ -343,7 +337,6 @@ export class BotSettingsPage implements HasUnsavedChanges {
       starterQuestions: bot.starterQuestions.join('\n'),
       systemPrompt: bot.systemPrompt ?? '',
       model: bot.model,
-      temperature: bot.temperature,
       widgetColor: bot.widgetColor,
       isPublic: bot.isPublic,
       allowedDomains: bot.allowedDomains.join('\n'),

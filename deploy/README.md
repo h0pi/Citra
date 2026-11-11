@@ -90,7 +90,9 @@ Run this from your own computer, against the live site:
 python demo-data/seed.py --api https://<your-address> --email owner@northwind-outdoor.example --password '<a strong password>'
 ```
 
-Then set `DEMO_TENANT_SLUG=northwind-outdoor` in `.env` on the VM, and restart:
+Register your own account on the live site too. Then, in `.env` on the VM, set
+`DEMO_TENANT_SLUG=northwind-outdoor` and **`REGISTRATION_ENABLED=false`**, and restart. With sign-up closed, strangers
+cannot create companies and spend your AI budget. Visitors use "Try the demo", and existing accounts keep logging in:
 
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d

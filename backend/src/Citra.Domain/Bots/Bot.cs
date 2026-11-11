@@ -33,11 +33,8 @@ public sealed class Bot : Entity, ITenantOwned
 
     public string WelcomeMessage { get; private set; } = DefaultWelcomeMessage;
 
-    /// <summary>Optional per-bot model override (e.g. "claude-haiku-4-5"); null = app default.</summary>
+    /// <summary>Optional per-bot model override (e.g. "claude-haiku-5-5"); null = app default.</summary>
     public string? Model { get; private set; }
-
-    /// <summary>0 = focused and consistent, 1 = more creative. Low values suit document Q&amp;A.</summary>
-    public double Temperature { get; private set; } = 0.2;
 
     /// <summary>Whether the public website widget may use this bot.</summary>
     public bool IsPublic { get; private set; }
@@ -95,13 +92,9 @@ public sealed class Bot : Entity, ITenantOwned
         Slug = Common.Slug.From(slug);
     }
 
-    public void ConfigureModel(string? model, double temperature)
+    public void ConfigureModel(string? model)
     {
-        ArgumentOutOfRangeException.ThrowIfNegative(temperature);
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(temperature, 1.0);
-
         Model = NullIfEmpty(model);
-        Temperature = temperature;
     }
 
     public void ChangeWidgetColor(string widgetColor)

@@ -23,9 +23,6 @@ public sealed record ChatRequest(string SystemPrompt, IReadOnlyList<ChatMessage>
     /// <summary>The model to use; null = <see cref="IChatModel.DefaultModel"/>.</summary>
     public string? Model { get; init; }
 
-    /// <summary>0 = focused and repeatable, 1 = creative. Answers from documents want it low.</summary>
-    public double Temperature { get; init; } = 0.2;
-
     /// <summary>Longest answer allowed, in tokens; null = the configured maximum.</summary>
     public int? MaxOutputTokens { get; init; }
 
@@ -44,8 +41,6 @@ public sealed record ChatRequest(string SystemPrompt, IReadOnlyList<ChatMessage>
             throw new ArgumentException("Messages must not be empty.", nameof(Messages));
         }
 
-        ArgumentOutOfRangeException.ThrowIfLessThan(Temperature, 0, nameof(Temperature));
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(Temperature, 1, nameof(Temperature));
         if (MaxOutputTokens is < 1)
         {
             throw new ArgumentOutOfRangeException(nameof(MaxOutputTokens), "Must be at least 1.");
