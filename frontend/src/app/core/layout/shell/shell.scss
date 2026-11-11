@@ -1,11 +1,11 @@
 :host {
   display: block;
-  height: 100%;
 }
 
+// At least the window's height, and taller with the page: the sticky sidebar stays in view only while its
+// parent goes on (a parent fixed to the window's height let it scroll away with long pages).
 .shell {
   display: flex;
-  height: 100%;
   min-height: 100vh;
 }
 
