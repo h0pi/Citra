@@ -1,0 +1,51 @@
+# Additions for the server (see deploy/README.md):
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+# - Caddy serves the app on ports 80/443 with an automatic HTTPS certificate for CITRA_DOMAIN;
+#   the app itself is no longer published on a port of its own.
+# - A nightly database backup into ./backups, keeping the last 7 days.
+services:
+  web:
+    ports: !reset []
+
+  caddy:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      CITRA_DOMAIN: ${CITRA_DOMAIN:?Set CITRA_DOMAIN in .env}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data # certificates: kept, so a restart doesn't ask Let's Encrypt again
+      - caddy-config:/config
+    depends_on:
+      - web
+
+  backup:
+    image: pgvector/pgvector:pg17 # same PostgreSQL version as the database, so pg_dump matches
+    restart: unless-stopped
+    environment:
+      PGHOST: db
+      PGUSER: citra
+      PGDATABASE: citra
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./backups:/backups
+    # One dump a day (citra-YYYY-MM-DD.dump), dumps older than 7 days removed. Restore: see deploy/README.md.
+    entrypoint:
+      - sh
+      - -c
+      - >-
+        while true; do
+        pg_dump --format=custom --file=/backups/citra-$$(date +%F).dump &&
+        find /backups -name 'citra-*.dump' -mtime +7 -delete;
+        sleep 86400;
+        done
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  caddy-data:
+  caddy-config:

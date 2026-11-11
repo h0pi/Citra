@@ -1,0 +1,5 @@
+# Only sources go into the image build.
+node_modules/
+dist/
+.angular/
+coverage/

@@ -1,0 +1,7 @@
+# HTTPS in front of the app (docker-compose.prod.yml). Caddy gets and renews the Let's Encrypt certificate for
+# CITRA_DOMAIN by itself, sends http:// visitors to https://, and tells nginx (X-Forwarded-Proto) that the visit was
+# HTTPS. Streamed chat answers are passed on as they arrive.
+{$CITRA_DOMAIN} {
+	encode gzip
+	reverse_proxy web:8080
+}

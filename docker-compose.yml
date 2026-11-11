@@ -1,0 +1,70 @@
+# The whole of Citra in one command:  docker compose up --build   →  http://localhost:8080
+# Secrets come from a .env file next to this one (copy .env.example); none are built into the images.
+# For development with live reload use docker-compose.dev.yml (database only) instead.
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: citra
+      POSTGRES_USER: citra
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./deploy/db-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U citra -d citra"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: src/Citra.Api/Dockerfile
+    restart: unless-stopped
+    environment: &backend
+      # No Kerberos (GSS) encryption: not used, and its library is not in the slim images.
+      ConnectionStrings__Database: Host=db;Port=5432;Database=citra;Username=citra;Password=${POSTGRES_PASSWORD};Gss Encryption Mode=Disable
+      Voyage__ApiKey: ${VOYAGE_API_KEY:-}
+      Anthropic__ApiKey: ${ANTHROPIC_API_KEY:-}
+      Chat__Provider: ${CHAT_PROVIDER:-Extractive}
+      Demo__TenantSlug: ${DEMO_TENANT_SLUG:-}
+      Jwt__SigningKey: ${JWT_SIGNING_KEY:?Set JWT_SIGNING_KEY in .env}
+      # The only API: it brings the database schema up to date when it starts.
+      Database__MigrateOnStartup: "true"
+      # Requests arrive through nginx: trust its X-Forwarded-For/-Proto, so rate limits see the visitor's address
+      # and HTTPS (HSTS) is recognised behind the host's proxy.
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+    volumes:
+      - storage:/data/storage
+    depends_on:
+      db:
+        condition: service_healthy
+
+  worker:
+    build:
+      context: ./backend
+      dockerfile: src/Citra.Worker/Dockerfile
+    restart: unless-stopped
+    environment: *backend
+    volumes:
+      - storage:/data/storage
+    depends_on:
+      db:
+        condition: service_healthy
+      api:
+        condition: service_started
+
+  web:
+    build: ./frontend
+    restart: unless-stopped
+    ports:
+      - "${CITRA_PORT:-8080}:8080"
+    depends_on:
+      - api
+
+volumes:
+  db-data:
+  # Uploaded files, shared by the API (stores them) and the Worker (reads them).
+  storage:

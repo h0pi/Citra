@@ -92,9 +92,10 @@ try
 
     var app = builder.Build();
 
-    // Development only: bring the local database schema up to date on startup.
+    // Bring the database schema up to date on startup: always in Development, elsewhere only when the deployment
+    // asks for it (Database:MigrateOnStartup, set by docker-compose.yml for its single API).
     // (Only the API does this — the Worker never migrates, so the two can't race.)
-    if (app.Environment.IsDevelopment())
+    if (app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("Database:MigrateOnStartup"))
     {
         await app.Services.ApplyDatabaseMigrationsAsync();
     }

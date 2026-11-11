@@ -1,0 +1,7 @@
+# Only sources go into the image build: no build output, local files or tests.
+**/bin/
+**/obj/
+**/*.user
+TestResults/
+storage/
+tests/
