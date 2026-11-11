@@ -101,7 +101,9 @@ public static class UrlSafety
                 || address.IsIPv6Multicast                      // ff00::/8
                 || (b[0] & 0xFE) == 0xFC                        // fc00::/7 unique local (private)
                 || (b[0] == 0x00 && b[1] == 0x64 && b[2] == 0xFF && b[3] == 0x9B) // 64:ff9b::/96 NAT64 → IPv4
-                || (b[0] == 0x20 && b[1] == 0x02));             // 2002::/16 6to4 (embeds an IPv4)
+                || (b[0] == 0x20 && b[1] == 0x02)               // 2002::/16 6to4 (embeds an IPv4)
+                || (b[0] == 0x20 && b[1] == 0x01 && b[2] == 0x00 && b[3] == 0x00) // 2001::/32 Teredo (embeds an IPv4)
+                || b[..12].All(x => x == 0));                   // ::/96 IPv4-compatible (::127.0.0.1), deprecated
         }
 
         return false;

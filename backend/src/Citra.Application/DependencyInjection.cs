@@ -4,6 +4,7 @@ using Citra.Application.Common.Chunking;
 using Citra.Application.Common.Retrieval;
 using Citra.Application.Features.Auth;
 using Citra.Application.Features.Auth.Demo;
+using Citra.Application.Features.Chat.Conversations;
 using Citra.Application.Features.Documents.Processing;
 using Citra.Application.Features.Evaluation.Runs;
 using FluentValidation;
@@ -55,6 +56,7 @@ public static class DependencyInjection
 
         // The nightly clean-up of the public demo (run by the Worker).
         services.AddScoped<IDemoReset, DemoReset>();
+        services.AddScoped<IConversationCleanup, ConversationCleanup>();
 
         return services;
     }

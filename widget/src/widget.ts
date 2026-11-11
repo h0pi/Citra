@@ -1,3 +1,5 @@
+import { renderMarkdown } from './markdown';
+
 // Citra website widget: embedded with <script src="https://api.example.com/widget.js" data-bot="company/bot"></script>.
 
 interface BotConfig {
@@ -44,6 +46,14 @@ const STYLE = `
   .messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
   .message { max-width: 85%; padding: 8px 12px; border-radius: 12px; background: #f3f4f6; white-space: pre-wrap; }
   .message.user { align-self: flex-end; background: var(--color); color: #fff; }
+  .message.answer { white-space: normal; }
+  .message p { margin: 0; }
+  .message p + p, .message p + ul, .message p + ol, .message ul + p, .message ol + p { margin-top: 6px; }
+  .message ul, .message ol { margin: 4px 0 0; padding-left: 20px; }
+  .message strong { font-weight: 600; }
+  .message em { font-style: italic; }
+  .message code { font-family: ui-monospace, monospace; font-size: 13px; background: rgb(0 0 0 / 6%);
+    padding: 0 3px; border-radius: 4px; }
   .starters { display: flex; flex-wrap: wrap; gap: 6px; }
   .starters button { border: 1px solid var(--color); border-radius: 16px; padding: 4px 10px; background: #fff;
     color: var(--color); cursor: pointer; }
@@ -82,7 +92,7 @@ function showWidget(config: BotConfig): void {
   bubble.setAttribute('aria-label', `Chat with ${config.name}`);
   addMessage(root, config.welcomeMessage);
   for (const message of chat.messages) {
-    addMessage(root, message.text, message.sources).classList.toggle('user', !message.sources);
+    addMessage(root, message.text, message.sources, !!message.sources).classList.toggle('user', !message.sources);
   }
   const starters = document.createElement('div');
   starters.className = 'starters';
@@ -129,10 +139,15 @@ function showWidget(config: BotConfig): void {
   document.body.append(host);
 }
 
-function addMessage(root: ShadowRoot, text: string, sources: Source[] = []): HTMLElement {
+/** A chat bubble; a bot's answer (`isAnswer`) is shown with its Markdown formatting. */
+function addMessage(root: ShadowRoot, text: string, sources: Source[] = [], isAnswer = false): HTMLElement {
   const message = document.createElement('div');
   message.className = 'message';
-  message.textContent = text;
+  if (isAnswer) {
+    showAnswer(message, text);
+  } else {
+    message.textContent = text;
+  }
   message.append(...sources.map(sourceLink));
   const messages = root.querySelector('.messages')!;
   messages.append(message);
@@ -214,10 +229,10 @@ async function streamAnswer(question: string, answer: HTMLElement): Promise<void
       } else if (type === 'citations') {
         sources = data.sources;
       } else if (type === 'token') {
-        answer.textContent = text += data.text;
+        showAnswer(answer, (text += data.text));
       } else if (type === 'done') {
         const cited = sources.filter((s) => data.citedSources.includes(s.number));
-        answer.textContent = data.content;
+        showAnswer(answer, data.content);
         answer.append(...cited.map(sourceLink));
         chat.messages.push({ text: question }, { text: data.content, sources: cited });
         saveChat();
@@ -226,6 +241,12 @@ async function streamAnswer(question: string, answer: HTMLElement): Promise<void
       }
     }
   }
+}
+
+/** Shows (part of) an answer, formatted; called again as more words arrive. */
+function showAnswer(message: HTMLElement, text: string): void {
+  message.classList.add('answer');
+  renderMarkdown(message, text);
 }
 
 /** A small "[1] Handbook.pdf, page 3" link that opens the cited passage. */

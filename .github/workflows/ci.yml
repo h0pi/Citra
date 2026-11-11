@@ -71,3 +71,13 @@ jobs:
       # The API serves the committed widget.js: it must be the build of the committed source.
       - name: Committed widget.js is up to date
         run: git diff --exit-code -- ../backend/src/Citra.Api/wwwroot/widget.js
+
+  docker:
+    name: Docker images (build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      # The images the server runs (docker-compose.yml): they must still build after every change.
+      - run: docker build -f backend/src/Citra.Api/Dockerfile backend
+      - run: docker build -f backend/src/Citra.Worker/Dockerfile backend
+      - run: docker build frontend

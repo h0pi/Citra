@@ -3,8 +3,9 @@
   A fake company website with the Citra widget, for trying the widget the way a customer would use it.
   1. In Citra, open a bot's settings: turn on "Show on websites" and copy the snippet from the Embed tab.
   2. Replace the <script> at the end of this page with that snippet.
-  3. Serve this folder, e.g. `python -m http.server 8080`, and open http://localhost:8080
-     (add "localhost" to the bot's allowed websites if it has a list).
+  3. Serve this folder, e.g. `python -m http.server 8000`, and open http://localhost:8000
+     (add "localhost" to the bot's allowed websites if it has a list). Port 8000, because the Docker version of
+     Citra (docker-compose.yml) uses 8080; its widget is then at http://localhost:8080/widget.js.
 -->
 <html lang="en">
   <head>

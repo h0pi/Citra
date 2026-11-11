@@ -24,6 +24,7 @@ try
     builder.Services.AddHostedService<DocumentProcessingService>();
     builder.Services.AddHostedService<EvalRunService>();
     builder.Services.AddHostedService<DemoResetService>();
+    builder.Services.AddHostedService<ConversationCleanupService>();
 
     var host = builder.Build();
     host.Run();

@@ -7,6 +7,7 @@ using Citra.Application.Common.Retrieval;
 using Citra.Application.Common.Storage;
 using Citra.Application.Features.Auth.Demo;
 using Citra.Application.Features.Auth.Register;
+using Citra.Application.Features.Chat.Conversations;
 using Citra.Application.Features.Documents.Processing;
 using Citra.Application.Features.Evaluation.Runs;
 using Citra.Infrastructure.Chat;
@@ -51,6 +52,8 @@ public static class DependencyInjection
         services.AddValidatedOptions<RegistrationOptions>(configuration, RegistrationOptions.SectionName);
         services.AddSingleton<IRegistrationSettings>(
             provider => provider.GetRequiredService<IOptions<RegistrationOptions>>().Value);
+        services.AddValidatedOptions<RetentionOptions>(configuration, RetentionOptions.SectionName);
+        services.AddSingleton<IRetentionSettings>(provider => provider.GetRequiredService<IOptions<RetentionOptions>>().Value);
         services.AddValidatedOptions<ProcessingOptions>(configuration, ProcessingOptions.SectionName);
         services.AddValidatedOptions<RetrievalOptions>(configuration, RetrievalOptions.SectionName);
 

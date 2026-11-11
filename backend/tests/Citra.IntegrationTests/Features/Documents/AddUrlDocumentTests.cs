@@ -179,6 +179,9 @@ public sealed class AddUrlDocumentTests(DatabaseFixture fixture)
     [InlineData("::1", false)]
     [InlineData("64:ff9b::7f00:1", false)]
     [InlineData("2002:7f00:1::", false)]
+    [InlineData("2001:0:4136:e378:8000:63bf:3fff:fdd2", false)] // Teredo
+    [InlineData("::7f00:1", false)]                           // IPv4-compatible ::127.0.0.1
+    [InlineData("2001:4860:4860::8888", true)]                // a public 2001:4860:: address is not Teredo
     [InlineData("2606:4700:4700::1111", true)]
     public void Knows_which_resolved_addresses_are_public(string ip, bool isPublic) =>
         UrlSafety.IsPublicAddress(IPAddress.Parse(ip)).ShouldBe(isPublic);

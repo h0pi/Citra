@@ -40,6 +40,7 @@ services:
       Chat__Provider: ${CHAT_PROVIDER:-Extractive}
       Demo__TenantSlug: ${DEMO_TENANT_SLUG:-}
       Registration__Enabled: ${REGISTRATION_ENABLED:-true}
+      Retention__ConversationDays: ${CONVERSATION_RETENTION_DAYS:-}
       Jwt__SigningKey: ${JWT_SIGNING_KEY:?Set JWT_SIGNING_KEY in .env}
       # The only API: it brings the database schema up to date when it starts.
       Database__MigrateOnStartup: "true"
