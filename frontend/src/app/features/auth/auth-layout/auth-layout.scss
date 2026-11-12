@@ -53,16 +53,29 @@
     margin-right: var(--citra-space-2);
   }
 
-  // Capped by the screen height so the page fits without scrolling.
+  // Cut to the screen height so the page fits without scrolling; the lower half fades into the page.
+  .preview {
+    position: relative;
+    max-height: 50vh;
+    overflow: hidden;
+    border-radius: var(--citra-radius-lg) var(--citra-radius-lg) 0 0;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 50% 0 0;
+      background: linear-gradient(transparent, var(--citra-bg));
+      backdrop-filter: blur(2px);
+      mask-image: linear-gradient(transparent, #000 60%);
+    }
+  }
+
   img {
     display: block;
-    width: auto;
-    max-width: 100%;
+    width: 100%;
     height: auto;
-    max-height: 50vh;
     border: 1px solid var(--citra-border);
     border-radius: var(--citra-radius-lg);
-    box-shadow: var(--citra-shadow-md);
   }
 }
 
