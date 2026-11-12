@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import {
   AnalyticsPeriod,
+  CitedDocument,
   CompanyConversation,
   CompanyConversationsQuery,
   DashboardStats,
@@ -28,6 +29,10 @@ export class AnalyticsApi {
 
   unansweredQuestions(period: AnalyticsPeriod): Observable<UnansweredQuestion[]> {
     return this.api.get<UnansweredQuestion[]>('/api/analytics/unanswered-questions', { ...period });
+  }
+
+  mostCitedDocuments(period: AnalyticsPeriod): Observable<CitedDocument[]> {
+    return this.api.get<CitedDocument[]>('/api/analytics/most-cited-documents', { ...period });
   }
 
   feedback(period: AnalyticsPeriod): Observable<FeedbackSummary> {

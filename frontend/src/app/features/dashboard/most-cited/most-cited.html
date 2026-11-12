@@ -1,0 +1,21 @@
+<section class="card" aria-labelledby="cited-heading">
+  <div class="header">
+    <h2 id="cited-heading">Most cited</h2>
+    <span class="text-muted">Documents behind the answers</span>
+  </div>
+  @if (documents().length === 0) {
+    <p class="text-muted empty">No answers cited a document in this period.</p>
+  } @else {
+    <ol>
+      @for (doc of documents(); track doc.documentId; let i = $index) {
+        <li>
+          <span class="ref" aria-hidden="true">[{{ i + 1 }}]</span>
+          <span class="name" [title]="doc.name">{{ doc.name }}</span>
+          <span class="count text-muted"
+            >{{ doc.answers }} {{ doc.answers === 1 ? 'answer' : 'answers' }}</span
+          >
+        </li>
+      }
+    </ol>
+  }
+</section>

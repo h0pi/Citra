@@ -11,9 +11,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--citra-space-6) var(--citra-space-4);
-  background:
-    radial-gradient(circle at 20% 10%, var(--citra-primary-soft), transparent 45%),
-    radial-gradient(circle at 85% 90%, var(--citra-primary-soft), transparent 40%), var(--citra-bg);
+  background: var(--citra-bg);
 }
 
 .theme-toggle {
@@ -39,7 +37,6 @@
   h2 {
     font-size: var(--citra-text-2xl);
     line-height: 1.25;
-    letter-spacing: -0.02em;
     margin-bottom: var(--citra-space-3);
   }
 
@@ -81,7 +78,6 @@
   background: var(--citra-surface);
   border: 1px solid var(--citra-border);
   border-radius: var(--citra-radius-lg);
-  box-shadow: var(--citra-shadow-md);
 }
 
 .brand {
@@ -96,9 +92,9 @@
 }
 
 .brand-name {
-  font-size: var(--citra-text-lg);
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-family: var(--citra-font-serif);
+  font-size: var(--citra-text-xl);
+  font-weight: 600;
 }
 
 h1 {

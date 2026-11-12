@@ -1,0 +1,71 @@
+:host {
+  display: block;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--citra-space-3);
+  height: 100%;
+  padding: var(--citra-space-5);
+  background: var(--citra-surface);
+  border: 1px solid var(--citra-border);
+  border-radius: var(--citra-radius-lg);
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--citra-space-2);
+  font-size: var(--citra-text-sm);
+
+  h2 {
+    margin: 0;
+    font-size: var(--citra-text-lg);
+  }
+}
+
+.empty {
+  margin: 0;
+  font-size: var(--citra-text-sm);
+}
+
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--citra-text-sm);
+}
+
+li {
+  display: flex;
+  align-items: baseline;
+  gap: var(--citra-space-2);
+  padding: var(--citra-space-2) 0;
+  border-bottom: 1px solid var(--citra-border);
+
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+// Numbered like the citations in an answer.
+.ref {
+  color: var(--citra-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.count {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}

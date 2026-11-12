@@ -38,6 +38,7 @@
             ],
             "styles": [
               "@fontsource-variable/inter/index.css",
+              "@fontsource-variable/source-serif-4/index.css",
               "primeicons/primeicons.css",
               "src/styles.scss"
             ]

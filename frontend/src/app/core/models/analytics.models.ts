@@ -33,6 +33,13 @@ export interface UnansweredQuestion {
   askedAt: string;
 }
 
+/** GET /api/analytics/most-cited-documents: a document and how many answers cited it. */
+export interface CitedDocument {
+  documentId: string;
+  name: string;
+  answers: number;
+}
+
 /** GET /api/analytics/feedback: how people rated the period's answers. */
 export interface FeedbackSummary {
   positive: number;

@@ -183,7 +183,7 @@ export class BotSettingsPage implements HasUnsavedChanges {
   /** Live widget preview; falls back to the saved color while the typed hex is incomplete. */
   protected readonly previewColor = computed(() => {
     const color = this.formValue().widgetColor ?? '';
-    return HEX_COLOR.test(color) ? color : (this.bot()?.widgetColor ?? '#6366F1');
+    return HEX_COLOR.test(color) ? color : (this.bot()?.widgetColor ?? '#1F5F5B');
   });
   protected readonly dirty = computed(() => {
     this.formValue();
@@ -318,7 +318,7 @@ export class BotSettingsPage implements HasUnsavedChanges {
     const errors = this.form.controls[field].errors ?? {};
     if (errors['server']) return errors['server'] as string;
     if (errors['required']) return 'This field is required.';
-    if (errors['pattern']) return 'Use a hex color like #6366F1.';
+    if (errors['pattern']) return 'Use a hex color like #1F5F5B.';
     if (typeof errors[field] === 'string') return errors[field]; // the field's own validator
     if (errors['maxlength']) {
       return `Use at most ${(errors['maxlength'] as { requiredLength: number }).requiredLength} characters.`;

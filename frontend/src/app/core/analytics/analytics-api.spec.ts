@@ -28,6 +28,12 @@ describe('AnalyticsApi', () => {
     http.expectOne(`${base}/conversations/c1`);
   });
 
+  it('loads the most cited documents', () => {
+    api.mostCitedDocuments({ from: '2026-10-01', to: '2026-10-07', botId: 'b1' }).subscribe();
+
+    http.expectOne(`${base}/most-cited-documents?from=2026-10-01&to=2026-10-07&botId=b1`);
+  });
+
   it('loads the feedback summary', () => {
     api.feedback({ from: '2026-10-01', to: '2026-10-07', botId: null }).subscribe();
 

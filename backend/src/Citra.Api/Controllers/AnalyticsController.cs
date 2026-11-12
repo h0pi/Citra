@@ -44,6 +44,18 @@ public sealed class AnalyticsController(ISender sender) : ControllerBase
         CancellationToken cancellationToken = default) =>
         sender.Send(new GetTopQuestionsQuery(botId, from, to, limit), cancellationToken);
 
+    /// <summary>The documents the period's answers cited most (each answer counted once per document).</summary>
+    [HttpGet("most-cited-documents")]
+    [ProducesResponseType<IReadOnlyList<CitedDocumentDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    public Task<IReadOnlyList<CitedDocumentDto>> GetMostCitedDocuments(
+        [FromQuery] DateOnly from,
+        [FromQuery] DateOnly to,
+        [FromQuery] Guid? botId,
+        [FromQuery] int limit = GetMostCitedDocumentsQuery.DefaultLimit,
+        CancellationToken cancellationToken = default) =>
+        sender.Send(new GetMostCitedDocumentsQuery(botId, from, to, limit), cancellationToken);
+
     /// <summary>Questions of the period the documents could not answer ("knowledge gaps"), newest first.</summary>
     [HttpGet("unanswered-questions")]
     [ProducesResponseType<IReadOnlyList<UnansweredQuestionDto>>(StatusCodes.Status200OK)]

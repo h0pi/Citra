@@ -17,7 +17,7 @@ public sealed class Bot : Entity, ITenantOwned
     public const int MaxAllowedDomains = 20;
 
     public const string DefaultWelcomeMessage = "Hi! Ask me anything about our documentation.";
-    public const string DefaultWidgetColor = "#6366F1";
+    public const string DefaultWidgetColor = "#1F5F5B";
 
     public Guid TenantId { get; private set; }
 
@@ -39,7 +39,7 @@ public sealed class Bot : Entity, ITenantOwned
     /// <summary>Whether the public website widget may use this bot.</summary>
     public bool IsPublic { get; private set; }
 
-    /// <summary>Hex color for the widget bubble and header, e.g. "#6366F1".</summary>
+    /// <summary>Hex color for the widget bubble and header, e.g. "#1F5F5B".</summary>
     public string WidgetColor { get; private set; } = DefaultWidgetColor;
 
     /// <summary>Websites allowed to embed the widget (e.g. "acme.com"). Empty = none.</summary>

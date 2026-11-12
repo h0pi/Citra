@@ -187,7 +187,7 @@ describe('BotSettingsPage', () => {
     expect(update).not.toHaveBeenCalled();
     const errors = [...el.querySelectorAll('.field-error')].map((e) => e.textContent?.trim());
     expect(errors).toContain('This field is required.');
-    expect(errors).toContain('Use a hex color like #6366F1.');
+    expect(errors).toContain('Use a hex color like #1F5F5B.');
   });
 
   it('shows server validation errors under the right field', async () => {

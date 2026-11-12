@@ -1,10 +1,12 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { AnalyticsApi } from '@core/analytics/analytics-api';
 import { CurrentBot } from '@core/bots/current-bot';
 import { AuthService } from '@core/auth/auth.service';
 import {
   AnalyticsPeriod,
+  CitedDocument,
   DashboardStats,
   DayCount,
   FeedbackSummary,
@@ -18,6 +20,7 @@ import { DashboardPage, lastDays } from './dashboard-page';
 import { ConversationsBrowser } from './conversations-browser/conversations-browser';
 import { FeedbackSummaryCard } from './feedback-summary/feedback-summary';
 import { KnowledgeGaps } from './knowledge-gaps/knowledge-gaps';
+import { MostCited } from './most-cited/most-cited';
 import { QuestionsChart } from './questions-chart/questions-chart';
 import { TranscriptDialog } from './transcript-dialog/transcript-dialog';
 
@@ -43,6 +46,8 @@ describe('DashboardPage', () => {
       askedAt: '2026-10-10T09:00:00Z',
     },
   ];
+  const citedCall = vi.fn<(period: AnalyticsPeriod) => Observable<CitedDocument[]>>();
+  const cited: CitedDocument[] = [{ documentId: 'd1', name: 'Returns.pdf', answers: 4 }];
   const canEdit = signal(true);
   const feedbackCall = vi.fn<(period: AnalyticsPeriod) => Observable<FeedbackSummary>>();
   const feedback: FeedbackSummary = { positive: 2, negative: 1, badAnswers: [] };
@@ -53,10 +58,12 @@ describe('DashboardPage', () => {
     perDayCall.mockReturnValue(of(days));
     gapsCall.mockReturnValue(of(gaps));
     feedbackCall.mockReturnValue(of(feedback));
+    citedCall.mockReturnValue(of(cited));
     canEdit.set(true);
     TestBed.configureTestingModule({
       imports: [DashboardPage],
       providers: [
+        provideRouter([]),
         {
           provide: AnalyticsApi,
           useValue: {
@@ -64,6 +71,7 @@ describe('DashboardPage', () => {
             messagesPerDay: perDayCall,
             unansweredQuestions: gapsCall,
             feedback: feedbackCall,
+            mostCitedDocuments: citedCall,
             conversations: () =>
               of({ items: [], page: 1, pageSize: 20, totalCount: 0, totalPages: 0 }),
             conversation: () => of(),
@@ -86,23 +94,59 @@ describe('DashboardPage', () => {
     return { fixture, el: fixture.nativeElement as HTMLElement };
   }
 
-  const cards = (el: HTMLElement) =>
-    [...el.querySelectorAll('.kpi')].map((k) => [
-      k.querySelector('.label')?.textContent?.trim(),
-      k.querySelector('.value')?.textContent?.trim(),
+  const headline = (el: HTMLElement) =>
+    el.querySelector('.headline')?.textContent?.replace(/\s+/g, ' ').trim();
+  const figures = (el: HTMLElement) =>
+    [...el.querySelectorAll('.figure')].map((f) => [
+      f.querySelector('dt')?.textContent?.trim(),
+      f.querySelector('dd')?.textContent?.trim(),
     ]);
 
-  it('shows the headline numbers of the last 30 days for all bots', async () => {
+  it('sums up the last 30 days of all bots in a sentence and a row of numbers', async () => {
     const { el } = await render();
 
     expect(statsCall).toHaveBeenCalledWith({ ...lastDays(30), botId: null });
-    expect(cards(el)).toEqual([
+    expect(headline(el)).toBe('Your bots answered 4,968 of 5,678 questions (87.5%) for $0.0351.');
+    expect(figures(el)).toEqual([
       ['Chats', '1,234'],
-      ['Questions', '5,678'],
-      ['Answered', '87.5%'],
       ['Avg. answer time', '2.3 s'],
-      ['AI cost', '$0.0351'],
+      ['Cost per question', '$0.00'],
     ]);
+  });
+
+  it('names the chosen bot in the summary', async () => {
+    const { fixture, el } = await render();
+
+    (fixture.componentInstance as unknown as { botId: { set(v: string): void } }).botId.set('b1');
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(headline(el)).toMatch(/^Support answered/);
+  });
+
+  it('shows where to start instead of empty numbers and a flat chart', async () => {
+    statsCall.mockReturnValue(of({ ...stats, conversations: 0, questions: 0, answeredPercent: 0 }));
+    const { fixture, el } = await render();
+
+    expect(headline(el)).toBe('No questions in this period yet.');
+    expect(el.querySelector('a[href="/chat"]')).not.toBeNull();
+    expect(figures(el)).toEqual([]);
+    expect(fixture.debugElement.query(By.directive(QuestionsChart))).toBeNull();
+    expect(fixture.debugElement.query(By.directive(MostCited))).toBeNull();
+  });
+
+  it('shows the most cited documents next to the chart, with their own retry', async () => {
+    citedCall.mockReturnValueOnce(throwError(() => new Error('offline')));
+    const { fixture, el } = await render();
+
+    expect(el.textContent).toContain("Couldn't load the most cited documents.");
+    el.querySelector<HTMLButtonElement>('.load-error button')!.click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const list = fixture.debugElement.query(By.directive(MostCited));
+    expect((list.componentInstance as MostCited).documents()).toEqual(cited);
   });
 
   it('loads again for another period or bot', async () => {
@@ -121,6 +165,7 @@ describe('DashboardPage', () => {
     expect(perDayCall).toHaveBeenLastCalledWith({ ...lastDays(7), botId: 'b1' });
     expect(gapsCall).toHaveBeenLastCalledWith({ ...lastDays(7), botId: 'b1' });
     expect(feedbackCall).toHaveBeenLastCalledWith({ ...lastDays(7), botId: 'b1' });
+    expect(citedCall).toHaveBeenLastCalledWith({ ...lastDays(7), botId: 'b1' });
   });
 
   it('offers a retry when loading fails', async () => {
@@ -133,7 +178,7 @@ describe('DashboardPage', () => {
     fixture.detectChanges();
 
     expect(statsCall).toHaveBeenCalledTimes(2);
-    expect(cards(el)[0]).toEqual(['Chats', '1,234']);
+    expect(figures(el)[0]).toEqual(['Chats', '1,234']);
   });
 
   it('shows questions per day in a chart, with its own retry', async () => {

@@ -37,7 +37,7 @@ BOTS = {
         'systemPrompt': 'You help Northwind Outdoor employees with HR questions. Answer briefly and name the '
                         'policy the answer comes from.',
         'welcomeMessage': 'Hi! Ask me about leave, travel expenses, benefits or company rules.',
-        'widgetColor': '#6366F1',
+        'widgetColor': '#1F5F5B',
         'starterQuestions': ['How many days of annual leave do I get?', 'Can I work from home?',
                              'What is the daily allowance for business trips?'],
         'isPublic': False,

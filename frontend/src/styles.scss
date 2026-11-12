@@ -6,6 +6,8 @@
 :root {
   // Typography
   --citra-font: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  // Headings in a serif (the "paper" voice); everything else stays in the sans.
+  --citra-font-serif: 'Source Serif 4 Variable', Georgia, 'Times New Roman', serif;
   --citra-font-mono: ui-monospace, 'Cascadia Code', 'Consolas', monospace;
   --citra-text-xs: 0.75rem;
   --citra-text-sm: 0.875rem;
@@ -25,11 +27,12 @@
   --citra-space-8: 4rem;
 
   // Shape & depth
-  --citra-radius-sm: 6px;
-  --citra-radius-md: 10px;
-  --citra-radius-lg: 16px;
-  --citra-shadow-sm: 0 1px 2px rgb(15 23 42 / 0.06), 0 1px 3px rgb(15 23 42 / 0.08);
-  --citra-shadow-md: 0 4px 12px rgb(15 23 42 / 0.08);
+  // Flat paper: small radii, hairline borders, barely-there shadows.
+  --citra-radius-sm: 4px;
+  --citra-radius-md: 6px;
+  --citra-radius-lg: 8px;
+  --citra-shadow-sm: 0 1px 2px rgb(31 30 27 / 0.04);
+  --citra-shadow-md: 0 4px 12px rgb(31 30 27 / 0.08);
 
   // Layout
   --citra-sidebar-width: 260px;
@@ -45,6 +48,9 @@
   --citra-text-muted: var(--p-surface-500);
   --citra-primary: var(--p-primary-600);
   --citra-primary-soft: var(--p-primary-50);
+  // Sidebar: a slightly darker sheet of paper; the current page sits on a lighter one.
+  --citra-sidebar-bg: var(--p-surface-100);
+  --citra-nav-active: var(--citra-surface);
 
   color-scheme: light;
 }
@@ -59,7 +65,9 @@
   --citra-text-muted: var(--p-surface-400);
   --citra-primary: var(--p-primary-400);
   --citra-primary-soft: color-mix(in srgb, var(--p-primary-400) 15%, transparent);
-  --citra-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --citra-sidebar-bg: var(--p-surface-950);
+  --citra-nav-active: var(--p-surface-800);
+  --citra-shadow-sm: none;
   --citra-shadow-md: 0 4px 12px rgb(0 0 0 / 0.5);
 
   color-scheme: dark;
@@ -99,6 +107,13 @@ h4 {
   line-height: 1.25;
   font-weight: 600;
   letter-spacing: -0.01em;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--citra-font-serif);
+  letter-spacing: 0;
 }
 
 h1 {

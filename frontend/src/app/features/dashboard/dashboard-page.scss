@@ -4,37 +4,57 @@
   gap: var(--citra-space-2);
 }
 
-.kpis {
-  margin-bottom: var(--citra-space-4);
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: var(--citra-space-4);
+// The period in one sentence, like the opening line of a report.
+.summary {
+  margin-bottom: var(--citra-space-5);
+
+  .headline {
+    margin: 0 0 var(--citra-space-2);
+    max-width: 48rem;
+    font-family: var(--citra-font-serif);
+    font-size: var(--citra-text-xl);
+    line-height: 1.4;
+
+    strong {
+      font-weight: 600;
+    }
+  }
 }
 
-.kpi {
+// Secondary numbers: one quiet row, separated by hairlines.
+.figures {
   display: flex;
-  flex-direction: column;
-  gap: var(--citra-space-1);
-  min-height: 92px;
-  padding: var(--citra-space-4) var(--citra-space-5);
-  background: var(--citra-surface);
-  border: 1px solid var(--citra-border);
-  border-radius: var(--citra-radius-lg);
-  box-shadow: var(--citra-shadow-sm);
+  flex-wrap: wrap;
+  margin: var(--citra-space-4) 0 0;
+  border-top: 1px solid var(--citra-border);
+}
 
-  .label {
+.figure {
+  padding: var(--citra-space-3) var(--citra-space-6) 0 0;
+  margin-right: var(--citra-space-6);
+
+  dt {
     color: var(--citra-text-muted);
-    font-size: var(--citra-text-sm);
+    font-size: var(--citra-text-xs);
   }
 
-  .value {
-    font-size: var(--citra-text-2xl);
+  dd {
+    margin: 0;
+    font-size: var(--citra-text-lg);
     font-variant-numeric: tabular-nums;
   }
 }
 
-.kpis[aria-busy='true'] .value {
-  opacity: 0.5;
+// The chart and what the answers rely on, side by side on wide screens.
+.activity {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: var(--citra-space-4);
+  margin-bottom: var(--citra-space-4);
+
+  @media (max-width: 1199.98px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 :host ::ng-deep .load-error,
@@ -42,7 +62,6 @@
   margin-bottom: var(--citra-space-4);
 }
 
-app-questions-chart,
 app-knowledge-gaps,
 app-feedback-summary {
   display: block;

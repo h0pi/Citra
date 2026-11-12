@@ -1,4 +1,4 @@
-<app-page-header title="Dashboard" subtitle="Usage, answer quality and costs at a glance.">
+<app-page-header title="Dashboard">
   <div class="filters">
     <p-select
       [options]="botOptions()"
@@ -24,45 +24,67 @@
     Couldn't load the stats.
     <p-button label="Try again" [link]="true" (onClick)="stats.reload()" />
   </p-message>
-} @else {
-  <section class="kpis" aria-label="Headline numbers" [attr.aria-busy]="stats.isLoading()">
-    @let s = stats.value();
-    <div class="kpi">
-      <span class="label">Chats</span>
-      <strong class="value">{{ s ? (s.conversations | number) : '' }}</strong>
-    </div>
-    <div class="kpi">
-      <span class="label">Questions</span>
-      <strong class="value">{{ s ? (s.questions | number) : '' }}</strong>
-    </div>
-    <div class="kpi">
-      <span class="label">Answered</span>
-      <strong class="value">{{ s ? (s.answeredPercent | number: '1.0-1') + '%' : '' }}</strong>
-    </div>
-    <div class="kpi">
-      <span class="label">Avg. answer time</span>
-      <strong class="value">{{
-        s ? (s.averageLatencyMs / 1000 | number: '1.1-1') + ' s' : ''
-      }}</strong>
-    </div>
-    <div class="kpi">
-      <span class="label">AI cost</span>
-      <strong class="value">{{
-        s ? (s.totalCostUsd | currency: 'USD' : 'symbol' : '1.2-4') : ''
-      }}</strong>
-    </div>
-  </section>
-}
+} @else if (stats.value(); as s) {
+  <!-- The period in one sentence, then the secondary numbers in one row. -->
+  @if (s.questions === 0) {
+    <section class="summary" aria-label="Summary">
+      <p class="headline">No questions in this period yet.</p>
+      <p class="text-muted">
+        Ask your bot something in <a routerLink="/chat">Chat</a>, or put it on your website from
+        <a routerLink="/bots">Bots</a>. Numbers, charts and the most cited documents show up here.
+      </p>
+    </section>
+  } @else {
+    <section class="summary" aria-label="Summary">
+      <p class="headline">
+        {{ subject() }} answered
+        <strong>{{ answered(s) | number }} of {{ s.questions | number }}</strong> questions ({{
+          s.answeredPercent | number: '1.0-1'
+        }}%) for <strong>{{ s.totalCostUsd | currency: 'USD' : 'symbol' : '1.2-4' }}</strong
+        >.
+      </p>
+      <dl class="figures" [attr.aria-busy]="stats.isLoading()">
+        <div class="figure">
+          <dt>Chats</dt>
+          <dd>{{ s.conversations | number }}</dd>
+        </div>
+        <div class="figure">
+          <dt>Avg. answer time</dt>
+          <dd>{{ s.averageLatencyMs / 1000 | number: '1.1-1' }} s</dd>
+        </div>
+        <div class="figure">
+          <dt>Cost per question</dt>
+          <dd>{{ s.totalCostUsd / s.questions | currency: 'USD' : 'symbol' : '1.2-4' }}</dd>
+        </div>
+      </dl>
+    </section>
 
-@if (perDay.error()) {
-  <p-message severity="error" styleClass="load-error">
-    Couldn't load the chart.
-    <p-button label="Try again" [link]="true" (onClick)="perDay.reload()" />
-  </p-message>
-} @else if (perDay.value(); as days) {
-  <app-questions-chart [days]="days" />
-} @else if (perDay.isLoading()) {
-  <p-skeleton height="10rem" styleClass="load-placeholder" />
+    <div class="activity">
+      @if (perDay.error()) {
+        <p-message severity="error" styleClass="load-error">
+          Couldn't load the chart.
+          <p-button label="Try again" [link]="true" (onClick)="perDay.reload()" />
+        </p-message>
+      } @else if (perDay.value(); as days) {
+        <app-questions-chart [days]="days" />
+      } @else {
+        <p-skeleton height="14rem" />
+      }
+
+      @if (cited.error()) {
+        <p-message severity="error" styleClass="load-error">
+          Couldn't load the most cited documents.
+          <p-button label="Try again" [link]="true" (onClick)="cited.reload()" />
+        </p-message>
+      } @else if (cited.value(); as documents) {
+        <app-most-cited [documents]="documents" />
+      } @else {
+        <p-skeleton height="14rem" />
+      }
+    </div>
+  }
+} @else if (stats.isLoading()) {
+  <p-skeleton height="6rem" styleClass="load-placeholder" />
 }
 
 @if (gaps.error()) {

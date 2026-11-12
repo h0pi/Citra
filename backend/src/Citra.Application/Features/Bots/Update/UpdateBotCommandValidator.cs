@@ -23,7 +23,7 @@ internal sealed class UpdateBotCommandValidator : AbstractValidator<UpdateBotCom
             .Cascade(CascadeMode.Stop)
             .NotEmpty()
             .Matches("^#[0-9A-Fa-f]{6}$")
-            .WithMessage("Widget color must be a hex color like #6366F1.");
+            .WithMessage("Widget color must be a hex color like #1F5F5B.");
 
         RuleFor(x => x.StarterQuestions)
             .NotNull()

@@ -2,10 +2,11 @@ import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { AnalyticsApi } from '@core/analytics/analytics-api';
 import { AuthService } from '@core/auth/auth.service';
 import { CurrentBot } from '@core/bots/current-bot';
-import { AnalyticsPeriod } from '@core/models/analytics.models';
+import { AnalyticsPeriod, DashboardStats } from '@core/models/analytics.models';
 import { PageHeader } from '@shared/components/page-header/page-header';
 import { ButtonModule } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
@@ -15,6 +16,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { ConversationsBrowser } from './conversations-browser/conversations-browser';
 import { FeedbackSummaryCard } from './feedback-summary/feedback-summary';
 import { KnowledgeGaps } from './knowledge-gaps/knowledge-gaps';
+import { MostCited } from './most-cited/most-cited';
 import { QuestionsChart } from './questions-chart/questions-chart';
 import { TranscriptDialog } from './transcript-dialog/transcript-dialog';
 
@@ -41,8 +43,10 @@ export function lastDays(days: number, now = new Date()): { from: string; to: st
     ConversationsBrowser,
     FeedbackSummaryCard,
     KnowledgeGaps,
+    MostCited,
     PageHeader,
     QuestionsChart,
+    RouterLink,
     TranscriptDialog,
     ButtonModule,
     MessageModule,
@@ -70,6 +74,11 @@ export class DashboardPage {
     ...this.currentBot.bots().map((b) => ({ label: b.name, value: b.id as string | null })),
   ]);
 
+  /** Who answered, for the summary sentence: the chosen bot, or all of them. */
+  protected readonly subject = computed(
+    () => this.currentBot.bots().find((b) => b.id === this.botId())?.name ?? 'Your bots',
+  );
+
   private readonly period = computed<AnalyticsPeriod>(() => ({
     ...lastDays(this.days()),
     botId: this.botId(),
@@ -85,6 +94,11 @@ export class DashboardPage {
     stream: ({ params }) => this.analyticsApi.messagesPerDay(params),
   });
 
+  protected readonly cited = rxResource({
+    params: () => this.period(),
+    stream: ({ params }) => this.analyticsApi.mostCitedDocuments(params),
+  });
+
   protected readonly gaps = rxResource({
     params: () => this.period(),
     stream: ({ params }) => this.analyticsApi.unansweredQuestions(params),
@@ -94,4 +108,9 @@ export class DashboardPage {
     params: () => this.period(),
     stream: ({ params }) => this.analyticsApi.feedback(params),
   });
+
+  /** How many of the period's questions were answered from the documents. */
+  protected answered(stats: DashboardStats): number {
+    return Math.round((stats.questions * stats.answeredPercent) / 100);
+  }
 }

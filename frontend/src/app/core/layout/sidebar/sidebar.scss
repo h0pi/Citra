@@ -7,7 +7,7 @@
   flex-direction: column;
   height: 100%;
   padding: var(--citra-space-4) var(--citra-space-3);
-  background: var(--citra-surface);
+  background: var(--citra-sidebar-bg);
   border-right: 1px solid var(--citra-border);
 }
 
@@ -31,9 +31,9 @@
 }
 
 .brand-name {
-  font-size: var(--citra-text-lg);
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-family: var(--citra-font-serif);
+  font-size: var(--citra-text-xl);
+  font-weight: 600;
 }
 
 .nav {
@@ -80,15 +80,20 @@
   }
 
   &:hover {
-    background: var(--citra-surface-hover);
+    background: var(--citra-nav-active);
     color: var(--citra-text);
     text-decoration: none;
   }
 
+  // The current page: a lighter sheet with a hairline edge; teal only on its icon.
   &.active {
-    background: var(--citra-primary-soft);
-    color: var(--citra-primary);
-    font-weight: 600;
+    background: var(--citra-nav-active);
+    box-shadow: inset 0 0 0 1px var(--citra-border);
+    color: var(--citra-text);
+
+    i {
+      color: var(--citra-primary);
+    }
   }
 }
 
