@@ -53,10 +53,13 @@
     margin-right: var(--citra-space-2);
   }
 
+  // Capped by the screen height so the page fits without scrolling.
   img {
     display: block;
-    width: 100%;
+    width: auto;
+    max-width: 100%;
     height: auto;
+    max-height: 50vh;
     border: 1px solid var(--citra-border);
     border-radius: var(--citra-radius-lg);
     box-shadow: var(--citra-shadow-md);
