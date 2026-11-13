@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 600" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="13" fill="#1f1e1b">
+  <title>Citra architecture</title>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 10 5 0 10z" fill="#6f6a5e"/>
+    </marker>
+    <style>
+      .box { fill: #ffffff; stroke: #cfc9b9; }
+      .own { fill: #eff7f6; stroke: #1f5f5b; }
+      .ext { fill: #faf8f3; stroke: #a8a293; stroke-dasharray: 5 4; }
+      .name { font-family: Georgia, 'Times New Roman', serif; font-size: 16px; font-weight: 600; }
+      .sub { fill: #5d5a52; font-size: 12px; }
+      .line { fill: none; stroke: #6f6a5e; stroke-width: 1.3; marker-end: url(#arrow); }
+      .both { marker-start: url(#arrow); }
+      .label { fill: #5d5a52; font-size: 11.5px; }
+      .group { fill: #6f6a5e; font-size: 11px; letter-spacing: 0.08em; }
+    </style>
+  </defs>
+  <rect width="1120" height="600" fill="#faf8f3"/>
+
+  <text class="group" x="40" y="48">USERS</text>
+  <text class="group" x="320" y="48">YOUR SERVER (DOCKER COMPOSE)</text>
+  <text class="group" x="910" y="48">EXTERNAL AI SERVICES</text>
+  <rect x="300" y="60" width="570" height="510" rx="8" fill="#f2efe7" stroke="#e3dfd3"/>
+
+  <!-- Users -->
+  <rect class="box" x="40" y="130" width="200" height="74" rx="6"/>
+  <text class="name" x="56" y="160">Admin app</text>
+  <text class="sub" x="56" y="182">Angular 21 · in the browser</text>
+
+  <rect class="box" x="40" y="250" width="200" height="74" rx="6"/>
+  <text class="name" x="56" y="280">Website widget</text>
+  <text class="sub" x="56" y="302">widget.js on a customer's site</text>
+
+  <!-- Reverse proxy -->
+  <rect class="box" x="325" y="190" width="170" height="74" rx="6"/>
+  <text class="name" x="341" y="220">Caddy + nginx</text>
+  <text class="sub" x="341" y="242">HTTPS · static files</text>
+
+  <!-- API -->
+  <rect class="own" x="580" y="190" width="240" height="74" rx="6"/>
+  <text class="name" x="596" y="220">API</text>
+  <text class="sub" x="596" y="242">ASP.NET Core 10 · CQRS (MediatR)</text>
+
+  <!-- Data -->
+  <rect class="box" x="490" y="350" width="200" height="74" rx="6"/>
+  <text class="name" x="506" y="380">PostgreSQL 17</text>
+  <text class="sub" x="506" y="402">pgvector · full-text · job queue</text>
+
+  <rect class="box" x="710" y="350" width="140" height="74" rx="6"/>
+  <text class="name" x="726" y="380">File storage</text>
+  <text class="sub" x="726" y="402">uploaded files</text>
+
+  <!-- Worker -->
+  <rect class="own" x="580" y="480" width="240" height="74" rx="6"/>
+  <text class="name" x="596" y="510">Worker</text>
+  <text class="sub" x="596" y="532">extract · chunk · embed documents</text>
+
+  <!-- External -->
+  <rect class="ext" x="910" y="90" width="180" height="74" rx="6"/>
+  <text class="name" x="926" y="120">Claude</text>
+  <text class="sub" x="926" y="142">writes the cited answer</text>
+
+  <rect class="ext" x="910" y="350" width="180" height="74" rx="6"/>
+  <text class="name" x="926" y="380">Voyage AI</text>
+  <text class="sub" x="926" y="402">embeddings (voyage-4)</text>
+
+  <!-- Users to proxy -->
+  <path class="line" d="M240 167H282V215H325"/>
+  <path class="line" d="M240 287H282V239H325"/>
+  <text class="label" x="252" y="232">HTTPS</text>
+
+  <!-- Proxy to API -->
+  <path class="line" d="M495 227H580"/>
+  <text class="label" x="506" y="182">REST · SSE · SignalR</text>
+
+  <!-- API to data -->
+  <path class="line both" d="M620 264V350"/>
+  <text class="label" x="508" y="312">hybrid search, data</text>
+  <path class="line both" d="M765 264V350"/>
+
+  <!-- Worker to data -->
+  <path class="line both" d="M620 480V424"/>
+  <text class="label" x="508" y="457">jobs, chunks, vectors</text>
+  <path class="line" d="M765 424V480"/>
+
+  <!-- API to Claude -->
+  <path class="line" d="M820 212H880V127H910"/>
+  <text class="label" x="888" y="190">question + sources</text>
+
+  <!-- API and Worker to Voyage -->
+  <path class="line" d="M820 242H1000V350"/>
+  <text class="label" x="1008" y="300">embed question</text>
+  <path class="line" d="M820 517H1000V424"/>
+  <text class="label" x="1008" y="476">embed chunks</text>
+</svg>

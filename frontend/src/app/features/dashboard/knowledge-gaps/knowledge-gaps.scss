@@ -50,7 +50,8 @@ th {
   width: 100%;
 }
 
-.asked {
+.asked,
+td:last-child {
   white-space: nowrap;
 }
 

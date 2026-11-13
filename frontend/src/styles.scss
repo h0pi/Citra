@@ -194,3 +194,8 @@ pre {
   color: var(--p-red-500);
   font-size: var(--citra-text-xs);
 }
+
+// The cited passage in the PDF viewer: the app's teal instead of the viewer's magenta (its own rules are more specific).
+ngx-extended-pdf-viewer .textLayer .highlight {
+  background-color: rgb(95 179 169 / 0.4) !important;
+}

@@ -101,6 +101,10 @@
   overflow-wrap: anywhere;
 }
 
+.more {
+  margin-right: var(--citra-space-3);
+}
+
 .more,
 .open-document {
   margin-top: var(--citra-space-2);
