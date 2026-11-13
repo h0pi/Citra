@@ -9,6 +9,8 @@ your website, and you see what was asked, what could not be answered and how acc
 **[Live demo](https://citra-demo.germanywestcentral.cloudapp.azure.com)** — click **Try the demo** to look around
 a sample company, read-only, without an account.
 
+**[Demo video](https://youtu.be/D96oZrMpOEM)** — the whole product in 90 seconds.
+
 ![Asking a question, getting a cited answer and opening the source](docs/images/demo.gif)
 
 ## Features
