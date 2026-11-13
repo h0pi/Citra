@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Citra.IntegrationTests.Features.Evaluation;
 
-/// <summary>C-244: answers graded correct / partly correct / wrong with a reason — the free word judge and an AI judge.</summary>
+/// <summary>Answers graded correct / partly correct / wrong with a reason — the free word judge and an AI judge.</summary>
 [Collection(DatabaseCollection.Name)]
 public sealed class AnswerJudgeTests(DatabaseFixture fixture)
 {

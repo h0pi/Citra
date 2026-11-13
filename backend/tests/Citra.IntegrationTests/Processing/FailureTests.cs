@@ -20,7 +20,7 @@ using Npgsql;
 namespace Citra.IntegrationTests.Processing;
 
 /// <summary>
-/// C-146: a failed attempt is retried (after 30 s, then 2 min) until 3 attempts are used, then the job and its
+/// A failed attempt is retried (after 30 s, then 2 min) until 3 attempts are used, then the job and its
 /// document are Failed with a message for the user; errors another attempt cannot fix fail at once; and what is
 /// not this worker's failure (a lost job, a deleted document, a shutdown) is not recorded as one.
 /// The real runner with a fake clock; runs on the isolated database (the runner takes the oldest due job).

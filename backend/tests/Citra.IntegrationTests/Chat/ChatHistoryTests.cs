@@ -3,7 +3,7 @@ using Citra.Application.Common.Chunking;
 
 namespace Citra.IntegrationTests.Chat;
 
-/// <summary>C-183: how much of a conversation goes with a new question (newest messages first, within limits).</summary>
+/// <summary>How much of a conversation goes with a new question (newest messages first, within limits).</summary>
 public sealed class ChatHistoryTests
 {
     private static readonly ChatMessage Q1 = User("one two"), A1 = Assistant("three four five"),

@@ -14,7 +14,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 namespace Citra.IntegrationTests.Processing;
 
 /// <summary>
-/// C-143: pipeline step 2 — the document is marked Chunking (saved first, together with a web page's new name),
+/// Pipeline step 2 — the document is marked Chunking (saved first, together with a web page's new name),
 /// the cleaned text is split with the real chunker, and every chunk carries what the embedding step needs.
 /// </summary>
 [Collection(DatabaseCollection.Name)]

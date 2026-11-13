@@ -6,7 +6,7 @@ using static Citra.IntegrationTests.Retrieval.SearchData;
 
 namespace Citra.IntegrationTests.Retrieval;
 
-/// <summary>C-164: vector search in PostgreSQL — nearest in meaning first, one bot only, fast index or not.</summary>
+/// <summary>Vector search in PostgreSQL — nearest in meaning first, one bot only, fast index or not.</summary>
 [Collection(DatabaseCollection.Name)]
 public sealed class VectorSearchTests(DatabaseFixture fixture)
 {

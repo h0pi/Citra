@@ -8,7 +8,7 @@ namespace Citra.Infrastructure.Identity;
 
 /// <summary>
 /// Creates signed JWT access tokens (HMAC-SHA256). Short-lived by design (Jwt:AccessTokenMinutes, default 60);
-/// the refresh token (C-074) gets a new one without asking for the password again.
+/// the refresh token gets a new one without asking for the password again.
 /// </summary>
 internal sealed class JwtTokenService(IOptions<JwtOptions> options, TimeProvider timeProvider) : ITokenService
 {

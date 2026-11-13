@@ -15,7 +15,7 @@ using static Citra.IntegrationTests.Chunking.TextChunkerTests;
 namespace Citra.IntegrationTests.Chunking;
 
 /// <summary>
-/// Page numbers and character offsets (C-127): every chunk must point at exactly its passage on the right page,
+/// Page numbers and character offsets: every chunk must point at exactly its passage on the right page,
 /// through the real pipeline (extract → clean → chunk) and after saving to the database.
 /// </summary>
 [Collection(DatabaseCollection.Name)]

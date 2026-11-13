@@ -3,7 +3,7 @@ using Citra.IntegrationTests.Infrastructure;
 
 namespace Citra.IntegrationTests.Features.Public;
 
-/// <summary>C-224: websites load the widget script from the API, and browsers cache it.</summary>
+/// <summary>Websites load the widget script from the API, and browsers cache it.</summary>
 [Collection(DatabaseCollection.Name)]
 public sealed class WidgetScriptTests(DatabaseFixture fixture)
 {

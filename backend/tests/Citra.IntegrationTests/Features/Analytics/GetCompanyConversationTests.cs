@@ -8,7 +8,7 @@ using static Citra.IntegrationTests.Features.Chat.ChatData;
 
 namespace Citra.IntegrationTests.Features.Analytics;
 
-/// <summary>C-236: owners and admins read any chat of the company (e.g. from the knowledge gaps), never another company's.</summary>
+/// <summary>Owners and admins read any chat of the company (e.g. from the knowledge gaps), never another company's.</summary>
 [Collection(DatabaseCollection.Name)]
 public sealed class GetCompanyConversationTests(DatabaseFixture fixture)
 {

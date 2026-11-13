@@ -41,7 +41,7 @@ internal sealed class ChunkConfiguration : IEntityTypeConfiguration<Chunk>
             .HasStorageParameter("m", 16)
             .HasStorageParameter("ef_construction", 64);
 
-        // Full-text (keyword) search, combined with vector search in Phase 12 ("hybrid search").
+        // Full-text (keyword) search, combined with vector search ("hybrid search").
         // A database-only column: PostgreSQL computes it from heading + content on every insert/update.
         // Heading matches weigh more (A) than body matches (B). 'english' = stemming (refunds → refund)
         // and stop words; exact terms (codes, names, numbers) still match in any language.

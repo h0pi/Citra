@@ -3,7 +3,7 @@ using Citra.Application.Common.Retrieval;
 
 namespace Citra.IntegrationTests.Chat;
 
-/// <summary>C-174/C-175: the rules every answer follows, and how the sources and the question are given to the model.</summary>
+/// <summary>The rules every answer follows, and how the sources and the question are given to the model.</summary>
 public sealed class ChatPromptsTests
 {
     [Fact]

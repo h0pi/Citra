@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Citra.IntegrationTests.Chunking;
 
-/// <summary>Token counting (C-124): the chunker relies on every guarantee tested here.</summary>
+/// <summary>Token counting: the chunker relies on every guarantee tested here.</summary>
 public sealed class TokenCounterTests
 {
     // Loading the vocabulary is the slow part; one shared instance, like in production.

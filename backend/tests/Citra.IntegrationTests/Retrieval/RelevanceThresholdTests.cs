@@ -11,7 +11,7 @@ using static Citra.IntegrationTests.Retrieval.SearchData;
 namespace Citra.IntegrationTests.Retrieval;
 
 /// <summary>
-/// C-167: chunks not similar enough in meaning to the question are dropped, however they were found; chunks that
+/// Chunks not similar enough in meaning to the question are dropped, however they were found; chunks that
 /// contain the question's words need less similarity.
 /// </summary>
 [Collection(DatabaseCollection.Name)]

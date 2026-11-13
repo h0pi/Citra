@@ -9,7 +9,7 @@ using static Citra.IntegrationTests.Chat.ChatHistoryTests;
 
 namespace Citra.IntegrationTests.Chat;
 
-/// <summary>C-176: follow-up questions are rewritten into standalone ones (with the cheap model) before searching.</summary>
+/// <summary>Follow-up questions are rewritten into standalone ones (with the cheap model) before searching.</summary>
 public sealed class QueryRewriterTests
 {
     private static CancellationToken Ct => TestContext.Current.CancellationToken;

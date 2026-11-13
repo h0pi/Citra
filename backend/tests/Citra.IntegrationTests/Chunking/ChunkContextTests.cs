@@ -8,7 +8,7 @@ using static Citra.IntegrationTests.Chunking.TextChunkerTests;
 
 namespace Citra.IntegrationTests.Chunking;
 
-/// <summary>Document title and section heading in front of every chunk for embedding (C-129).</summary>
+/// <summary>Document title and section heading in front of every chunk for embedding.</summary>
 public sealed class ChunkContextTests
 {
     private static CancellationToken Ct => TestContext.Current.CancellationToken;

@@ -2,7 +2,7 @@ using Citra.Application.Common.Chat;
 
 namespace Citra.IntegrationTests.Chat;
 
-/// <summary>C-172: requests no model could answer are refused before anything is sent.</summary>
+/// <summary>Requests no model could answer are refused before anything is sent.</summary>
 public sealed class ChatRequestTests
 {
     private static readonly ChatRequest Valid = new(

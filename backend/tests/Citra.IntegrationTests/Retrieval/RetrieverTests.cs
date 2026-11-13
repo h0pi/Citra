@@ -6,7 +6,7 @@ using static Citra.IntegrationTests.Retrieval.SearchData;
 namespace Citra.IntegrationTests.Retrieval;
 
 /// <summary>
-/// C-163/C-166: the retriever embeds the question (the fake embedding service gives each text its own fixed vector,
+/// The retriever embeds the question (the fake embedding service gives each text its own fixed vector,
 /// unrelated to any other) and combines the chunks nearest to it with the chunks sharing its words.
 /// </summary>
 [Collection(DatabaseCollection.Name)]

@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Citra.IntegrationTests.Features.Documents;
 
-/// <summary>C-161: a document's chunks, in reading order and paged, for its company only.</summary>
+/// <summary>A document's chunks, in reading order and paged, for its company only.</summary>
 [Collection(DatabaseCollection.Name)]
 public sealed class GetDocumentChunksTests(DatabaseFixture fixture)
 {

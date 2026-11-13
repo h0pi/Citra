@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 namespace Citra.IntegrationTests.Processing;
 
 /// <summary>
-/// C-140: the Worker's polling loop, driven with a fake job runner (no database): waits the poll interval when
+/// The Worker's polling loop, driven with a fake job runner (no database): waits the poll interval when
 /// idle, runs due jobs back to back, gives every job its own scope, survives errors and stops cleanly.
 /// </summary>
 public sealed class DocumentProcessingServiceTests

@@ -12,7 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Citra.IntegrationTests.Embeddings;
 
 /// <summary>
-/// Retries with backoff (C-136), through the real DI registration (the same resilience pipeline the app uses);
+/// Retries with backoff, through the real DI registration (the same resilience pipeline the app uses);
 /// only the network is replaced by a scripted fake. Waits are shortened to milliseconds via settings.
 /// </summary>
 public sealed class VoyageRetryTests

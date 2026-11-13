@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Hosting;
 namespace Citra.IntegrationTests.Api;
 
 /// <summary>
-/// C-275: sign-up, login, refresh and logout through the real API (validation, error handling, JWT), as the
+/// Sign-up, login, refresh and logout through the real API (validation, error handling, JWT), as the
 /// login and register pages use them.
 /// </summary>
 [Collection(DatabaseCollection.Name)]

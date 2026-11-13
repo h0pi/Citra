@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace Citra.IntegrationTests.Api;
 
-/// <summary>C-268: security headers on every response — data, errors and the widget script.</summary>
+/// <summary>Security headers on every response — data, errors and the widget script.</summary>
 [Collection(DatabaseCollection.Name)]
 public sealed class SecurityHeadersTests(DatabaseFixture fixture)
 {

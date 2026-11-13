@@ -15,7 +15,7 @@ using Microsoft.Extensions.Options;
 
 namespace Citra.IntegrationTests.Chat;
 
-/// <summary>C-172/C-173: which model answers (settings), Claude's retries, and how chat failures reach the browser.</summary>
+/// <summary>Which model answers (settings), Claude's retries, and how chat failures reach the browser.</summary>
 [Collection(DatabaseCollection.Name)]
 public sealed class ChatSetupTests(DatabaseFixture fixture)
 {

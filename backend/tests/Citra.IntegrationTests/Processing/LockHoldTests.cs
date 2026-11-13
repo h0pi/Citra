@@ -17,7 +17,7 @@ using Npgsql;
 namespace Citra.IntegrationTests.Processing;
 
 /// <summary>
-/// C-144: a taken job's lock is renewed while it is processed (every third of the lock duration), so a slow
+/// A taken job's lock is renewed while it is processed (every third of the lock duration), so a slow
 /// document is never taken over by a second worker; and if the job does stop being this worker's, processing is
 /// cancelled instead of finished twice. A fake clock moves time forward instantly.
 /// Runs on the isolated database because the runner takes "the oldest due job" of all.

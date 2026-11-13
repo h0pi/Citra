@@ -17,7 +17,7 @@ public sealed class AddUrlDocumentTests(DatabaseFixture fixture)
     private static CancellationToken Ct => TestContext.Current.CancellationToken;
 
     [Theory]
-    // C-270: a page's title becomes its name, without invisible characters or line breaks.
+    // A page's title becomes its name, without invisible characters or line breaks.
     [InlineData("Returns‮ and\n\n  refunds​", "Returns and refunds")]
     [InlineData("​\u0007 \n", "help.acme.com/returns")] // nothing visible: the address stays the name
     public void A_web_pages_title_is_cleaned_before_it_becomes_the_name(string title, string name)

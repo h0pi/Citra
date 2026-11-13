@@ -19,7 +19,7 @@ public sealed class FileExtractorTests(DatabaseFixture fixture)
     // Stream-based tests never touch storage.
     private static readonly IFileStorage NoStorage = null!;
 
-    // ---------- PDF (C-114, C-115) ----------
+    // ---------- PDF ----------
 
     [Fact]
     public async Task Pdf_text_is_extracted_page_by_page()
@@ -79,7 +79,7 @@ public sealed class FileExtractorTests(DatabaseFixture fixture)
         error.Message.ShouldContain("could not be read");
     }
 
-    // ---------- Word (C-116) ----------
+    // ---------- Word ----------
 
     [Fact]
     public async Task Docx_keeps_headings_lists_and_tables()
@@ -126,7 +126,7 @@ public sealed class FileExtractorTests(DatabaseFixture fixture)
         error.Message.ShouldContain("This Word file could not be read");
     }
 
-    // ---------- Plain text and Markdown (C-117) ----------
+    // ---------- Plain text and Markdown ----------
 
     [Theory]
     [InlineData("utf8")]
@@ -160,7 +160,7 @@ public sealed class FileExtractorTests(DatabaseFixture fixture)
         result.Pages.ShouldHaveSingleItem().Text.ShouldBe(markdown);
     }
 
-    // ---------- Through storage and DI (C-121) ----------
+    // ---------- Through storage and DI ----------
 
     [Theory]
     [InlineData("Handbook.pdf", DocumentSourceType.Pdf, "vacation days")]

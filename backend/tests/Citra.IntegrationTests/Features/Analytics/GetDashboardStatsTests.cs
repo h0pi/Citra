@@ -9,7 +9,7 @@ using static Citra.IntegrationTests.Features.Chat.ChatData;
 
 namespace Citra.IntegrationTests.Features.Analytics;
 
-/// <summary>C-229: the dashboard's headline numbers for a period, per bot or for all bots.</summary>
+/// <summary>The dashboard's headline numbers for a period, per bot or for all bots.</summary>
 [Collection(DatabaseCollection.Name)]
 public sealed class GetDashboardStatsTests(DatabaseFixture fixture)
 {

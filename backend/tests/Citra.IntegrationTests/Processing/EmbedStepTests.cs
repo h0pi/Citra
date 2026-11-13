@@ -15,7 +15,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 namespace Citra.IntegrationTests.Processing;
 
 /// <summary>
-/// C-144: pipeline step 3 — the document is marked Embedding (saved first), every chunk's embedding text is
+/// Pipeline step 3 — the document is marked Embedding (saved first), every chunk's embedding text is
 /// embedded, the cost is recorded, and the chunks are saved with their vectors in one transaction (by the final
 /// step): all or none. The embedding provider is <see cref="FakeEmbeddingService"/> (no network, no cost).
 /// </summary>

@@ -3,7 +3,7 @@ using static Citra.IntegrationTests.Chat.ChatPromptsTests;
 
 namespace Citra.IntegrationTests.Chat;
 
-/// <summary>C-180/C-181: reading an answer's citation markers, and hiding the "not found" marker while streaming.</summary>
+/// <summary>Reading an answer's citation markers, and hiding the "not found" marker while streaming.</summary>
 public sealed class AnswerMarkersTests
 {
     private const string Marker = ChatPrompts.NotFoundMarker;

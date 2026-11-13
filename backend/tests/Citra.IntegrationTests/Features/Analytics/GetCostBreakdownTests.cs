@@ -7,7 +7,7 @@ using static Citra.IntegrationTests.Features.Chat.ChatData;
 
 namespace Citra.IntegrationTests.Features.Analytics;
 
-/// <summary>C-233: AI cost of the period per bot, answers and embeddings apart.</summary>
+/// <summary>AI cost of the period per bot, answers and embeddings apart.</summary>
 [Collection(DatabaseCollection.Name)]
 public sealed class GetCostBreakdownTests(DatabaseFixture fixture)
 {

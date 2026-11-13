@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Citra.IntegrationTests.Embeddings;
 
-/// <summary>Embedding token usage and cost, recorded for the cost dashboard (C-137).</summary>
+/// <summary>Embedding token usage and cost, recorded for the cost dashboard.</summary>
 [Collection(DatabaseCollection.Name)]
 public sealed class EmbeddingUsageTests(DatabaseFixture fixture)
 {

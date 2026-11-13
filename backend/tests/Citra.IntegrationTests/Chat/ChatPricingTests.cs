@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 
 namespace Citra.IntegrationTests.Chat;
 
-/// <summary>C-182: what an answer cost, from the price list in the settings.</summary>
+/// <summary>What an answer cost, from the price list in the settings.</summary>
 public sealed class ChatPricingTests
 {
     [Fact]

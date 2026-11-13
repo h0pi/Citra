@@ -7,7 +7,7 @@ using Citra.Infrastructure.Options;
 
 namespace Citra.IntegrationTests.Chat;
 
-/// <summary>C-172/C-173: the Claude client against a fake Anthropic server (no network, no cost).</summary>
+/// <summary>The Claude client against a fake Anthropic server (no network, no cost).</summary>
 public sealed class ClaudeChatModelTests
 {
     private static CancellationToken Ct => TestContext.Current.CancellationToken;

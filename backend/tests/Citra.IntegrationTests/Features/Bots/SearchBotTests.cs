@@ -15,7 +15,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Citra.IntegrationTests.Features.Bots;
 
-/// <summary>C-169: the search playground's endpoint — what the bot finds for a question, with every score.</summary>
+/// <summary>The search playground's endpoint — what the bot finds for a question, with every score.</summary>
 [Collection(DatabaseCollection.Name)]
 public sealed class SearchBotTests(DatabaseFixture fixture)
 {

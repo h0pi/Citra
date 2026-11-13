@@ -11,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Citra.IntegrationTests.Features.Auth;
 
-/// <summary>C-256/C-257: "Try demo" logs every visitor in as an own read-only demo user, without a password.</summary>
+/// <summary>"Try demo" logs every visitor in as an own read-only demo user, without a password.</summary>
 [Collection(DatabaseCollection.Name)]
 public sealed class DemoLoginTests(DatabaseFixture fixture)
 {

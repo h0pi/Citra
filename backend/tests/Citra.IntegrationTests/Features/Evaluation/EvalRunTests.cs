@@ -15,7 +15,7 @@ using static Citra.IntegrationTests.Features.Chat.ChatData;
 namespace Citra.IntegrationTests.Features.Evaluation;
 
 /// <summary>
-/// C-242–C-245: an eval run is started as pending and the Worker answers every test question like a new chat would
+/// An eval run is started as pending and the Worker answers every test question like a new chat would
 /// (without saving conversations), grades it and saves the results.
 /// </summary>
 [Collection(DatabaseCollection.Name)]

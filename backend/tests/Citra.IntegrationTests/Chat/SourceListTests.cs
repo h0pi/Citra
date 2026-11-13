@@ -3,7 +3,7 @@ using static Citra.IntegrationTests.Chat.ChatPromptsTests;
 
 namespace Citra.IntegrationTests.Chat;
 
-/// <summary>C-175: the numbered sources block (document name, page and section for each passage).</summary>
+/// <summary>The numbered sources block (document name, page and section for each passage).</summary>
 public sealed class SourceListTests
 {
     [Fact]

@@ -3,7 +3,7 @@ using Citra.Domain.Documents;
 
 namespace Citra.IntegrationTests.Embeddings;
 
-/// <summary>The promises every embedding implementation must keep (C-132).</summary>
+/// <summary>The promises every embedding implementation must keep.</summary>
 public sealed class EmbeddingContractTests
 {
     private const int Dimensions = Chunk.EmbeddingDimensions;

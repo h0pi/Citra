@@ -5,7 +5,7 @@ using static Citra.IntegrationTests.Retrieval.SearchData;
 
 namespace Citra.IntegrationTests.Retrieval;
 
-/// <summary>C-165: keyword search with PostgreSQL full-text search — any of the question's words, best first.</summary>
+/// <summary>Keyword search with PostgreSQL full-text search — any of the question's words, best first.</summary>
 [Collection(DatabaseCollection.Name)]
 public sealed class KeywordSearchTests(DatabaseFixture fixture)
 {

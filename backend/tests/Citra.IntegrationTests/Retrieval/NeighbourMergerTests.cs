@@ -2,7 +2,7 @@ using Citra.Application.Common.Retrieval;
 
 namespace Citra.IntegrationTests.Retrieval;
 
-/// <summary>C-168: overlapping neighbour chunks of one page are joined into one passage.</summary>
+/// <summary>Overlapping neighbour chunks of one page are joined into one passage.</summary>
 public sealed class NeighbourMergerTests
 {
     private const string Page =

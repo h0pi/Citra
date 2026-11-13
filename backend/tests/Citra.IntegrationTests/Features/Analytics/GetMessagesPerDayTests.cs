@@ -6,7 +6,7 @@ using static Citra.IntegrationTests.Features.Chat.ChatData;
 
 namespace Citra.IntegrationTests.Features.Analytics;
 
-/// <summary>C-230: questions per day for the dashboard chart.</summary>
+/// <summary>Questions per day for the dashboard chart.</summary>
 [Collection(DatabaseCollection.Name)]
 public sealed class GetMessagesPerDayTests(DatabaseFixture fixture)
 {

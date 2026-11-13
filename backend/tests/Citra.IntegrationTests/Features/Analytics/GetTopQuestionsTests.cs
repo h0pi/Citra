@@ -6,7 +6,7 @@ using static Citra.IntegrationTests.Features.Chat.ChatData;
 
 namespace Citra.IntegrationTests.Features.Analytics;
 
-/// <summary>C-231: the most asked questions, with wordings that differ only in case or punctuation counted together.</summary>
+/// <summary>The most asked questions, with wordings that differ only in case or punctuation counted together.</summary>
 [Collection(DatabaseCollection.Name)]
 public sealed class GetTopQuestionsTests(DatabaseFixture fixture)
 {

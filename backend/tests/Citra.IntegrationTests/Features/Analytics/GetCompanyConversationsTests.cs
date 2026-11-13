@@ -8,7 +8,7 @@ using static Citra.IntegrationTests.Features.Chat.ChatData;
 
 namespace Citra.IntegrationTests.Features.Analytics;
 
-/// <summary>C-238: owners and admins browse all of the company's chats, newest activity first, by bot and channel.</summary>
+/// <summary>Owners and admins browse all of the company's chats, newest activity first, by bot and channel.</summary>
 [Collection(DatabaseCollection.Name)]
 public sealed class GetCompanyConversationsTests(DatabaseFixture fixture)
 {

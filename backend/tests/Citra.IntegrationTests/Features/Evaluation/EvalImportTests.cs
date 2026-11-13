@@ -7,7 +7,7 @@ using static Citra.IntegrationTests.Features.Chat.ChatData;
 
 namespace Citra.IntegrationTests.Features.Evaluation;
 
-/// <summary>C-241: test questions imported from a CSV file, all or nothing, with errors naming the rows.</summary>
+/// <summary>Test questions imported from a CSV file, all or nothing, with errors naming the rows.</summary>
 [Collection(DatabaseCollection.Name)]
 public sealed class EvalImportTests(DatabaseFixture fixture)
 {

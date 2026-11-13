@@ -9,7 +9,7 @@ using Citra.Infrastructure.Extraction;
 namespace Citra.IntegrationTests.Extraction;
 
 /// <summary>
-/// Web pages (C-118) and SSRF protection at download time (C-119). A fake DNS maps test names to addresses;
+/// Web pages and SSRF protection at download time. A fake DNS maps test names to addresses;
 /// connections always go to the local test server, whatever address was chosen, so we can see exactly which
 /// addresses the fetcher agreed to use.
 /// </summary>
@@ -159,7 +159,7 @@ public sealed class WebExtractionTests
         error.Message.ShouldContain("could not be found");
     }
 
-    // ---------- SSRF at download time (C-119) ----------
+    // ---------- SSRF at download time ----------
 
     [Theory]
     [InlineData("http://evil.test/")]

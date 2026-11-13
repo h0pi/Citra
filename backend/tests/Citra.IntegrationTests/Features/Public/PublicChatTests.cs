@@ -11,7 +11,7 @@ using static Citra.IntegrationTests.Features.Chat.ChatData;
 
 namespace Citra.IntegrationTests.Features.Public;
 
-/// <summary>C-212: website visitors chat with a public bot without a login, known only by a visitor id.</summary>
+/// <summary>Website visitors chat with a public bot without a login, known only by a visitor id.</summary>
 [Collection(DatabaseCollection.Name)]
 public sealed class PublicChatTests(DatabaseFixture fixture)
 {

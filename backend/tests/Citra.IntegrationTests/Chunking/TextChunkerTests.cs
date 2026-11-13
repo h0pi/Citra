@@ -5,7 +5,7 @@ using Citra.Infrastructure.Chunking;
 
 namespace Citra.IntegrationTests.Chunking;
 
-/// <summary>The chunker (C-125): structure-aware splitting within size limits, losing no text.</summary>
+/// <summary>The chunker: structure-aware splitting within size limits, losing no text.</summary>
 public sealed class TextChunkerTests
 {
     private static readonly TiktokenTokenCounter Tokens = new();

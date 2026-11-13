@@ -6,7 +6,7 @@ using Citra.Infrastructure.Chunking;
 namespace Citra.IntegrationTests.Chunking;
 
 /// <summary>
-/// C-130: every rule of chunking, checked together on 300 generated documents of every shape (headings, lists,
+/// Every rule of chunking, checked together on 300 generated documents of every shape (headings, lists,
 /// tables, long and short sentences, abbreviations, emoji, Bosnian text, blank and multiple pages, rare giant
 /// sentences). Seeds are fixed, so a failure names the exact document to reproduce.
 /// </summary>

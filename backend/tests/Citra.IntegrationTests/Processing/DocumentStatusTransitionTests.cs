@@ -3,7 +3,7 @@ using Citra.Domain.Documents;
 namespace Citra.IntegrationTests.Processing;
 
 /// <summary>
-/// C-142: extraction may (re)start from any unfinished status — a retry or a crash takeover begins again from the
+/// Extraction may (re)start from any unfinished status — a retry or a crash takeover begins again from the
 /// first step — but never from a finished one: Ready/Failed documents go through ResetForReprocessing first.
 /// </summary>
 public sealed class DocumentStatusTransitionTests

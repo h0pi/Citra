@@ -12,7 +12,7 @@ using static Citra.IntegrationTests.Features.Chat.ChatData;
 
 namespace Citra.IntegrationTests.Features.Chat;
 
-/// <summary>C-187: thumbs up / down on answers, and the chat endpoints over HTTP (C-185).</summary>
+/// <summary>Thumbs up / down on answers, and the chat endpoints over HTTP.</summary>
 [Collection(DatabaseCollection.Name)]
 public sealed class RateAnswerTests(DatabaseFixture fixture)
 {

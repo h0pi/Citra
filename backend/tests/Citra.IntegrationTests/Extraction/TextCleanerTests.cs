@@ -3,7 +3,7 @@ using Citra.Infrastructure.Extraction;
 
 namespace Citra.IntegrationTests.Extraction;
 
-/// <summary>Text cleanup (C-120).</summary>
+/// <summary>Text cleanup.</summary>
 public sealed class TextCleanerTests
 {
     private static CancellationToken Ct => TestContext.Current.CancellationToken;

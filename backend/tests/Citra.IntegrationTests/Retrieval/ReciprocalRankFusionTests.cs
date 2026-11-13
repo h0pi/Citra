@@ -2,7 +2,7 @@ using Citra.Application.Common.Retrieval;
 
 namespace Citra.IntegrationTests.Retrieval;
 
-/// <summary>C-166: combining the vector and keyword rankings (Reciprocal Rank Fusion, k = 60).</summary>
+/// <summary>Combining the vector and keyword rankings (Reciprocal Rank Fusion, k = 60).</summary>
 public sealed class ReciprocalRankFusionTests
 {
     private static readonly ChunkHit A = Hit("A"), B = Hit("B"), C = Hit("C"), D = Hit("D");

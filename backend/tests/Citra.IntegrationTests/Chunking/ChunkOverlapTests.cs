@@ -5,7 +5,7 @@ using static Citra.IntegrationTests.Chunking.TextChunkerTests;
 
 namespace Citra.IntegrationTests.Chunking;
 
-/// <summary>Overlap between consecutive chunks (C-126).</summary>
+/// <summary>Overlap between consecutive chunks.</summary>
 public sealed class ChunkOverlapTests
 {
     private static readonly TiktokenTokenCounter Tokens = new();

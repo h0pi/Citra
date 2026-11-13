@@ -17,7 +17,7 @@ using Microsoft.Extensions.Time.Testing;
 namespace Citra.IntegrationTests.Processing;
 
 /// <summary>
-/// C-145: the final step saves, in one transaction, the chunks, the document as Ready with its page and chunk
+/// The final step saves, in one transaction, the chunks, the document as Ready with its page and chunk
 /// counts, and the job as Succeeded — and saves none of it if the job stopped being this worker's meanwhile.
 /// Runs on the isolated database because the runner test takes "the oldest due job" of all.
 /// </summary>

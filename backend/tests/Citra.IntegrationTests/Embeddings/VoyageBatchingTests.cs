@@ -10,7 +10,7 @@ using Citra.Infrastructure.Options;
 
 namespace Citra.IntegrationTests.Embeddings;
 
-/// <summary>Batching (C-135): many chunks per request, limited by count and tokens, results kept in order.</summary>
+/// <summary>Batching: many chunks per request, limited by count and tokens, results kept in order.</summary>
 public sealed class VoyageBatchingTests
 {
     private static CancellationToken Ct => TestContext.Current.CancellationToken;

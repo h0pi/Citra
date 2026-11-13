@@ -12,7 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Citra.IntegrationTests.Features.Auth;
 
-/// <summary>C-258: every night the demo loses what visitors left — their demo users, their chats and website chats.</summary>
+/// <summary>Every night the demo loses what visitors left — their demo users, their chats and website chats.</summary>
 [Collection(DatabaseCollection.Name)]
 public sealed class DemoResetTests(DatabaseFixture fixture)
 {

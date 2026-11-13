@@ -16,7 +16,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Citra.IntegrationTests.Api;
 
 /// <summary>
-/// C-178/C-179/C-184: POST /api/bots/{botId}/chat streams the answer as server-sent events (start, citations,
+/// POST /api/bots/{botId}/chat streams the answer as server-sent events (start, citations,
 /// token…, done; or error), and stops the model when the browser disconnects.
 /// </summary>
 [Collection(DatabaseCollection.Name)]
@@ -163,7 +163,7 @@ public sealed class ChatEndpointTests(DatabaseFixture fixture)
         events[^1].Data.GetRawText().ShouldNotContain("Secret");
     }
 
-    // ---------- C-184: leaving stops the model ----------
+    // ---------- Leaving stops the model ----------
 
     [Fact]
     public async Task Closing_the_connection_stops_the_model_and_saves_no_answer()

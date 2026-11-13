@@ -5,7 +5,7 @@ using static Citra.IntegrationTests.Chat.ChatPromptsTests;
 
 namespace Citra.IntegrationTests.Chat;
 
-/// <summary>C-173: the free stand-in model, which answers by quoting the sources it is given, with citations.</summary>
+/// <summary>The free stand-in model, which answers by quoting the sources it is given, with citations.</summary>
 public sealed class ExtractiveChatModelTests
 {
     private static CancellationToken Ct => TestContext.Current.CancellationToken;

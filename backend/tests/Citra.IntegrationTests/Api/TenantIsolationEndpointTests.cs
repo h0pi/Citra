@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Citra.IntegrationTests.Api;
 
 /// <summary>
-/// C-276: one company can never reach another's data through any main endpoint. Company A gets a bot, a document,
+/// One company can never reach another's data through any main endpoint. Company A gets a bot, a document,
 /// a chat and an evaluation; company B (an owner, so roles are no excuse) tries every endpoint that takes their
 /// ids: each answers 404, as for an id that does not exist, and A's data is unchanged afterwards.
 /// </summary>

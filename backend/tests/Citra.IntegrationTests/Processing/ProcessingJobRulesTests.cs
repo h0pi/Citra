@@ -2,7 +2,7 @@ using Citra.Domain.Documents;
 
 namespace Citra.IntegrationTests.Processing;
 
-/// <summary>C-146: the job's own retry rules — growing waits, 3 attempts, and giving up at once.</summary>
+/// <summary>The job's own retry rules — growing waits, 3 attempts, and giving up at once.</summary>
 public sealed class ProcessingJobRulesTests
 {
     private static readonly DateTimeOffset Now = new(2026, 9, 29, 12, 0, 0, TimeSpan.Zero);

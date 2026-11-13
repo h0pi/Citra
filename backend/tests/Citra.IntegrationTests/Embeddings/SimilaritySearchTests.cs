@@ -10,7 +10,7 @@ using Pgvector;
 namespace Citra.IntegrationTests.Embeddings;
 
 /// <summary>
-/// C-138: similar texts get similar vectors, and PostgreSQL (pgvector, cosine distance "&lt;=&gt;", the operator the
+/// Similar texts get similar vectors, and PostgreSQL (pgvector, cosine distance "&lt;=&gt;", the operator the
 /// search will use) returns the closest chunks first. One test always runs with hand-made vectors; the real one
 /// embeds with Voyage (opt-in, CITRA_REAL_API_TESTS=1).
 /// </summary>

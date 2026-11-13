@@ -10,7 +10,7 @@ using static Citra.IntegrationTests.Features.Chat.ChatData;
 
 namespace Citra.IntegrationTests.Features.Chat;
 
-/// <summary>C-185/C-186: the chat list, reopening a chat, deleting one, and chat titles.</summary>
+/// <summary>The chat list, reopening a chat, deleting one, and chat titles.</summary>
 [Collection(DatabaseCollection.Name)]
 public sealed class ConversationsTests(DatabaseFixture fixture)
 {
@@ -298,7 +298,7 @@ public sealed class ConversationsTests(DatabaseFixture fixture)
         await Should.ThrowAsync<NotFoundException>(() => scope.Send(new RenameConversationCommand(Guid.NewGuid(), "Mine")));
     }
 
-    // ---------- C-186: titles ----------
+    // ---------- Titles ----------
 
     [Fact]
     public async Task A_chat_is_named_after_its_first_question_and_keeps_that_name()

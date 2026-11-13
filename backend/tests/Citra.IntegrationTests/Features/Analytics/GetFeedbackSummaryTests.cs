@@ -7,7 +7,7 @@ using static Citra.IntegrationTests.Features.Chat.ChatData;
 
 namespace Citra.IntegrationTests.Features.Analytics;
 
-/// <summary>C-237: good and bad ratings of the period's answers, and the badly rated answers with their questions.</summary>
+/// <summary>Good and bad ratings of the period's answers, and the badly rated answers with their questions.</summary>
 [Collection(DatabaseCollection.Name)]
 public sealed class GetFeedbackSummaryTests(DatabaseFixture fixture)
 {

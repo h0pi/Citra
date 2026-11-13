@@ -12,7 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Citra.IntegrationTests.Processing;
 
 /// <summary>
-/// C-141: which jobs the Worker takes and that taking them is safe with several workers at once
+/// Which jobs the Worker takes and that taking them is safe with several workers at once
 /// (FOR UPDATE SKIP LOCKED), checked in PostgreSQL. Runs on its own database: every test starts with an empty
 /// job table, because the queue always takes "the oldest due job" of all.
 /// </summary>

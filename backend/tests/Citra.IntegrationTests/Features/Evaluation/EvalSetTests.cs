@@ -8,7 +8,7 @@ using static Citra.IntegrationTests.Features.Chat.ChatData;
 
 namespace Citra.IntegrationTests.Features.Evaluation;
 
-/// <summary>C-240: eval sets and their test questions — created, read, changed and deleted per bot.</summary>
+/// <summary>Eval sets and their test questions — created, read, changed and deleted per bot.</summary>
 [Collection(DatabaseCollection.Name)]
 public sealed class EvalSetTests(DatabaseFixture fixture)
 {

@@ -14,7 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Citra.IntegrationTests.Processing;
 
 /// <summary>
-/// C-147: a document's old chunks are replaced by the new ones, never mixed with them — when it is reprocessed
+/// A document's old chunks are replaced by the new ones, never mixed with them — when it is reprocessed
 /// (the command removes them at once) and in the final step itself (whatever left chunks behind), without
 /// touching any other document's chunks. Real command, real runner; isolated database (the runner takes the
 /// oldest due job of all).

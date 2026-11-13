@@ -8,7 +8,7 @@ using Citra.IntegrationTests.Infrastructure;
 
 namespace Citra.IntegrationTests.Features.Public;
 
-/// <summary>C-211: the widget loads a public bot by company and bot slug, without a login.</summary>
+/// <summary>The widget loads a public bot by company and bot slug, without a login.</summary>
 [Collection(DatabaseCollection.Name)]
 public sealed class GetPublicBotTests(DatabaseFixture fixture)
 {

@@ -28,7 +28,7 @@ python -m pip install reportlab python-docx
 python generate.py
 ```
 
-## Documents (C-252, C-253)
+## Documents
 
 Customer support:
 1. Shipping policy (zones, prices, delivery times — a table)
@@ -58,13 +58,13 @@ HR assistant:
 23. Code of conduct
 24. Performance reviews and salary bands (a table)
 
-## Test questions (C-254)
+## Test questions
 
 `eval/support-questions.csv` (22 questions) and `eval/hr-questions.csv` (18 questions): each with its expected
 answer and the document the answer comes from. They import straight into an eval set (Evaluation → Import CSV;
 columns `question`, `expected_answer`, `expected_document`). `eval/make_questions.py` writes them.
 
-## Seeding the demo (C-255)
+## Seeding the demo
 
 With the API and the Worker running, `seed.py` creates the whole demo through Citra's normal API (standard
 Python, no extra packages):
@@ -78,7 +78,7 @@ settings (Customer support is public for the website widget), uploads all docume
 bot from the CSV files. The Worker then reads the documents in the background; on Voyage's free tier this takes
 about 10 minutes. Running it again stops with "already exists" instead of creating a second copy.
 
-## Eval results (C-259)
+## Eval results
 
 Baseline with the free stand-in answer model (it copies matching sentences) and the free word judge
 (2026-11-10):

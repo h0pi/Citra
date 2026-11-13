@@ -13,7 +13,7 @@ using Npgsql;
 namespace Citra.IntegrationTests.Persistence;
 
 /// <summary>
-/// C-149: the documents table's trigger sends a "document_changes" notification for exactly the changes the
+/// The documents table's trigger sends a "document_changes" notification for exactly the changes the
 /// documents page shows — on commit only — with the document, its company and its bot.
 /// </summary>
 [Collection(DatabaseCollection.Name)]

@@ -16,7 +16,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 namespace Citra.IntegrationTests.Processing;
 
 /// <summary>
-/// C-142: pipeline step 1 — the document is marked Extracting (saved before the slow part starts), its text is
+/// Pipeline step 1 — the document is marked Extracting (saved before the slow part starts), its text is
 /// read with the real extractors and cleaned, and unreadable documents fail with a message for the user.
 /// Runs on the isolated database because the runner tests take "the oldest due job" of all.
 /// </summary>

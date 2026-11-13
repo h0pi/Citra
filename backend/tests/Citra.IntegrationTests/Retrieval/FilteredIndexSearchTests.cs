@@ -9,7 +9,7 @@ using static Citra.IntegrationTests.Retrieval.SearchData;
 namespace Citra.IntegrationTests.Retrieval;
 
 /// <summary>
-/// C-164: vector search through the fast (approximate) HNSW index, which finds the nearest chunks of all bots
+/// Vector search through the fast (approximate) HNSW index, which finds the nearest chunks of all bots
 /// before the bot filter is applied. Own database: the index's graph is built from every vector in the table.
 /// </summary>
 [Collection(SearchIndexCollection.Name)]

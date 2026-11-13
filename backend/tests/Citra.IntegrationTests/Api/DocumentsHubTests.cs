@@ -14,7 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Citra.IntegrationTests.Api;
 
 /// <summary>
-/// C-148: the documents hub of the real API (in memory). Only signed-in users connect; each receives its own
+/// The documents hub of the real API (in memory). Only signed-in users connect; each receives its own
 /// company's document updates and no other company's; the JSON matches the API's (camelCase, enums as text); and the
 /// browser way of connecting (WebSockets, token in the address) works — while a token in the address is refused
 /// for normal API calls.

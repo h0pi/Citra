@@ -2,7 +2,7 @@ using Citra.Application.Common.Chunking;
 
 namespace Citra.IntegrationTests.Chunking;
 
-/// <summary>Where sentences start (C-128). "|" in the expected text marks each boundary.</summary>
+/// <summary>Where sentences start. "|" in the expected text marks each boundary.</summary>
 public sealed class SentenceBoundariesTests
 {
     [Theory]

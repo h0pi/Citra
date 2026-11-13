@@ -20,7 +20,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Citra.IntegrationTests.Api;
 
 /// <summary>
-/// C-149: document changes made anywhere (here: straight in the database, and by the real processing pipeline, as
+/// Document changes made anywhere (here: straight in the database, and by the real processing pipeline, as
 /// the Worker does) reach the browsers of the document's company through the real API's listener and hub —
 /// and keep coming after the listener's database connection is lost.
 /// </summary>

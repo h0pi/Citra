@@ -8,7 +8,7 @@ using static Citra.IntegrationTests.Features.Chat.ChatData;
 
 namespace Citra.IntegrationTests.Features.Analytics;
 
-/// <summary>C-232: questions the documents could not answer ("knowledge gaps"), newest first, with their chats.</summary>
+/// <summary>Questions the documents could not answer ("knowledge gaps"), newest first, with their chats.</summary>
 [Collection(DatabaseCollection.Name)]
 public sealed class GetUnansweredQuestionsTests(DatabaseFixture fixture)
 {

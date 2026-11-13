@@ -13,7 +13,7 @@ using Microsoft.Extensions.Options;
 
 namespace Citra.IntegrationTests.Embeddings;
 
-/// <summary>The Voyage AI client (C-133), mostly against a fake HTTP handler, plus one real smoke test.</summary>
+/// <summary>The Voyage AI client, mostly against a fake HTTP handler, plus one real smoke test.</summary>
 public sealed class VoyageEmbeddingServiceTests
 {
     private static CancellationToken Ct => TestContext.Current.CancellationToken;

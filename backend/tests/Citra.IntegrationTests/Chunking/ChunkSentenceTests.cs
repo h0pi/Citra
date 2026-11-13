@@ -5,7 +5,7 @@ using static Citra.IntegrationTests.Chunking.TextChunkerTests;
 
 namespace Citra.IntegrationTests.Chunking;
 
-/// <summary>Chunks begin and end on whole sentences (C-128).</summary>
+/// <summary>Chunks begin and end on whole sentences.</summary>
 public sealed class ChunkSentenceTests
 {
     private static readonly TiktokenTokenCounter Tokens = new();
